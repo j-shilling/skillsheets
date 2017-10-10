@@ -80,17 +80,25 @@ var skillsheets = {
 	},
 	
 	redirectWithToken : function (url) {
-		var form = document.createElement('form');
-		form.method = 'post';
-		form.action = url;
-
-		var input = document.createElement('input');
-		input.type = 'hidden';
-		input.name = 'tokenid';
-		input.value = this.getIdToken();
-		form.appendChild(input);
-
-		form.submit();
+		var doAction = function() {
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', url, true);
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.onload = function() {
+				document.open('text/html');
+				document.write(xhr.responseText);
+				document.close();
+			};
+			xhr.send(
+					'{ \"tokenid\" : \"' + skillsheets.getIdToken() + '\" }'
+			);
+		};
+		
+		if (!this.authenticationIsInitialized() || !this.isSignedIn()) {
+			this.signIn().then(doAction);
+		} else {
+			doAction();
+		}
 	},
 	
 	profile : function() {

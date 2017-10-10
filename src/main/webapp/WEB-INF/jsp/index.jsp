@@ -12,11 +12,7 @@
 
 <script type="text/javascript">
 	function onLoad() {
-		skillsheets.signIn().then(function() {
-			document.getElementById("id").innerHTML = skillsheets.profile().getId();
-			document.getElementById("name").innerHTML = skillsheets.profile().getName();
-			skillsheets.redirectWithToken("http://localhost:8080/home/");
-		});
+		skillsheets.redirectWithToken("/home");
 	}
 </script>
 
@@ -25,9 +21,6 @@
 <body onload="onLoad()">
 
 <h1>index.jsp</h1>
-
-<p>ID: <label id="id"/></p>
-<p>FullName: <label id="name"/></p>
 
 </body>
 

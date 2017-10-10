@@ -1,40 +1,54 @@
 package com.shilling.skillsheets;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Collections;
+import java.util.Optional;
 
-import org.springframework.web.servlet.view.RedirectView;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 
-public class GoogleOAuth2Consumer {
+public class GoogleUserFactory {
 	
-	private static final String client_id = "407997016708-o3kmbrmnodmqtfmvp2j0hsu9uvh9ittn.apps.googleusercontent.com";
-	private static final String redirect_uri = "http://localhost:8080/oauth2callback";
-	private static final String response_type = "code";
-	private static final String scope = "profile email openid";
+	private final String client_id 
+		= "407997016708-o3kmbrmnodmqtfmvp2j0hsu9uvh9ittn.apps.googleusercontent.com";
 	
-	private String getUrlString() {
-		UriComponents uriComponents;
+	public Optional<User> getUser (TokenId tokenid) {
+		GoogleIdTokenVerifier verifier 
+			= new GoogleIdTokenVerifier.Builder (new NetHttpTransport(), new JacksonFactory())
+				.setAudience(Collections.singletonList(this.client_id))
+				.build();
+		
+		GoogleIdToken token = null;
+		
 		try {
-			uriComponents = UriComponentsBuilder.newInstance()
-					.scheme("https").host("accounts.google.com").path("/o/oauth2/v2/auth")
-					.queryParam("client_id", URLEncoder.encode(client_id, "UTF-8"))
-					.queryParam("redirect_uri", URLEncoder.encode(redirect_uri, "UTF-8"))
-					.queryParam("response_type", URLEncoder.encode(response_type, "UTF-8"))
-					.queryParam("scope", URLEncoder.encode(scope, "UTF-8"))
-					.build();
-			return uriComponents.toUriString();
-			
-		} catch (UnsupportedEncodingException e) {
+			token = verifier.verify(tokenid.toString());
+		} catch (GeneralSecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return "";
+			return Optional.empty();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return Optional.empty();
 		}
-	}
-	
-	public RedirectView authenticate() {
-		return new RedirectView(this.getUrlString());
+		
+		if (token == null)
+			return Optional.empty();
+		
+		Payload payload = token.getPayload();
+		User user = new User.Builder()
+				.setId(payload.getSubject())
+				.setEmail(payload.getEmail())
+				.setName((String) payload.get("name"))
+				.setFamilyName((String) payload.get("family_name"))
+				.setFirstName((String) payload.get("given_name"))
+				.build();
+		
+		return Optional.of(user);
 	}
 
 }
