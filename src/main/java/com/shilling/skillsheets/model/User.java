@@ -1,7 +1,20 @@
-package com.shilling.skillsheets;
+package com.shilling.skillsheets.model;
 
+/**
+ * A class to model user account information.
+ * 
+ * @author Jake Shilling
+ *
+ */
 public class User {
 	
+	/**
+	 * A mutable version of {@link#User} to make it easier to
+	 * construct.
+	 * 
+	 * @author Jake Shilling
+	 *
+	 */
 	public static class Builder {
 		private String id = "";
 		private String name = "";
@@ -30,7 +43,8 @@ public class User {
 			return this;
 		}
 		
-		User build() {
+		/** Construct an instance of User */
+		public User build() {
 			return new User (this.id, this.name, this.firstName,
 					this.familyName, this.email);
 		}

@@ -10,12 +10,27 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.shilling.skillsheets.model.TokenId;
+import com.shilling.skillsheets.model.User;
 
+/**
+ * A class to validated Google's Token ID from the client and get
+ * user information.
+ * 
+ * @author Jake
+ *
+ */
 public class GoogleUserFactory {
 	
-	private final String client_id 
-		= "407997016708-o3kmbrmnodmqtfmvp2j0hsu9uvh9ittn.apps.googleusercontent.com";
+	private final String client_id =
+		"407997016708-o3kmbrmnodmqtfmvp2j0hsu9uvh9ittn.apps.googleusercontent.com";
 	
+	/**
+	 * Get a user from a given token id string.
+	 * 
+	 * @param tokenid	The Token ID from the client.
+	 * @return			The user account if found; an Optional.empty() otherwise.
+	 */
 	public Optional<User> getUser (TokenId tokenid) {
 		GoogleIdTokenVerifier verifier 
 			= new GoogleIdTokenVerifier.Builder (new NetHttpTransport(), new JacksonFactory())

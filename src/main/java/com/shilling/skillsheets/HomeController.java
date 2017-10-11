@@ -9,6 +9,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.shilling.skillsheets.model.TokenId;
+import com.shilling.skillsheets.model.User;
+
+/**
+ * A class to receive and process HTTP requests.
+ * 
+ * @author Jake Shilling
+ *
+ */
 @Controller
 public class HomeController {
 	
@@ -19,11 +28,13 @@ public class HomeController {
 		this.users = users;
 	}
 	
+	/** Return index.jsp */
 	@RequestMapping("/")
 	public String index(ModelMap model) {
 		return "index";
 	}
 	
+	/** Validate user and return home.jsp on success */
 	@RequestMapping(value = "/home", 
 			method = RequestMethod.POST,
 			consumes = {"application/json"})
