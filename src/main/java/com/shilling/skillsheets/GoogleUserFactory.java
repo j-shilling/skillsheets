@@ -5,6 +5,9 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -24,6 +27,8 @@ public class GoogleUserFactory {
 	
 	private final String client_id =
 		"407997016708-o3kmbrmnodmqtfmvp2j0hsu9uvh9ittn.apps.googleusercontent.com";
+	private final Logger logger =
+			LogManager.getLogger(GoogleUserFactory.class);
 	
 	/**
 	 * Get a user from a given token id string.
@@ -32,6 +37,8 @@ public class GoogleUserFactory {
 	 * @return			The user account if found; an Optional.empty() otherwise.
 	 */
 	public Optional<User> getUser (TokenId tokenid) {
+		this.logger.traceEntry();
+		
 		GoogleIdTokenVerifier verifier 
 			= new GoogleIdTokenVerifier.Builder (new NetHttpTransport(), new JacksonFactory())
 				.setAudience(Collections.singletonList(this.client_id))
@@ -42,12 +49,12 @@ public class GoogleUserFactory {
 		try {
 			token = verifier.verify(tokenid.toString());
 		} catch (GeneralSecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			this.logger.error(e.getMessage());
+			this.logger.traceExit("Returning Optional.empty()");
 			return Optional.empty();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			this.logger.error(e.getMessage());
+			this.logger.traceExit("Returning Optional.empty()");
 			return Optional.empty();
 		}
 		
@@ -63,6 +70,7 @@ public class GoogleUserFactory {
 				.setFirstName((String) payload.get("given_name"))
 				.build();
 		
+		this.logger.traceExit(user.toString());
 		return Optional.of(user);
 	}
 
