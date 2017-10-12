@@ -21,6 +21,7 @@ public class User {
 		private String firstName = "";
 		private String familyName = "";
 		private String email = "";
+		private String imageurl = "";
 		
 		public Builder setId(String id) {
 			this.id = id;
@@ -43,10 +44,15 @@ public class User {
 			return this;
 		}
 		
+		public Builder setImageUrl(String url) {
+			this.imageurl = url;
+			return this;
+		}
+		
 		/** Construct an instance of User */
 		public User build() {
 			return new User (this.id, this.name, this.firstName,
-					this.familyName, this.email);
+					this.familyName, this.email, this.imageurl);
 		}
 	}
 	
@@ -55,15 +61,17 @@ public class User {
 	private final String firstName;
 	private final String familyName;
 	private final String email;
+	private final String imageurl;
 	
 	public User (String id, String name, String firstName,
-			String familyName, String email) {
+			String familyName, String email, String imageurl) {
 		
 		this.id = id != null ? id : "";
 		this.name = name != null ? name : "";
 		this.firstName = firstName != null ? firstName : "";
 		this.familyName = familyName != null ? familyName : "";
 		this.email = email != null ? email : "";
+		this.imageurl = imageurl != null ? imageurl : "";
 	
 	}
 
@@ -85,6 +93,10 @@ public class User {
 
 	public String getEmail() {
 		return email;
+	}
+	
+	public String getImageUrl() {
+		return imageurl;
 	}
 	
 	@Override

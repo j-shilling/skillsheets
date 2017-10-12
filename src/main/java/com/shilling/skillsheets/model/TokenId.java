@@ -12,10 +12,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class TokenId {
 	
 	private final String tokenId;
+	private final String imageurl;
 	
 	@JsonCreator
-	public TokenId(@JsonProperty("tokenid") String val) {
+	public TokenId(@JsonProperty("tokenid") String val,
+			@JsonProperty("imageurl") String imageurl) {
 		this.tokenId = val;
+		this.imageurl = imageurl;
 	}
 	
 	/**
@@ -26,6 +29,11 @@ public class TokenId {
 	@JsonProperty ("tokenid")
 	public String getTokenId() {
 		return this.tokenId;
+	}
+	
+	@JsonProperty ("imageurl")
+	public String getImageUrl() {
+		return this.imageurl;
 	}
 	
 	/**

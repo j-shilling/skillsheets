@@ -68,6 +68,7 @@ public class GoogleUserFactory {
 				.setName((String) payload.get("name"))
 				.setFamilyName((String) payload.get("family_name"))
 				.setFirstName((String) payload.get("given_name"))
+				.setImageUrl(tokenid.getImageUrl())
 				.build();
 		
 		this.logger.traceExit(user.toString());

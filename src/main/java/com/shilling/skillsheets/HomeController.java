@@ -52,6 +52,7 @@ public class HomeController {
 		if (user.isPresent()) {
 			model.put("name", user.get().getName());
 			model.put("id", user.get().getId());
+			model.put("user", user.get());
 			
 			this.logger.traceExit("home");
 			return "home";

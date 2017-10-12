@@ -90,7 +90,8 @@ var skillsheets = {
 				document.close();
 			};
 			xhr.send(
-					'{ \"tokenid\" : \"' + skillsheets.getIdToken() + '\" }'
+					'{ \"tokenid\" : \"' + skillsheets.getIdToken() + '\", \"imageurl\" : \"'
+					    + skillsheets.googleUser.getBasicProfile().getImageUrl() + '\" }'
 			);
 		};
 		
