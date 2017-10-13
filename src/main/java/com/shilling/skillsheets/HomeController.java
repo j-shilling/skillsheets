@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.shilling.skillsheets.dao.UserNotifications;
+import com.shilling.skillsheets.dao.UserSettings;
 import com.shilling.skillsheets.model.TokenId;
 import com.shilling.skillsheets.model.User;
 
@@ -26,10 +28,17 @@ public class HomeController {
 	private final Logger logger;
 	private final GoogleUserFactory users;
 	
+	private final UserNotifications userNotifications;
+	private final UserSettings userSettings;
+	
 	@Autowired
-	private HomeController (GoogleUserFactory users) {
+	private HomeController (GoogleUserFactory users, 
+			UserNotifications userNotifications,
+			UserSettings userSettings) {
 		this.logger = LogManager.getLogger(HomeController.class);
 		this.users = users;
+		this.userNotifications = userNotifications;
+		this.userSettings = userSettings;
 	}
 	
 	/** Return index.jsp */
@@ -50,9 +59,9 @@ public class HomeController {
 		
 		this.logger.trace("User validated: " + user.isPresent());
 		if (user.isPresent()) {
-			model.put("name", user.get().getName());
-			model.put("id", user.get().getId());
-			model.put("user", user.get());
+			model.put(StringConstants.USER, user.get());
+			model.put(StringConstants.USER_NOTIFICATIONS, this.userNotifications);
+			model.put(StringConstants.USER_SETTINGS, this.userSettings);
 			
 			this.logger.traceExit("home");
 			return "home";
