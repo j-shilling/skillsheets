@@ -48,6 +48,23 @@ var skillsheets = {
 	isSignedIn : function() {
 		return this.googleUser != null;
 	},
+	
+	ifSignedIn : function (onTrue, onFalse) {
+		onTrue = onTrue || function() {};
+		onFalse = onFalse || function() {};
+		
+		var afterInit = function(onTrue, onFalse) {
+			if (skillsheets.auth2.isSignedIn.get())
+				onTrue();
+			else
+				onFalse();
+		}
+		
+		if (skillsheets.authenticationIsInitialized())
+			afterInit();
+		else
+			skillsheets.initAuthentication().then(afterInit);
+	},
 
 	signIn : function() {
 		return new Promise (
@@ -69,6 +86,31 @@ var skillsheets = {
 							});
 						}
 					}
+				});
+	},
+	
+	signOut : function() {
+		return new Promise (
+				function(resolve, reject) {
+					
+					var onResolve = function() {
+						console.log ('Sign out successfull.');
+						resolve();
+					}
+					
+					var onReject = function(error) {
+						console.log ('Sign out error.');
+						reject();
+					}
+					
+					var afterInit = function() {
+						skillsheets.auth2.signOut().then(onResolve, onReject);
+					};
+					
+					if (skillsheets.authenticationIsInitialized())
+						afterInit();
+					else
+						skillsheets.initAuthentication().then(afterInit);
 				});
 	},
 	

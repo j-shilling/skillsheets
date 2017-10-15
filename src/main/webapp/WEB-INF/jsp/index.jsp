@@ -8,17 +8,14 @@
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <title>Skill Sheets</title>
-
-<script type="text/javascript">
-	function onLoad() {
-		skillsheets.redirectWithToken("/home");
-	}
-</script>
 
 </head>
 
-<body onload="onLoad()">
+<body>
+
+<jsp:include page="header.jsp" />
 
 <h1>index.jsp</h1>
 
