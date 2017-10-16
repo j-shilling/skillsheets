@@ -24,12 +24,6 @@
 <body class="w3-light-gray">
 
 <jsp:include page="header.jsp" />
-
-<h1>Home JSP</h1>
-
-<p>Hello, <b><%=user.getName() %></b>! Your Google Id is <b><%=user.getId() %></b> and 
-your image url is <b><%=user.getImageUrl() %></b></p>
-
+<h1>settings.jsp</h1>
 </body>
-
 </html>

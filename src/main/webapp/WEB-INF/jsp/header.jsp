@@ -17,7 +17,8 @@
 
 <div class="w3-bar w3-white w3-padding" style="height:56px">
 
-	<img class="w3-bar-item w3-left" style="height:40px" src="/resources/img/logo.png">
+	<img class="w3-bar-item w3-left" style="height:40px" src="/resources/img/logo.png"
+		onClick="skillsheets.redirectWithToken('/home')">
 	
 	<c:if test="${user != null}">
 	
@@ -33,7 +34,10 @@
 					<%=user.getName() %><br>
 					<%=user.getEmail() %>
 				</span>
-				<span class="w3-bar-item w3-button">Settings</span>
+				<span class="w3-bar-item w3-button"
+						onClick="skillsheets.redirectWithToken('/settings')">
+					Settings
+				</span>
 				<span class="w3-bar-item w3-button" 
 				      onClick="skillsheets.signOut().then(function() { window.location.href = '/';} )">
 				   Logout
@@ -83,9 +87,9 @@
 	
 	<c:if test="${user == null}">
 	
+		<script>skillsheets.ifSignedIn(skillsheets.redirectWithToken('/home'));</script>
 		<span class = "w3-bar-item w3-right w3-text-red w3-large w3-button"
 				onClick = "skillsheets.signIn().then(skillsheets.redirectWithToken('/home'))"
-				onLoad = "skillsheets.ifSignedIn(skillsheets.redirectWithToken('/home'))"
 		>
 			Sign In
 		</span>

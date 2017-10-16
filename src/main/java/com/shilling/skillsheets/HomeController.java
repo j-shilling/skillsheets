@@ -70,5 +70,28 @@ public class HomeController {
 			return "index";
 		}
 	}
+	
+	/** Validate user and return home.jsp on success */
+	@RequestMapping(value = "/settings", 
+			method = RequestMethod.POST,
+			consumes = {"application/json"})
+	public String settings(@RequestBody TokenId tokenid, ModelMap model) {
+		this.logger.traceEntry();
+		
+		Optional<User> user = this.users.getUser(tokenid);
+		
+		this.logger.trace("User validated: " + user.isPresent());
+		if (user.isPresent()) {
+			model.put(StringConstants.USER, user.get());
+			model.put(StringConstants.USER_NOTIFICATIONS, this.userNotifications);
+			model.put(StringConstants.USER_SETTINGS, this.userSettings);
+			
+			this.logger.traceExit("settings");
+			return "settings";
+		} else {
+			this.logger.traceExit("index");
+			return "index";
+		}
+	}
 
 }
