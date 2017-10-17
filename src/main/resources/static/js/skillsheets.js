@@ -2,7 +2,7 @@ var skillsheets = {
 	auth2 : null,
 	googleUser : null,
 
-	initAuthentication : function() {
+	init : function() {
 		return new Promise(
 				function(resolve, reject) {
 					if (!skillsheets.authenticationIsInitialized()) {
@@ -42,7 +42,10 @@ var skillsheets = {
 						window.onpopstate = function(event) {
 							if (event.state != null) {
 								if ('page' in event.state) {
-									skillsheets.redirectWithToken (event.state.page);
+									if (event.state.withtoken)
+										skillsheets.redirectWithToken (event.state.page);
+									else
+										window.location.href = event.state.page; 
 								}
 							}
 						};
@@ -113,23 +116,19 @@ var skillsheets = {
 					
 					var onResolve = function() {
 						console.log ('Sign out successfull.');
+						skillsheets.googleUser = null;
 						resolve();
 					}
 					
 					var onReject = function(error) {
-						console.log ('Sign out error.');
+						console.log ('Sign out error:' + error);
 						reject();
 					}
 					
-					var afterInit = function() {
-						skillsheets.auth2.signOut().then(onResolve, onReject);
-						skillsheets.googleUser = null;
-					};
-					
 					if (skillsheets.authenticationIsInitialized())
-						afterInit();
+						skillsheets.auth2.signOut().then(onResolve, onReject);
 					else
-						skillsheets.initAuthentication().then(afterInit);
+						skillsheets.initAuthentication().then(skillsheets.signOut(resolve,reject));
 				});
 	},
 	
@@ -141,7 +140,20 @@ var skillsheets = {
 	},
 	
 	redirectWithToken : function (url) {
-		var doAction = function() {
+		var doaction = function() {
+			var dest = window.location.protocol 
+							+ "//" + skillsheets.getIdToken() 
+							+ "@" + window.location.host + url;
+			window.location.href = dest;
+		};
+		
+		if (!this.authenticationIsInitialized() || !this.isSignedIn()) {
+			this.signIn().then(doaction);
+		} else {
+			doaction();
+		}
+		
+		/*var doAction = function() {
 			var xhr = new XMLHttpRequest();
 			xhr.open('POST', url, true);
 			xhr.setRequestHeader('Content-Type', 'application/json');
@@ -150,7 +162,7 @@ var skillsheets = {
 				document.write(xhr.responseText);
 				document.close();
 				
-				history.pushState({ page : url },
+				history.pushState({ page : url, withtoken : true },
 								  "", url);
 			};
 			xhr.send(
@@ -163,7 +175,7 @@ var skillsheets = {
 			this.signIn().then(doAction);
 		} else {
 			doAction();
-		}
+		}*/
 	},
 	
 	profile : function() {

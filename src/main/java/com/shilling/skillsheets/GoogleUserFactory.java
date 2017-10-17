@@ -36,6 +36,53 @@ public class GoogleUserFactory {
 	 * @param tokenid	The Token ID from the client.
 	 * @return			The user account if found; an Optional.empty() otherwise.
 	 */
+	public Optional<User> getUser (String tokenid) {
+		this.logger.traceEntry();
+		
+		if (tokenid == null || tokenid.isEmpty())
+			return Optional.empty();
+		
+		GoogleIdTokenVerifier verifier 
+			= new GoogleIdTokenVerifier.Builder (new NetHttpTransport(), new JacksonFactory())
+				.setAudience(Collections.singletonList(this.client_id))
+				.build();
+		
+		GoogleIdToken token = null;
+		
+		try {
+			token = verifier.verify(tokenid);
+		} catch (GeneralSecurityException e) {
+			this.logger.error(e.getMessage());
+			this.logger.traceExit("Returning Optional.empty()");
+			return Optional.empty();
+		} catch (IOException e) {
+			this.logger.error(e.getMessage());
+			this.logger.traceExit("Returning Optional.empty()");
+			return Optional.empty();
+		}
+		
+		if (token == null)
+			return Optional.empty();
+		
+		Payload payload = token.getPayload();
+		User user = new User.Builder()
+				.setId(payload.getSubject())
+				.setEmail(payload.getEmail())
+				.setName((String) payload.get("name"))
+				.setFamilyName((String) payload.get("family_name"))
+				.setFirstName((String) payload.get("given_name"))
+				.build();
+		
+		this.logger.traceExit(user.toString());
+		return Optional.of(user);
+	}
+	
+	/**
+	 * Get a user from a given token id string.
+	 * 
+	 * @param tokenid	The Token ID from the client.
+	 * @return			The user account if found; an Optional.empty() otherwise.
+	 */
 	public Optional<User> getUser (TokenId tokenid) {
 		this.logger.traceEntry();
 		
@@ -68,7 +115,6 @@ public class GoogleUserFactory {
 				.setName((String) payload.get("name"))
 				.setFamilyName((String) payload.get("family_name"))
 				.setFirstName((String) payload.get("given_name"))
-				.setImageUrl(tokenid.getImageUrl())
 				.build();
 		
 		this.logger.traceExit(user.toString());
