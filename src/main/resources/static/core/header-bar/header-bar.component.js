@@ -11,7 +11,7 @@ angular
 				
 				$interval(function() {
 					$scope.msgs = msgService.getUserMsgs({}, userService.getIdToken());
-				}, 30000);
+				}, 10000);
 				
 				this.viewing = 'all';
 		

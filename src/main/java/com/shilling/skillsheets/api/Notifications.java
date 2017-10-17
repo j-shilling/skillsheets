@@ -33,14 +33,23 @@ public class Notifications {
 	public Notification[] getNotifications (@RequestBody(required = false) String tokenid) {
 		this.logger.traceEntry();
 		Optional<User> user = this.users.getUser(tokenid);
-		if (!user.isPresent())
-			return new Notification[0];
+		//if (!user.isPresent())
+		//	return new Notification[0];
 		
 		int rand = new Random().nextInt(10);
 		Notification[] ret = new Notification[rand];
 		
 		for (int i = 0; i < rand; i ++)
-			ret[i] = new Notification(Integer.toString(i));
+			ret[i] = new Notification(i, Integer.toString(i),
+						(Notification.Action[]) ((rand % 2) == 0 ? 
+								new Notification.Action[]
+									{
+										Notification.Action.create(new Random().nextInt(3)) 
+									}
+								: new Notification.Action[] 
+									{ Notification.Action.create(new Random().nextInt(3)),
+										Notification.Action.create(new Random().nextInt(3)) 
+									}));
 		
 		return ret;
 	}

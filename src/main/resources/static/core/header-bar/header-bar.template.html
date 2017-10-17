@@ -35,9 +35,24 @@
 				style="width: 40px; height: 40px; padding: 0; line-height: 40px; margin-left: 50px">
 				<b>{{msgs.length}}</b>
 			</span>
+
 			<div class="w3-dropdown-content w3-bar-block"
 				style="position: fixed; top: 56px">
-				<span class="w3-bar-item w3-button">Message Here</span>
+
+				<div class="w3-border w3-container w3-padding" ng-repeat="msg in msgs">
+					<span class="w3-section">
+
+						{{msg.text}}
+
+						<div ng-repeat="act in msg.actions">
+							<span class="w3-margin w3-button w3-right {{act.color}}"
+									style="width:100px">
+								{{act.text}} </span>
+						</div>
+					</span>
+
+
+				</div>
 			</div>
 		</div>
 	</div>
