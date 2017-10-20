@@ -13,7 +13,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.shilling.skillsheets.model.TokenId;
+import com.shilling.skillsheets.model.Tokens;
 import com.shilling.skillsheets.model.User;
 
 /**
@@ -36,87 +36,45 @@ public class GoogleUserFactory {
 	 * @param tokenid	The Token ID from the client.
 	 * @return			The user account if found; an Optional.empty() otherwise.
 	 */
-	public Optional<User> getUser (String tokenid) {
+	public Optional<User> getUser (Tokens tokens) {
 		this.logger.traceEntry();
 		
-		if (tokenid == null || tokenid.isEmpty())
-			return Optional.empty();
-		
-		GoogleIdTokenVerifier verifier 
+		User.Builder builder = new User.Builder(tokens);
+		if (tokens.getIdToken().isPresent()) {
+			String id_token = tokens.getIdToken().get();
+			
+			GoogleIdTokenVerifier verifier 
 			= new GoogleIdTokenVerifier.Builder (new NetHttpTransport(), new JacksonFactory())
 				.setAudience(Collections.singletonList(this.client_id))
 				.build();
-		
-		GoogleIdToken token = null;
-		
-		try {
-			token = verifier.verify(tokenid);
-		} catch (GeneralSecurityException e) {
-			this.logger.error(e.getMessage());
-			this.logger.traceExit("Returning Optional.empty()");
-			return Optional.empty();
-		} catch (IOException e) {
-			this.logger.error(e.getMessage());
-			this.logger.traceExit("Returning Optional.empty()");
-			return Optional.empty();
+			
+			GoogleIdToken token = null;
+			
+			try {
+				token = verifier.verify(id_token);
+			} catch (GeneralSecurityException e) {
+				this.logger.error(e.getMessage());
+				this.logger.traceExit("Returning Optional.empty()");
+				return Optional.empty();
+			} catch (IOException e) {
+				this.logger.error(e.getMessage());
+				this.logger.traceExit("Returning Optional.empty()");
+				return Optional.empty();
+			}
+			
+			if (token == null)
+				return Optional.empty();
+			
+			Payload payload = token.getPayload();
+			
+			builder = builder.setId(payload.getSubject())
+						.setEmail(payload.getEmail())
+						.setName((String) payload.get("name"))
+						.setFamilyName((String) payload.get("family_name"))
+						.setFirstName((String) payload.get("given_name"));
 		}
 		
-		if (token == null)
-			return Optional.empty();
-		
-		Payload payload = token.getPayload();
-		User user = new User.Builder()
-				.setId(payload.getSubject())
-				.setEmail(payload.getEmail())
-				.setName((String) payload.get("name"))
-				.setFamilyName((String) payload.get("family_name"))
-				.setFirstName((String) payload.get("given_name"))
-				.build();
-		
-		this.logger.traceExit(user.toString());
-		return Optional.of(user);
-	}
-	
-	/**
-	 * Get a user from a given token id string.
-	 * 
-	 * @param tokenid	The Token ID from the client.
-	 * @return			The user account if found; an Optional.empty() otherwise.
-	 */
-	public Optional<User> getUser (TokenId tokenid) {
-		this.logger.traceEntry();
-		
-		GoogleIdTokenVerifier verifier 
-			= new GoogleIdTokenVerifier.Builder (new NetHttpTransport(), new JacksonFactory())
-				.setAudience(Collections.singletonList(this.client_id))
-				.build();
-		
-		GoogleIdToken token = null;
-		
-		try {
-			token = verifier.verify(tokenid.toString());
-		} catch (GeneralSecurityException e) {
-			this.logger.error(e.getMessage());
-			this.logger.traceExit("Returning Optional.empty()");
-			return Optional.empty();
-		} catch (IOException e) {
-			this.logger.error(e.getMessage());
-			this.logger.traceExit("Returning Optional.empty()");
-			return Optional.empty();
-		}
-		
-		if (token == null)
-			return Optional.empty();
-		
-		Payload payload = token.getPayload();
-		User user = new User.Builder()
-				.setId(payload.getSubject())
-				.setEmail(payload.getEmail())
-				.setName((String) payload.get("name"))
-				.setFamilyName((String) payload.get("family_name"))
-				.setFirstName((String) payload.get("given_name"))
-				.build();
-		
+		User user = builder.build();
 		this.logger.traceExit(user.toString());
 		return Optional.of(user);
 	}

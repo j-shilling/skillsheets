@@ -1,5 +1,9 @@
 package com.shilling.skillsheets.model;
 
+import java.util.Optional;
+
+import com.google.common.base.Preconditions;
+
 /**
  * A class to model user account information.
  * 
@@ -16,12 +20,18 @@ public class User {
 	 *
 	 */
 	public static class Builder {
-		private String id = "";
-		private String name = "";
-		private String firstName = "";
-		private String familyName = "";
-		private String email = "";
-		private String imageurl = "";
+		private String id = null;
+		private String name = null;
+		private String firstName = null;
+		private String familyName = null;
+		private String email = null;
+		
+		private final Tokens tokens;
+		
+		public Builder (Tokens tokens) {
+			Preconditions.checkNotNull(tokens);
+			this.tokens = tokens;
+		}
 		
 		public Builder setId(String id) {
 			this.id = id;
@@ -44,64 +54,72 @@ public class User {
 			return this;
 		}
 		
-		public Builder setImageUrl(String url) {
-			this.imageurl = url;
-			return this;
-		}
-		
 		/** Construct an instance of User */
 		public User build() {
-			return new User (this.id, this.name, this.firstName,
-					this.familyName, this.email, this.imageurl);
+			return new User (
+					this.id, 
+					this.name,
+					this.firstName,
+					this.familyName, 
+					this.email,
+					this.tokens);
 		}
 	}
 	
-	private final String id;
-	private final String name;
-	private final String firstName;
-	private final String familyName;
-	private final String email;
-	private final String imageurl;
+	private final Optional<String> id;
+	private final Optional<String> name;
+	private final Optional<String> firstName;
+	private final Optional<String> familyName;
+	private final Optional<String> email;
 	
-	public User (String id, String name, String firstName,
-			String familyName, String email, String imageurl) {
+	private final Tokens tokens;
+	
+	public User (
+			String id,
+			String name, 
+			String firstName,
+			String familyName, 
+			String email,
+			
+			Tokens tokens) {
 		
-		this.id = id != null ? id : "";
-		this.name = name != null ? name : "";
-		this.firstName = firstName != null ? firstName : "";
-		this.familyName = familyName != null ? familyName : "";
-		this.email = email != null ? email : "";
-		this.imageurl = imageurl != null ? imageurl : "";
+		Preconditions.checkNotNull(tokens);
+		this.tokens = tokens;
+		
+		this.id = Optional.ofNullable(id);
+		this.name = Optional.ofNullable(name);
+		this.firstName = Optional.ofNullable(firstName);
+		this.familyName = Optional.ofNullable(familyName);
+		this.email = Optional.ofNullable(email);
 	
 	}
 
-	public String getId() {
+	public Optional<String> getId() {
 		return id;
 	}
 
-	public String getName() {
+	public Optional<String> getName() {
 		return name;
 	}
 
-	public String getFirstName() {
+	public Optional<String> getFirstName() {
 		return firstName;
 	}
 
-	public String getFamilyName() {
+	public Optional<String> getFamilyName() {
 		return familyName;
 	}
 
-	public String getEmail() {
+	public Optional<String> getEmail() {
 		return email;
 	}
 	
-	public String getImageUrl() {
-		return imageurl;
+	public Optional<String> getIdToken() {
+		return this.tokens.getIdToken();
 	}
 	
-	@Override
-	public String toString() {
-		return this.getName() + "<" + this.getEmail() + ">";
+	public Optional<String> getAuthCode() {
+		return this.tokens.getAuthCode();
 	}
 
 }

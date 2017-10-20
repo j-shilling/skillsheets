@@ -20,7 +20,7 @@ angular
 																	{
 																		client_id : '407997016708-o3kmbrmnodmqtfmvp2j0hsu9uvh9ittn.apps.googleusercontent.com',
 																		fetch_basic_profile : true,
-																		scope : 'profile'
+																		scope : 'profile https://www.googleapis.com/auth/drive.appfolder'
 																	})
 															.then(
 																	function() {
@@ -88,6 +88,23 @@ angular
 								}
 							}
 						});
+			},
+			
+			requestCode : function () {
+				var self = this;
+				
+				return new Promise(function (resolve, reject) {
+					if (!self.isInitialized())
+						self.init().then(function () {
+							self.auth2.grantOfflineAccess({
+								scope: 'profile https://www.googleapis.com/auth/drive.appfolder'
+							}).then (resolve, reject);
+						});
+					else
+						self.auth2.grantOfflineAccess({
+							scope: 'profile https://www.googleapis.com/auth/drive.appfolder'
+						}).then (resolve, reject);
+				});
 			},
 			
 			signOut : function() {

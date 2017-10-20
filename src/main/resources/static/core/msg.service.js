@@ -17,7 +17,13 @@ angular
 			});
 			
 			self.getMsgs = function () {
-				return self.getUserMsgs({}, userService.getIdToken());
+				return new Promise (function(resolve, reject) {
+					userService.requestCode().then (function(resp) {
+						var result = self.getUserMsgs({},
+								'{ "auth_code" : "' + resp.code + '" }');
+						resolve (result);
+					}, reject);
+				});
 			}
 			
 			self.respond = function (id, value) {

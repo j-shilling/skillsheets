@@ -10,8 +10,9 @@
 
 	<context:annotation-config/>
 	
-	<bean id="GoogleUserFactor" class="com.shilling.skillsheets.GoogleUserFactory" />
+	<bean id="GoogleUserFactory" class="com.shilling.skillsheets.GoogleUserFactory" />
 	<bean id="UserNotifications" class="com.shilling.skillsheets.dao.UserNotificationsImpl" />
 	<bean id="UserSettings" class="com.shilling.skillsheets.dao.UserSettingsImpl" />
+	<bean id="GoogleDriveFactory" class="com.shilling.skillsheets.GoogleDriveFactory" />
    
 </beans>

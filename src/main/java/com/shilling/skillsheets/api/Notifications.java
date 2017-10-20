@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shilling.skillsheets.GoogleUserFactory;
+import com.shilling.skillsheets.dao.UserNotifications;
 import com.shilling.skillsheets.model.Notification;
+import com.shilling.skillsheets.model.Tokens;
 import com.shilling.skillsheets.model.User;
 
 @RestController
@@ -21,19 +23,22 @@ public class Notifications {
 	
 	private final Logger logger;
 	private final GoogleUserFactory users;
+	private final UserNotifications dao;
 	
 	@Autowired
-	private Notifications (GoogleUserFactory users) {
+	private Notifications (GoogleUserFactory users,
+			UserNotifications dao) {
 		this.logger = LogManager.getLogger(Notifications.class);
 		this.users = users;
+		this.dao = dao;
 	}
 
 	@RequestMapping(value = "/api/messages",
 			method = RequestMethod.POST,
 			consumes="application/json")
-	public Notification[] getNotifications (@RequestBody(required = false) String tokenid) {
+	public Notification[] getNotifications (@RequestBody(required = false) Tokens tokens) {
 		this.logger.traceEntry();
-		Optional<User> user = this.users.getUser(tokenid);
+		Optional<User> user = this.users.getUser(tokens);
 		if (!user.isPresent())
 			return new Notification[0];
 		
@@ -51,7 +56,7 @@ public class Notifications {
 									{ Notification.Action.create(new Random().nextInt(3)),
 										Notification.Action.create(new Random().nextInt(3)) 
 									}));
-		
+		this.notify(user.get(), "You checked for messages!");
 		return ret;
 	}
 	
@@ -61,10 +66,10 @@ public class Notifications {
 	public void respontToNotifications (
 			@PathVariable final int msgId,
 			@PathVariable final int actionId,
-			@RequestBody String tokenid) {
+			@RequestBody Tokens tokens) {
 		
 		this.logger.traceEntry();
-		Optional<User> user = this.users.getUser(tokenid);
+		Optional<User> user = this.users.getUser(tokens);
 		if (!user.isPresent()) {
 			this.logger.error("User responding to notification with invalid id token.");
 			return;
@@ -80,5 +85,17 @@ public class Notifications {
 		}
 		
 		this.logger.warn("This method is not yet written.");
+	}
+	
+	public void notify (final User user, final String message) {
+		if (user == null)
+			return;
+		if (message == null || message.isEmpty())
+			return;
+		
+		Notification msg = new Notification (this.dao.getNextMessageId(user),
+				message, Notification.Action.OK);
+		
+		this.dao.saveMessage(user, msg);
 	}
 }
