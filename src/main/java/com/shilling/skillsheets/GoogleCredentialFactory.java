@@ -1,5 +1,6 @@
 package com.shilling.skillsheets;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.TokenRequest;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
@@ -32,7 +34,7 @@ public class GoogleCredentialFactory {
 	private final List<String> scopes;
 
 	private GoogleCredentialFactory() {
-		this.logger = LogManager.getLogger(GoogleDriveFactory.class);
+		this.logger = LogManager.getLogger(GoogleCredentialFactory.class);
 		this.jsonFactory = JacksonFactory.getDefaultInstance();
 
 		HttpTransport httpTransport = null;
@@ -40,7 +42,8 @@ public class GoogleCredentialFactory {
 		try {
 
 			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-			dataStoreFactory = new FileDataStoreFactory (new java.io.File(System.getProperty("user.home"), ".credentials/skill-sheets"));
+			dataStoreFactory = 
+					new FileDataStoreFactory (new File(System.getProperty("user.home"), ".credentials/skill-sheets"));
 			
 
 		} catch (GeneralSecurityException e) {
@@ -57,8 +60,13 @@ public class GoogleCredentialFactory {
 	}
 
 	public Optional<Credential> authorize(final User user) {
-		if (!user.getId().isPresent())
+		this.logger.traceEntry("Authorizing " + user.toString());
+		
+		if (!user.getId().isPresent()) {
+			this.logger.warn("Cannot authorize without a User ID.");
+			this.logger.traceExit("Optional.empty()");
 			return Optional.empty();
+		}
 		
 		InputStream in = this.getClass().getResourceAsStream("/client_secret.json");
 		
@@ -72,29 +80,29 @@ public class GoogleCredentialFactory {
 	                .setAccessType("offline")
 	                .build();
 			
+			this.logger.trace("Checking if credentials are stored for user.");
 			Optional<Credential> ret = Optional.ofNullable(flow.loadCredential(user.getId().get()));
-			if (ret.isPresent())
+			if (ret.isPresent()) {
+				this.logger.traceExit("Credentials were already stored.");
 				return ret;
+			}
+			this.logger.trace("Credentials were not stored.");
 			
-			if (!user.getAuthCode().isPresent())
+			if (!user.getAuthCode().isPresent()) {
+				this.logger.warn("Cannot request credentials without an authorization code from the client.");
+				this.logger.traceExit("Optional.empty()");
 				return Optional.empty();
+			}
 			
-			/*GoogleTokenResponse response = 
-					new GoogleAuthorizationCodeTokenRequest(
-							this.httpTransport,
-							this.jsonFactory,
-							"https://www.googleapis.com/oauth2/v4/token",
-							clientSecrets.getDetails().getClientId(),
-				            clientSecrets.getDetails().getClientSecret(),
-				            user.getAuthCode().get(),
-				            "").execute();*/
-			TokenResponse response = flow.newTokenRequest(user.getAuthCode().get())
-					.setRedirectUri("http://localhost:8080/login")
-					.execute(); 
+			this.logger.trace("Executing request for credentials.");
+			TokenRequest request = flow.newTokenRequest(user.getAuthCode().get())
+					.setRedirectUri("http://localhost:8080/oauth2callback");
+			TokenResponse response = request.execute(); 
 			
-			return Optional
-				//	.ofNullable(new GoogleCredential().setAccessToken(response.getAccessToken()));
+			ret = Optional
 					.ofNullable(flow.createAndStoreCredential(response, user.getId().get()));
+			this.logger.traceExit("Credentials received: " + ret.isPresent());
+			return ret;
 		} catch (IOException e) {
 			this.logger.error(e.getMessage());
 			return Optional.empty();

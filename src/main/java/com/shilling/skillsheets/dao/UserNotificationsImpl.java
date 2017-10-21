@@ -27,12 +27,12 @@ import com.shilling.skillsheets.model.User;
 public class UserNotificationsImpl implements UserNotifications {
 	
 	private final Logger logger;
-	private final GoogleDriveFactory driveFactory;
+	private final ModelWriter writer;
 	
 	@Autowired
-	private UserNotificationsImpl(GoogleDriveFactory driveFactory) {
+	private UserNotificationsImpl(ModelWriter writer) {
 		this.logger = LogManager.getLogger(UserNotificationsImpl.class);
-		this.driveFactory = driveFactory;
+		this.writer = writer;
 	}
 
 	@Override
@@ -43,49 +43,9 @@ public class UserNotificationsImpl implements UserNotifications {
 
 	@Override
 	public void saveMessage(User user, Notification notification) {
-		
-		this.logger.traceEntry();
-		
-		Document doc = DocumentHelper.createDocument();
-		Element root = doc.addElement("notifications");
-		Element message = root.addElement("notification")
-				.addAttribute("id", Integer.toString(notification.getId()));
-		
-		message.addElement("text").addText(notification.getMessage());
-		for (Notification.Action action : notification.getAction())
-			message.addElement("Action").addText(Integer.toString(action.getValue()));
-		
-		OutputFormat format = OutputFormat.createPrettyPrint();
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			XMLWriter writer = new XMLWriter (out, format);
-			writer.write(doc);
-			
-			InputStream in = new ByteArrayInputStream(out.toByteArray());
-			InputStreamContent content = new InputStreamContent("text/xml", in);
-			
-			Optional<Drive> result = this.driveFactory.getDrive(user);
-			if (!result.isPresent()) {
-				this.logger.error("Could not get Drive instance");
-				return;
-			}
-			
-			Drive drive = result.get();
-			
-			File fileMetadata = new File();
-			fileMetadata.setName("notifications.xml");
-			fileMetadata.setParents(Collections.singletonList("appDataFolder"));
-			
-			drive.files().create(fileMetadata, content)
-					.setFields("id")
-					.execute();
-			
-		} catch (UnsupportedEncodingException e) {
-			this.logger.error(e.getMessage());
-		} catch (IOException e) {
-			this.logger.error(e.getMessage());
-		}
-		
+		this.logger.traceEntry("Sending message to " + user);
+		boolean ret = this.writer.write(user, notification);
+		this.logger.traceExit("Successful: " + ret);
 	}
 
 	@Override
@@ -98,6 +58,11 @@ public class UserNotificationsImpl implements UserNotifications {
 	public void deleteMessage(User user, int id) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Notification[] getAllMessages(User user) {
+		return new Notification[0];
 	}
 
 

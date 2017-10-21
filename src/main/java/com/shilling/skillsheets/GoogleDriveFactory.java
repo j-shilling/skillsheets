@@ -45,14 +45,17 @@ public class GoogleDriveFactory {
 
 	public Optional<Drive> getDrive(final User user) {
 
+		this.logger.traceEntry("Trying to get a Drive service object.");
 		Optional<Credential> credential = this.credentials.authorize(user);
 		if (!credential.isPresent()) {
 			this.logger.error("Could not get a Credential instance.");
 			return Optional.empty();
 		}
 
-		return Optional.of(new Drive.Builder(this.httpTransport, this.jsonFactory, credential.get())
+		Optional<Drive> ret = Optional.of(new Drive.Builder(this.httpTransport, this.jsonFactory, credential.get())
 				.setApplicationName("Skill Sheets").build());
-
+		
+		this.logger.traceExit("Successful: " + ret.isPresent());
+		return ret;
 	}
 }

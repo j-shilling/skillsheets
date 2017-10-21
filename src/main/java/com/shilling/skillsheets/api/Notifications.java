@@ -1,8 +1,6 @@
 package com.shilling.skillsheets.api;
 
 import java.util.Optional;
-import java.util.Random;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,22 +40,8 @@ public class Notifications {
 		if (!user.isPresent())
 			return new Notification[0];
 		
-		int rand = new Random().nextInt(10);
-		Notification[] ret = new Notification[rand];
-		
-		for (int i = 0; i < rand; i ++)
-			ret[i] = new Notification(i, Integer.toString(i),
-						(Notification.Action[]) ((rand % 2) == 0 ? 
-								new Notification.Action[]
-									{
-										Notification.Action.create(new Random().nextInt(3)) 
-									}
-								: new Notification.Action[] 
-									{ Notification.Action.create(new Random().nextInt(3)),
-										Notification.Action.create(new Random().nextInt(3)) 
-									}));
 		this.notify(user.get(), "You checked for messages!");
-		return ret;
+		return this.dao.getAllMessages(user.get());
 	}
 	
 	@RequestMapping(value = "/api/messages/{msgId}/{actionId}",
@@ -93,8 +77,7 @@ public class Notifications {
 		if (message == null || message.isEmpty())
 			return;
 		
-		Notification msg = new Notification (this.dao.getNextMessageId(user),
-				message, Notification.Action.OK);
+		Notification msg = new Notification (message);
 		
 		this.dao.saveMessage(user, msg);
 	}

@@ -15,5 +15,9 @@
 	<bean id="UserSettings" class="com.shilling.skillsheets.dao.UserSettingsImpl" />
 	<bean id="GoogleDriveFactory" class="com.shilling.skillsheets.GoogleDriveFactory" />
 	<bean id="GoogleCredentialFactory" class="com.shilling.skillsheets.GoogleCredentialFactory" />
+	<bean id="ModelEncoder" class="com.shilling.skillsheets.dao.XMLModelEncoder" />
+	<bean id="ModelWriter" class="com.shilling.skillsheets.dao.LocalModelWriter" />
+	<bean id="ModelReader" class="com.shilling.skillsheets.dao.LocalModelReader" />
+	<bean id="LocalFiles" class="com.shilling.skillsheets.dao.LocalFiles" />
    
 </beans>

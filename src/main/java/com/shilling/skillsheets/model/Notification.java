@@ -1,5 +1,7 @@
 package com.shilling.skillsheets.model;
 
+import java.time.Instant;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -53,17 +55,29 @@ public class Notification {
 	}
 	
 	private final int id;
+	private final Instant timestamp;
 	private final String msg;
 	private final Notification.Action[] acts;
 	
 	@JsonCreator
 	public Notification (
 			@JsonProperty ("id") int id,
+			@JsonProperty ("timestamp") String timestamp,
 			@JsonProperty ("text") String msg, 
 			@JsonProperty("actions") Notification.Action...acts) {
 		this.msg = msg;
 		this.acts = acts;
 		this.id = id;
+		this.timestamp = Instant.parse(timestamp);
+	}
+	
+	public Notification (String msg) {
+		this.id = -1;
+		this.msg = msg;
+		this.timestamp = Instant.now();
+		this.acts = new Notification.Action[] {
+				Action.OK
+		};
 	}
 	
 	@JsonProperty ("text")
@@ -79,5 +93,10 @@ public class Notification {
 	@JsonProperty ("id")
 	public int getId() {
 		return this.id;
+	}
+	
+	@JsonProperty ("timestamp")
+	public String getTimestamp() {
+		return this.timestamp.toString();
 	}
 }
