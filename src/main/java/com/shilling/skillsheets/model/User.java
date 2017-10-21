@@ -121,5 +121,22 @@ public class User {
 	public Optional<String> getAuthCode() {
 		return this.tokens.getAuthCode();
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		if (this.getName().isPresent())
+			sb.append(this.getName().get());
+		else if (this.getId().isPresent())
+			sb.append(this.getId().get());
+		else
+			return Optional.empty().toString();
+		
+		if (this.getEmail().isPresent())
+			sb.append(" <" + this.getEmail().get() + ">");
+		
+		return sb.toString();
+	}
 
 }

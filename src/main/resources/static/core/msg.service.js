@@ -17,13 +17,7 @@ angular
 			});
 			
 			self.getMsgs = function () {
-				return new Promise (function(resolve, reject) {
-					userService.requestCode().then (function(resp) {
-						var result = self.getUserMsgs({},
-								'{ "auth_code" : "' + resp.code + '" }');
-						resolve (result);
-					}, reject);
-				});
+				return self.getUserMsgs({}, userService.getRequestBody());
 			}
 			
 			self.respond = function (id, value) {
@@ -33,7 +27,7 @@ angular
 							action: value
 						},
 						
-						userService.getIdToken());
+						userService.getRequestBody());
 			}
 			
 			return self;

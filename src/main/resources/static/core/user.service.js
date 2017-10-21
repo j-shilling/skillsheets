@@ -2,8 +2,12 @@ angular
 	.module('core')
 	.factory('UserService', function() {
 		var userService = {
+				
+			access_scopes: 'profile https://www.googleapis.com/auth/drive.appfolder',
+			
 			auth2 : null,
 			googleUser : null,
+			auth_code : null,
 			
 			init : function() {
 				var self = this;
@@ -20,7 +24,7 @@ angular
 																	{
 																		client_id : '407997016708-o3kmbrmnodmqtfmvp2j0hsu9uvh9ittn.apps.googleusercontent.com',
 																		fetch_basic_profile : true,
-																		scope : 'profile https://www.googleapis.com/auth/drive.appfolder'
+																		scope : self.access_scopes
 																	})
 															.then(
 																	function() {
@@ -35,9 +39,11 @@ angular
 																		});
 			
 																		if (self.auth2.isSignedIn
-																				.get())
+																				.get()) {
 																			self.googleUser = self.auth2.currentUser
 																					.get();
+																			self.requestCode();
+																		}
 			
 																		resolve();
 																	}, function(error) {
@@ -72,6 +78,7 @@ angular
 									self.googleUser = self.auth2.currentUser.get();
 									console.log("Logged in as " + self.profile().getName());
 									resolve();
+									self.requestCode();
 								};
 								
 								var onFailure = function (error) {
@@ -94,16 +101,22 @@ angular
 				var self = this;
 				
 				return new Promise(function (resolve, reject) {
-					if (!self.isInitialized())
-						self.init().then(function () {
-							self.auth2.grantOfflineAccess({
-								scope: 'profile https://www.googleapis.com/auth/drive.appfolder'
-							}).then (resolve, reject);
-						});
-					else
+					
+					var afterInit = function () {
 						self.auth2.grantOfflineAccess({
-							scope: 'profile https://www.googleapis.com/auth/drive.appfolder'
-						}).then (resolve, reject);
+							scope: self.access_scopes
+						}).then (function (resp) {
+							self.auth_code = resp.code;
+							resolve();
+						}, function (error) {
+							reject (error);
+						});
+					};
+					
+					if (!self.isInitialized())
+						self.init().then(afterInit);
+					else
+						afterInit();
 				});
 			},
 			
@@ -116,6 +129,7 @@ angular
 							var onResolve = function() {
 								console.log ('Sign out successfull.');
 								self.googleUser = null;
+								self.auth_code = null;
 								resolve();
 							}
 							
@@ -138,11 +152,27 @@ angular
 					return null;
 			},
 			
+			getAuthCode : function() {
+				return this.auth_code;
+			},
+			
 			profile : function() {
 				if (this.isSignedIn())
 					return this.googleUser.getBasicProfile();
 				else
 					return null;
+			},
+			
+			getRequestBody : function() {
+				
+				var self = this;
+				var obj = {
+						id_token : self.getIdToken(),
+						auth_code : self.getAuthCode()
+				}
+				var body = JSON.stringify (obj);
+				
+				return body;
 			}
 		};
 		

@@ -14,5 +14,6 @@
 	<bean id="UserNotifications" class="com.shilling.skillsheets.dao.UserNotificationsImpl" />
 	<bean id="UserSettings" class="com.shilling.skillsheets.dao.UserSettingsImpl" />
 	<bean id="GoogleDriveFactory" class="com.shilling.skillsheets.GoogleDriveFactory" />
+	<bean id="GoogleCredentialFactory" class="com.shilling.skillsheets.GoogleCredentialFactory" />
    
 </beans>
