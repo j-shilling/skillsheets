@@ -1,8 +1,12 @@
 package com.shilling.skillsheets.model;
 
+import java.util.Objects;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -13,33 +17,49 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Tokens {
 	
-	private final Optional<String> id_token;
-	private final Optional<String> auth_code;
+	@JsonProperty ("id_token")
+	private final @Nullable String id_token;
 	
 	@JsonCreator
-	public Tokens(@JsonProperty("id_token") String id_token,
-			@JsonProperty("auth_code") String auth_code) {
-		this.id_token = Optional.ofNullable(id_token);
-		this.auth_code = Optional.ofNullable(auth_code);
+	public Tokens(@JsonProperty("id_token") @Nullable String id_token) {
+		
+		if (id_token != null && id_token.isEmpty())
+			this.id_token = null;
+		else
+			this.id_token = id_token;
+	
 	}
 	
-	@JsonProperty ("id_token")
-	private String getIdTokenPriv() {
-		return this.id_token.isPresent() ? this.id_token.get() : null;
-	}
-	
-	@JsonProperty ("auth_code")
-	private String getAuthCodePriv() {
-		return this.auth_code.isPresent() ? this.auth_code.get() : null;
-	}
-	
+	@JsonIgnore
 	public Optional<String> getIdToken() {
-		return this.id_token;
+		return Optional.ofNullable(this.id_token);
 	}
 	
-	public Optional<String> getAuthCode() {
-		return this.auth_code;
+	@Override
+	public String toString() {
+		if (this.getIdToken().isPresent())
+			return this.getIdToken().get();
+		else
+			return Optional.empty().toString();
 	}
 	
-
+	@Override
+	public boolean equals (Object obj) {
+		if (this.getIdToken().isPresent()) {
+			if (obj instanceof String)
+				return this.getIdToken().get().equals(obj);
+		}
+		
+		if (obj instanceof Optional<?>)
+			return this.getIdToken().equals(obj);
+		if (obj instanceof Tokens)
+			return this.getIdToken().equals(((Tokens) obj).getIdToken());
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getIdToken());
+	}
 }

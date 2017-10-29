@@ -1,6 +1,9 @@
 package com.shilling.skillsheets.model;
 
+import java.util.Objects;
 import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 
@@ -20,23 +23,20 @@ public class User {
 	 *
 	 */
 	public static class Builder {
-		private String id = null;
+		private final String id;
+		
 		private String name = null;
 		private String firstName = null;
 		private String familyName = null;
 		private String email = null;
 		
-		private final Tokens tokens;
-		
-		public Builder (Tokens tokens) {
-			Preconditions.checkNotNull(tokens);
-			this.tokens = tokens;
-		}
-		
-		public Builder setId(String id) {
+		public Builder (String id) {
+			Preconditions.checkNotNull(id);
+			Preconditions.checkArgument(!id.isEmpty());
+			
 			this.id = id;
-			return this;
 		}
+		
 		public Builder setName(String name) {
 			this.name = name;
 			return this;
@@ -61,65 +61,53 @@ public class User {
 					this.name,
 					this.firstName,
 					this.familyName, 
-					this.email,
-					this.tokens);
+					this.email);
 		}
 	}
 	
-	private final Optional<String> id;
-	private final Optional<String> name;
-	private final Optional<String> firstName;
-	private final Optional<String> familyName;
-	private final Optional<String> email;
-	
-	private final Tokens tokens;
+	private final String id;
+	private final String name;
+	private final String firstName;
+	private final String familyName;
+	private final String email;
 	
 	public User (
 			String id,
-			String name, 
-			String firstName,
-			String familyName, 
-			String email,
 			
-			Tokens tokens) {
+			@Nullable String name, 
+			@Nullable String firstName,
+			@Nullable String familyName, 
+			@Nullable String email) {
 		
-		Preconditions.checkNotNull(tokens);
-		this.tokens = tokens;
+		Preconditions.checkNotNull(id);
+		Preconditions.checkArgument(!id.isEmpty());
 		
-		this.id = Optional.ofNullable(id);
-		this.name = Optional.ofNullable(name);
-		this.firstName = Optional.ofNullable(firstName);
-		this.familyName = Optional.ofNullable(familyName);
-		this.email = Optional.ofNullable(email);
+		this.id = id;
+		this.name = name;
+		this.firstName = firstName;
+		this.familyName = familyName;
+		this.email = email;
 	
 	}
 
-	public Optional<String> getId() {
+	public String getId() {
 		return id;
 	}
 
 	public Optional<String> getName() {
-		return name;
+		return Optional.ofNullable(name);
 	}
 
 	public Optional<String> getFirstName() {
-		return firstName;
+		return Optional.ofNullable(firstName);
 	}
 
 	public Optional<String> getFamilyName() {
-		return familyName;
+		return Optional.ofNullable(familyName);
 	}
 
 	public Optional<String> getEmail() {
-		return email;
-	}
-	
-	public Optional<String> getIdToken() {
-		return this.tokens.getIdToken();
-	}
-	
-	public Optional<String> getAuthCode() {
-		return this.tokens.getAuthCode();
+		return Optional.ofNullable(email);
 	}
 	
 	@Override
@@ -128,15 +116,27 @@ public class User {
 		
 		if (this.getName().isPresent())
 			sb.append(this.getName().get());
-		else if (this.getId().isPresent())
-			sb.append(this.getId().get());
 		else
-			return Optional.empty().toString();
+			sb.append(this.getId());
 		
 		if (this.getEmail().isPresent())
 			sb.append(" <" + this.getEmail().get() + ">");
 		
 		return sb.toString();
+	}
+	
+	@Override
+	public boolean equals (Object obj) {
+		if (obj instanceof User) {
+			return this.getId().equals(((User) obj).getId());
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getId());
 	}
 
 }

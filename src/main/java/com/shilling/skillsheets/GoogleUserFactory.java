@@ -39,7 +39,7 @@ public class GoogleUserFactory {
 	public Optional<User> getUser (Tokens tokens) {
 		this.logger.traceEntry();
 		
-		User.Builder builder = new User.Builder(tokens);
+		User user = null;
 		if (tokens.getIdToken().isPresent()) {
 			String id_token = tokens.getIdToken().get();
 			
@@ -67,16 +67,17 @@ public class GoogleUserFactory {
 			
 			Payload payload = token.getPayload();
 			
-			builder = builder.setId(payload.getSubject())
+			user = new User.Builder(payload.getSubject())
 						.setEmail(payload.getEmail())
 						.setName((String) payload.get("name"))
 						.setFamilyName((String) payload.get("family_name"))
-						.setFirstName((String) payload.get("given_name"));
+						.setFirstName((String) payload.get("given_name"))
+						.build();
 		}
 		
-		User user = builder.build();
-		this.logger.traceExit(user.toString());
-		return Optional.of(user);
+		Optional<User> ret = Optional.ofNullable(user);
+		this.logger.traceExit(ret.toString());
+		return ret;
 	}
 
 }

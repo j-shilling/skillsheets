@@ -27,7 +27,7 @@ import com.google.api.services.drive.DriveScopes;
 import com.shilling.skillsheets.model.User;
 
 public class GoogleCredentialFactory {
-	private final Logger logger;
+	/*private final Logger logger;
 	private final JsonFactory jsonFactory;
 	private final HttpTransport httpTransport;
 	private final DataStoreFactory dataStoreFactory;
@@ -107,5 +107,5 @@ public class GoogleCredentialFactory {
 			this.logger.error(e.getMessage());
 			return Optional.empty();
 		}
-	}
+	}*/
 }

@@ -17,7 +17,7 @@ import com.shilling.skillsheets.model.User;
 
 public class GoogleDriveFactory {
 
-	private final Logger logger;
+/*	private final Logger logger;
 	private final GoogleCredentialFactory credentials;
 	private final JsonFactory jsonFactory;
 	private final HttpTransport httpTransport;
@@ -57,5 +57,5 @@ public class GoogleDriveFactory {
 		
 		this.logger.traceExit("Successful: " + ret.isPresent());
 		return ret;
-	}
+	}*/
 }
