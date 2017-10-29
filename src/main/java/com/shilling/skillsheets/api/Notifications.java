@@ -1,5 +1,7 @@
 package com.shilling.skillsheets.api;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,11 +36,11 @@ public class Notifications {
 	@RequestMapping(value = "/api/messages",
 			method = RequestMethod.POST,
 			consumes="application/json")
-	public Notification[] getNotifications (@RequestBody(required = false) Tokens tokens) {
+	public Collection<Notification> getNotifications (@RequestBody(required = false) Tokens tokens) {
 		this.logger.traceEntry();
 		Optional<User> user = this.users.getUser(tokens);
 		if (!user.isPresent())
-			return new Notification[0];
+			return Collections.emptyList();
 		
 		this.notify(user.get(), "You checked for messages!");
 		return this.dao.getAllMessages(user.get());

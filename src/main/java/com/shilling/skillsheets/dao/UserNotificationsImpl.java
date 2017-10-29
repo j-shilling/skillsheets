@@ -1,5 +1,6 @@
 package com.shilling.skillsheets.dao;
 
+import java.util.Collection;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -22,46 +23,64 @@ public class UserNotificationsImpl implements UserNotifications {
 		this.writer = writer;
 		this.reader = reader;
 	}
-
-	@Override
-	public void saveMessage(User user, Notification notification) {
-		this.logger.traceEntry("Sending message to " + user);
+	
+	private Notifications getNotifications(User user) {
+		this.logger.traceEntry("Reading current notifications for " + user);
 		
 		Optional<Notifications> prev = this.reader.read(user, Notifications.class);
-		Notifications notes = null;
-		if (prev.isPresent())
-			notes = prev.get();
-		else
-			notes = new Notifications();
+		if (prev.isPresent()) {
+			this.logger.traceExit("Found notifications.");
+			return prev.get();
+		} else {
+			this.logger.traceExit("No notifications found.");
+			return new Notifications();
+		}
+	}
+
+	@Override
+	public boolean saveMessage(User user, Notification notification) {
+		this.logger.traceEntry("Sending message to " + user);
 		
+		Notifications notes = this.getNotifications(user);
 		notes.add(notification);
 		
-		this.logger.traceExit("Successful: " + this.writer.write(user, notes));
+		boolean ret = this.writer.write(user, notes);
+		this.logger.traceExit("Successful: " + ret);
+		return ret;
 	}
 
 	@Override
-	public Notification getMessage(User user, int id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Optional<Notification> getMessage(User user, int id) {
+		this.logger.traceEntry("Getting notification " + id + " for " + user);
+		Optional<Notification> ret = this.getNotifications(user).get(id);
+		this.logger.traceExit("Notification found: " + ret.isPresent());
+		return ret;
+	}
+	
+	@Override
+	public Collection<Notification> getAllMessages(User user) {
+		this.logger.traceEntry("Getting all notifications for " + user);
+		Collection<Notification> ret = this.getNotifications(user).getNotifications();
+		this.logger.traceExit("Found " + ret.size() + " notifications.");
+		return ret;
 	}
 
 	@Override
-	public void deleteMessage(User user, int id) {
-		// TODO Auto-generated method stub
+	public boolean deleteMessage(User user, int id) {
+		this.logger.traceEntry("Deleting notification " + id + " for " + user);
 		
-	}
-
-	@Override
-	public Notification[] getAllMessages(User user) {
-		return new Notification[0];
-	}
-
-	@Override
-	public void deleteMessage(User user, Notification notification) {
-		// TODO Auto-generated method stub
+		Notifications notes = this.getNotifications(user);
+		boolean ret = notes.del(id);
 		
+		if (ret) {
+			this.logger.trace("Saving notifications.");
+			ret = this.writer.write(user, notes);
+			this.logger.traceExit("Successful: " + ret);
+			return ret;
+		} else {
+			this.logger.traceExit("Could not delete notification.");
+			return false;
+		}
 	}
-
-
 
 }
