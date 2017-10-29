@@ -12,12 +12,12 @@
 	
 	<bean id="GoogleUserFactory" class="com.shilling.skillsheets.GoogleUserFactory" />
 	<bean id="UserNotifications" class="com.shilling.skillsheets.dao.UserNotificationsImpl" />
-	<bean id="UserSettings" class="com.shilling.skillsheets.dao.UserSettingsImpl" />
 	<bean id="GoogleDriveFactory" class="com.shilling.skillsheets.GoogleDriveFactory" />
 	<bean id="GoogleCredentialFactory" class="com.shilling.skillsheets.GoogleCredentialFactory" />
-	<bean id="ModelEncoder" class="com.shilling.skillsheets.dao.XMLModelEncoder" />
-	<bean id="ModelWriter" class="com.shilling.skillsheets.dao.LocalModelWriter" />
-	<bean id="ModelReader" class="com.shilling.skillsheets.dao.LocalModelReader" />
-	<bean id="LocalFiles" class="com.shilling.skillsheets.dao.LocalFiles" />
+	<bean id="ModelEncoder" class="com.shilling.skillsheets.dao.xml.XMLModelEncoder" />
+	<bean id="ModelDecoder" class="com.shilling.skillsheets.dao.xml.XMLModelDecoder" />
+	<bean id="ModelWriter" class="com.shilling.skillsheets.dao.local.LocalModelWriter" />
+	<bean id="ModelReader" class="com.shilling.skillsheets.dao.local.LocalModelReader" />
+	<bean id="LocalFiles" class="com.shilling.skillsheets.dao.local.LocalFiles" />
    
 </beans>

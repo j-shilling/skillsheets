@@ -1,4 +1,4 @@
-package com.shilling.skillsheets.dao;
+package com.shilling.skillsheets.dao.drive;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,9 +18,9 @@ import com.shilling.skillsheets.GoogleDriveFactory;
 import com.shilling.skillsheets.model.Notification;
 import com.shilling.skillsheets.model.User;
 
-public class GoogleModelWriter implements ModelWriter {
+public class GoogleModelWriter {
 	
-	private final Logger logger;
+	/*private final Logger logger;
 	private final GoogleDriveFactory driveFactory;
 	private final ModelEncoder encoder;
 	
@@ -69,6 +69,6 @@ public class GoogleModelWriter implements ModelWriter {
 		}
 		
 		return true;
-	}
+	}*/
 
 }

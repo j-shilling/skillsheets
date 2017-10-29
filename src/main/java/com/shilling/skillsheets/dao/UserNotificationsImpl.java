@@ -1,51 +1,42 @@
 package com.shilling.skillsheets.dao;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Collections;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.api.client.http.InputStreamContent;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.File;
-import com.shilling.skillsheets.GoogleDriveFactory;
 import com.shilling.skillsheets.model.Notification;
+import com.shilling.skillsheets.model.Notifications;
 import com.shilling.skillsheets.model.User;
 
 public class UserNotificationsImpl implements UserNotifications {
 	
 	private final Logger logger;
 	private final ModelWriter writer;
+	private final ModelReader reader;
 	
 	@Autowired
-	private UserNotificationsImpl(ModelWriter writer) {
+	private UserNotificationsImpl(ModelWriter writer, ModelReader reader) {
 		this.logger = LogManager.getLogger(UserNotificationsImpl.class);
 		this.writer = writer;
-	}
-
-	@Override
-	public int getNextMessageId(User user) {
-		// TODO Auto-generated method stub
-		return 0;
+		this.reader = reader;
 	}
 
 	@Override
 	public void saveMessage(User user, Notification notification) {
 		this.logger.traceEntry("Sending message to " + user);
-		boolean ret = this.writer.write(user, notification);
-		this.logger.traceExit("Successful: " + ret);
+		
+		Optional<Notifications> prev = this.reader.read(user, Notifications.class);
+		Notifications notes = null;
+		if (prev.isPresent())
+			notes = prev.get();
+		else
+			notes = new Notifications();
+		
+		notes.add(notification);
+		
+		this.logger.traceExit("Successful: " + this.writer.write(user, notes));
 	}
 
 	@Override
@@ -63,6 +54,12 @@ public class UserNotificationsImpl implements UserNotifications {
 	@Override
 	public Notification[] getAllMessages(User user) {
 		return new Notification[0];
+	}
+
+	@Override
+	public void deleteMessage(User user, Notification notification) {
+		// TODO Auto-generated method stub
+		
 	}
 
 
