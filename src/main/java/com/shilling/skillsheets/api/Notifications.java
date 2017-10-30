@@ -36,13 +36,12 @@ public class Notifications {
 	@RequestMapping(value = "/api/messages",
 			method = RequestMethod.POST,
 			consumes="application/json")
-	public Collection<Notification> getNotifications (@RequestBody(required = false) Tokens tokens) {
+	public Collection<Notification> getNotifications (@RequestBody Tokens tokens) {
 		this.logger.traceEntry();
 		Optional<User> user = this.users.getUser(tokens);
 		if (!user.isPresent())
 			return Collections.emptyList();
 		
-		this.notify(user.get(), "You checked for messages!");
 		return this.dao.getAllMessages(user.get());
 	}
 	
@@ -64,13 +63,22 @@ public class Notifications {
 		Notification.Action action = Notification.Action.create(actionId);
 		if (action == null) {
 			this.logger.error("User " 
-					+ user.get().getId() 
+					+ user.get() 
 					+ " responding to notification with invalid action id: " 
 					+ actionId);
 			return;
 		}
 		
 		this.logger.warn("This method is not yet written.");
+		
+		switch (action) {
+		case OK:
+			this.dao.deleteMessage(user.get(), msgId);
+			break;
+		default:
+			this.logger.warn("Cannot process action " + action);
+			break;
+		}
 	}
 	
 	public void notify (final User user, final String message) {
