@@ -2,8 +2,8 @@ angular
 	.module('headerBar')
 	.component('headerBar', {
 		templateUrl: 'core/header-bar/header-bar.template.html',
-		controller: ['$scope', '$interval', 'UserService', 'MsgService',
-			function HeaderController($scope, $interval, userService, msgService) {
+		controller: ['$scope', '$interval', 'UserService', 'MsgService', 'ViewFilter',
+			function HeaderController($scope, $interval, userService, msgService, filter) {
 				userService.init().then(function () { $scope.$apply(); });
 				
 				$scope.user = userService;
@@ -13,7 +13,7 @@ angular
 					$scope.msgs = msgService.getMsgs();
 				}, 10000);
 				
-				this.viewing = 'all';
+				$scope.filter = filter;
 		
 				$scope.logIn = function() {
 					userService.signIn().then(function () { $scope.$apply(); });

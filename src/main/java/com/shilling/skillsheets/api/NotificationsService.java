@@ -19,16 +19,16 @@ import com.shilling.skillsheets.model.Tokens;
 import com.shilling.skillsheets.model.User;
 
 @RestController
-public class Notifications {
+public class NotificationsService {
 	
 	private final Logger logger;
 	private final GoogleUserFactory users;
 	private final UserNotifications dao;
 	
 	@Autowired
-	private Notifications (GoogleUserFactory users,
+	private NotificationsService (GoogleUserFactory users,
 			UserNotifications dao) {
-		this.logger = LogManager.getLogger(Notifications.class);
+		this.logger = LogManager.getLogger(NotificationsService.class);
 		this.users = users;
 		this.dao = dao;
 	}

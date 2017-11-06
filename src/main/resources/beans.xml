@@ -12,6 +12,7 @@
 	
 	<bean id="GoogleUserFactory" class="com.shilling.skillsheets.GoogleUserFactory" />
 	<bean id="UserNotifications" class="com.shilling.skillsheets.dao.UserNotificationsImpl" />
+	<bean id="UserResources" class="com.shilling.skillsheets.dao.UserResourcesImpl" />
 	<bean id="GoogleDriveFactory" class="com.shilling.skillsheets.GoogleDriveFactory" />
 	<bean id="GoogleCredentialFactory" class="com.shilling.skillsheets.GoogleCredentialFactory" />
 	<bean id="ModelEncoder" class="com.shilling.skillsheets.dao.xml.XMLModelEncoder" />
