@@ -15,6 +15,8 @@ angular
 						+ self.type.slice(1).toLowerCase()
 						+ " Resources";
 					
+					$scope.res = [];
+					
 					self.res_check = $interval(function() {
 						$scope.res = res.getResources(self.type).then($scope.$apply());
 					}, 10000);
