@@ -1,0 +1,19 @@
+<div class="w3-dropdown-click">
+
+	<img class="w3-circle w3-hover-opacity"
+		style="padding: 0; width: 40px; height: 40px;"
+		src="{{user.profile().getImageUrl()}}" ng-click="onClick()">
+
+	<div id="account-item-dropdown"
+		class="w3-dropdown-content w3-bar-block w3-border" 
+		style="right:0">
+
+		<span class="w3-bar-item w3-border w3-small"> <b>Google
+				Account</b><br> {{user.profile().getName()}}<br>
+			{{user.profile().getEmail()}}
+		</span> <span class="w3-bar-item w3-button"> Settings </span> <span
+			class="w3-bar-item w3-button" ng-click="logOut()"> Logout </span>
+
+	</div>
+
+</div>

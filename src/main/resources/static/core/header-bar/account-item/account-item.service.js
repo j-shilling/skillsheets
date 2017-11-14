@@ -1,5 +1,5 @@
 angular
-	.module('core')
+	.module('headerBar')
 	.factory('UserService', function() {
 		var userService = {
 				

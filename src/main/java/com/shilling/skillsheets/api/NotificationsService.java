@@ -42,7 +42,12 @@ public class NotificationsService {
 		if (!user.isPresent())
 			return Collections.emptyList();
 		
-		return this.dao.getAllMessages(user.get());
+		Collection<Notification> ret = this.dao.getAllMessages(user.get());
+		
+		if (ret.isEmpty())
+			this.notify(user.get(), "You checked for messages!");
+		
+		return ret;
 	}
 	
 	@RequestMapping(value = "/api/messages/{msgId}/{actionId}",

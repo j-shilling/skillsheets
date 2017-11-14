@@ -1,100 +1,38 @@
-<div class="w3-bar w3-white w3-padding" style="height: 56px">
+<div class="w3-bar w3-white w3-row">
 
-	<img class="w3-bar-item w3-left" style="height: 40px" src="img/logo.png"> 
-	
-	<input class="w3-bar-item w3-input w3-light-gray" type="text"
-		placeholder="Search" ng-model="filter.query"
-		ng-show="user.isSignedIn()">
-
-	<div class="w3-dropdown-hover w3-right" style="margin-left: 20px"
-		ng-show="user.isSignedIn()">
-		
-		<img class="w3-bar-item w3-circle w3-right w3-hover-grayscale"
-			style="padding: 0; width: 40px; height: 40px;"
-			src="{{user.profile().getImageUrl()}}">
-
-		<div class="w3-dropdown-content w3-bar-block"
-			style="position: fixed; top: 56px; right: 0">
-			
-			<span class="w3-bar-item w3-border w3-small"> 
-				<b>Google Account</b><br> 
-				{{user.profile().getName()}}<br>
-				{{user.profile().getEmail()}}
-			</span> 
-			
-			<span class="w3-bar-item w3-button"> 
-				Settings 
-			</span> 
-			
-			<span class="w3-bar-item w3-button" ng-click="logOut()"> 
-				Logout 
-			</span>
-				
-		</div>
-		
+	<div class="w3-bar-item w3-col m1">
+		<img style="height: 40px" src="img/logo.png">
 	</div>
 
 	<div ng-show="user.isSignedIn()">
-	
-		<span ng-show="msgs.length == 0"
-			class="w3-bar-item w3-circle w3-gray w3-large w3-center w3-text-white w3-right"
-			style="width: 40px; height: 40px; padding: 0; line-height: 40px; margin-left: 50px">
-			<b>0</b>
-		</span>
 
-		<div class="w3-dropdown-hover w3-right" ng-show="msgs.length > 0">
-		
-			<span
-				class="w3-bar-item w3-circle w3-red w3-large w3-center w3-hover-grayscale"
-				style="width: 40px; height: 40px; padding: 0; line-height: 40px; margin-left: 50px">
-				<b>{{msgs.length}}</b>
-			</span>
-
-			<div class="w3-dropdown-content"
-				style="position: fixed; top: 56px; right: 0; max-width: 500px; overflow: auto">
-
-				<div class="w3-display-container w3-cell-row w3-section" 
-						ng-repeat="msg in msgs">
-					<span class="w3-left w3-cell" style="max-width: 300px">
-
-						{{msg.text}}
-						
-					</span>
-
-					<div class="w3-right w3-cell-middle">
-						<span class="w3-button w3-right w3-round-xlarge {{act.color}}"
-								style="width:80px; margin: 3px" 
-								ng-repeat="act in msg.actions | orderBy: '-value'"
-								ng-click="respond(msg.id, act.value)">
-							{{act.text}} 
-						</span>
-					</div>
-				</div>
-			</div>
+		<div class="w3-bar-item w3-col m9">
+			<content-filter></content-filter>
 		</div>
+
+		<div class="w3-col m2 w3-row">
+
+			<div class="w3-bar-item w3-col s6">
+				new
+			</div>
+
+			<div class="w3-bar-item  w3-col s3">
+				<notifications></notifications>
+			</div>
+
+			<div class="w3-bar-item w3-col s3">
+				<account-item></account-item>
+			</div>
+
+		</div>
+
 	</div>
 
-	<select class="w3-bar-item w3-select w3-boarder w3-right w3-large w3-light-gray"
-		style="height: 40px" ng-model="filter.viewing"
-		ng-show="user.isSignedIn()">
-		
-		<option class="w3-large" value="all">All Resources</option>
-		<option class="w3-large" value="student">Student Resources</option>
-		<option class="w3-large" value="teacher">Teacher Resources</option>
-		<option class="w3-large" value="observer">Observer Resources</option>
-		
-	</select> 
-	
-	<label class="w3-right w3-large w3-light-gray"
-			style="height: 40px; line-height: 40px; text-alien: right; padding-left: 8px"
-			ng-show="user.isSignedIn()">
-		Viewing: 
-	</label> 
-	
-	<span
-			class="w3-bar-item w3-right w3-text-red w3-large w3-button"
-			ng-hide="user.isSignedIn()" ng-click="logIn()"> 
-		Sign In 
-	</span>
+	<div ng-show="!user.isSignedIn()"
+		class="w3-bar-item w3-right w3-col m11">
+		<span class="w3-text-red w3-large w3-button w3-right"
+			ng-click="logIn()"> Sign In </span>
+	</div>
+
 
 </div>

@@ -1,0 +1,39 @@
+<div class="w3-dropdown-click">
+
+	<span ng-show="msgs.length == 0"
+		class="w3-gray w3-large w3-text-white w3-center w3-circle"
+		style="display: inline-block; width:40px; height: 40px; line-height: 40px"> 
+		
+		<b>0</b>
+	
+	</span> 
+	
+	<span ng-show="msgs.length > 0"
+		class="w3-red w3-center w3-circle"
+		style="display: inline-block; width:40px; height: 40px; line-height: 40px"
+		ng-click="onClick()"> 
+		
+		<b>{{msgs.length}}</b>
+		
+	</span>
+
+	<div id="notifications-item-dropdown"
+		class="w3-dropdown-content w3-bar-block w3-border" 
+		style="right: 0">
+
+		<div class="w3-display-container w3-cell-row w3-section"
+			ng-repeat="msg in msgs">
+			<span class="w3-left w3-cell" style="max-width: 300px">
+
+				{{msg.text}} </span>
+
+			<div class="w3-right w3-cell-middle">
+				<span class="w3-button w3-right w3-round-xlarge {{act.color}}"
+					style="width: 80px; margin: 3px"
+					ng-repeat="act in msg.actions | orderBy: '-value'"
+					ng-click="respond(msg.id, act.value)"> {{act.text}} </span>
+			</div>
+		</div>
+	</div>
+	
+</div>

@@ -1,4 +1,4 @@
-angular
+ angular
 	.module('resources')
 	.component('resourcesSection', {
 		templateUrl: 'res/section/section.template.html',
@@ -18,7 +18,7 @@ angular
 					$scope.res = [];
 					
 					self.res_check = $interval(function() {
-						$scope.res = res.getResources(self.type).then($scope.$apply());
+						$scope.res = res.getResources(self.type);
 					}, 10000);
 					
 					$scope.show = function () {

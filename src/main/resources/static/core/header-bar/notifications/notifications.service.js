@@ -1,5 +1,5 @@
 angular
-	.module('core')
+	.module('headerBar')
 	.factory('MsgService', ['$resource', 'UserService',
 		function($resource, userService) {
 			var self = $resource('/api/messages/:msgid/:action', {}, {

@@ -1,0 +1,21 @@
+<div class="w3-row">
+
+	<div class="w3-col m8"
+		style="padding-left: 5px">
+		<input class="w3-input w3-light-gray " type="text"
+			placeholder="Search" ng-model="filter.query">
+	</div>
+
+	<div class="w3-col m4"
+		style="padding-left: 5px">
+		<select class="w3-select w3-boarder  w3-light-gray"
+			id="viewing" ng-model="filter.viewing">
+
+			<option class="w3-large" value="all">All Resources</option>
+			<option class="w3-large" value="student">Student Resources</option>
+			<option class="w3-large" value="teacher">Teacher Resources</option>
+			<option class="w3-large" value="observer">Observer Resources</option>
+		</select>
+	</div>
+
+</div>
