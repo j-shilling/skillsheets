@@ -1,7 +1,7 @@
  angular
 	.module('resources')
 	.component('resourcesSection', {
-		templateUrl: 'res/section/section.template.html',
+		templateUrl: 'homepage/res/section/section.template.html',
 		bindings: {
 			type: '@'
 		},

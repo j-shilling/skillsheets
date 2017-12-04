@@ -1,5 +1,5 @@
 angular
 	.module('resources')
 	.component('resourcesViewer', {
-		templateUrl: 'res/resources.template.html'
+		templateUrl: 'homepage/res/resources.template.html'
 	});

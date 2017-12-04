@@ -1,7 +1,7 @@
 angular
 	.module('headerBar')
 	.component('notifications', {
-		templateUrl: 'core/header-bar/notifications/notifications.template.html',
+		templateUrl: 'homepage/header-bar/notifications/notifications.template.html',
 		controller: ['$scope', '$interval', 'UserService', 'MsgService',
 			function HeaderController($scope, $interval, userService, msgService) {
 				$scope.user = userService;

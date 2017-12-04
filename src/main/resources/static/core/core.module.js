@@ -1,4 +1,1 @@
-angular.module('core', [
-	'headerBar',
-	'ngResource'
-]);
+angular.module('core', []);

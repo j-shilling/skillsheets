@@ -1,7 +1,7 @@
 angular
 	.module('headerBar')
 	.component('accountItem', {
-		templateUrl: 'core/header-bar/account-item/account-item.template.html',
+		templateUrl: 'homepage/header-bar/account-item/account-item.template.html',
 		controller: ['$scope', 'UserService',
 			function HeaderController($scope, user) {
 				$scope.user = user;
