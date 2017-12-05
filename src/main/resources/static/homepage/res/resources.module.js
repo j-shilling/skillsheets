@@ -1,5 +1,6 @@
 angular.module('resources', [
 	'core',
 	'ngResource',
-	'headerBar'
+	'headerBar',
+	'homepage'
 ]);

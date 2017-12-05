@@ -5,8 +5,8 @@
 		bindings: {
 			type: '@'
 		},
-		controller: ['$scope', '$interval', 'ResourcesService', 'ViewFilter',
-			function HeaderController($scope, $interval, res, filter) {
+		controller: ['$scope', 'ResourcesService', 'ViewFilter', 'UserService',
+			function HeaderController($scope, res, filter, user) {
 				var self = this;
 				
 				$scope.filter = filter;
@@ -15,20 +15,18 @@
 						+ self.type.slice(1).toLowerCase()
 						+ " Resources";
 					
-					$scope.res = [];
-					
-					self.res_check = $interval(function() {
-						$scope.res = res.getResources(self.type);
-					}, 10000);
+					user.onSignIn (function () {
+						res.get(self.type).then (function () { $scope.$apply(); });
+						$scope.res = res[self.type.toLowerCase()];
+					}); 
 					
 					$scope.show = function () {
 						return filter.viewing.toLowerCase() == 'all'
 							|| filter.viewing.toLowerCase() == self.type.toLowerCase();
-					}
+					};
 				}
 				
 				self.$onDestroy = function() {
-					$interval.cancel(self.res_check);
 					$scope.title = undefined;
 					$scope.show = undefined;
 				}

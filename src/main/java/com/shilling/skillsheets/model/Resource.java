@@ -16,7 +16,29 @@ import com.google.api.client.util.Preconditions;
 public class Resource {
 
 	public static enum Type {
-		CONTACT_GROUP, SKILL_SHEET
+		CONTACT_GROUP ("group"), SKILL_SHEET ("sheet");
+		
+		private final String string;
+		
+		private Type (String string) {
+			this.string = string;
+		}
+		
+		@Override
+		public String toString() {
+			return this.string;
+		}
+		
+		static public Type parseString (String string) {
+			for (Type type : Type.values()) {
+				if (type.toString().toLowerCase().equals(string.toLowerCase()))
+					return type;
+			}
+			
+			throw new 
+				IllegalArgumentException ("Cannot parse as Type: \"" + string + "\"");
+		}
+		
 	}
 
 	private final UUID uuid;

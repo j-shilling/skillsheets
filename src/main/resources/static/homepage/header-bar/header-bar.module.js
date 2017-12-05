@@ -1,1 +1,4 @@
-angular.module('headerBar', []);
+angular.module('headerBar', [
+	'ngResource',
+	'homepage'
+]);

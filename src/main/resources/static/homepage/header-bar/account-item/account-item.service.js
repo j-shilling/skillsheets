@@ -9,6 +9,8 @@ angular
 			googleUser : null,
 			auth_code : null,
 			
+			call_on_signin : [],
+			
 			init : function() {
 				var self = this;
 				
@@ -79,6 +81,11 @@ angular
 									console.log("Logged in as " + self.profile().getName());
 									resolve();
 									self.requestCode();
+									
+									for (var i = 0; i < userService.call_on_signin.length; i++) {
+										var func = userService.call_on_signin[i];
+										func();
+									}
 								};
 								
 								var onFailure = function (error) {
@@ -173,6 +180,17 @@ angular
 				var body = JSON.stringify (obj);
 				
 				return body;
+			},
+			
+			onSignIn: function(func) {
+				
+				userService.init().then (function() {
+					if (userService.isSignedIn())
+						func();
+					
+					userService.call_on_signin.push (func);
+				});
+				
 			}
 		};
 		

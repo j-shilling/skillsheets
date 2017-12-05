@@ -2,8 +2,12 @@ angular
 	.module('headerBar')
 	.component('createItem', {
 		templateUrl: 'homepage/header-bar/create-item/create-item.template.html',
-		controller: ['$scope',
-			function HeaderController($scope) {
+		controller: ['$scope', 'ResourcesService',
+			function HeaderController($scope, res) {
+				
+				$scope.newUserGroup = res.createUserGroup;
+				$scope.newSkillSheet = res.createSkillSheet;
+				
 				$scope.onClick = function() {
 					var content = document.getElementById("create-item-dropdown");
 					

@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,18 +28,21 @@ public class Resources {
 	
 	@JsonCreator
 	public Resources (
-			@JsonProperty ("teacher") Iterable<Resource> teacher,
-			@JsonProperty ("student") Iterable<Resource> student,
-			@JsonProperty ("observer") Iterable<Resource> observer) {
+			@JsonProperty ("teacher") @Nullable Iterable<Resource> teacher,
+			@JsonProperty ("student") @Nullable Iterable<Resource> student,
+			@JsonProperty ("observer") @Nullable Iterable<Resource> observer) {
 		
 		this();
 		
-		for (Resource r : teacher)
-			this.teacher.put(r.getUUID(), r);
-		for (Resource r : student)
-			this.student.put(r.getUUID(), r);
-		for (Resource r : observer)
-			this.observer.put(r.getUUID(), r);
+		if (teacher != null)
+			for (Resource r : teacher)
+				this.teacher.put(r.getUUID(), r);
+		if (student != null)
+			for (Resource r : student)
+				this.student.put(r.getUUID(), r);
+		if (observer != null)
+			for (Resource r : observer)
+				this.observer.put(r.getUUID(), r);
 	}
 	
 	@JsonProperty ("teacher")
@@ -57,17 +62,17 @@ public class Resources {
 	
 	public boolean addTeacherResource (Resource resource) {
 		Preconditions.checkNotNull(resource);
-		return null != this.teacher.put(resource.getUUID(), resource);
+		return null == this.teacher.put(resource.getUUID(), resource);
 	}
 	
 	public boolean addStudentResource (Resource resource) {
 		Preconditions.checkNotNull(resource);
-		return null != this.student.put(resource.getUUID(), resource);
+		return null == this.student.put(resource.getUUID(), resource);
 	}
 	
 	public boolean addObserverResource (Resource resource) {
 		Preconditions.checkNotNull(resource);
-		return null != this.observer.put(resource.getUUID(), resource);
+		return null == this.observer.put(resource.getUUID(), resource);
 	}
 	
 	public Optional<Resource> get (UUID uuid) {
