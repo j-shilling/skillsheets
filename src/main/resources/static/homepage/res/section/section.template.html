@@ -3,6 +3,10 @@
 	<p ng-show="res.length == 0"><i>There is nothing here yet.</i></p>
 	<p ng-show="res.length > 0">There are {{res.length}} things here.</p>
 	
+	<span ng-repeat="item in res">
+		'{{item.uuid}}' '{{item.type}}' '{{item.name}}'<br>
+	</span>
+	
 	<p><b>Viewing</b> {{filter.viewing}}</p>
 	<p><b>Query</b> {{filter.query}}</p>
 </div>
