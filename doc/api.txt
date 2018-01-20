@@ -1,0 +1,52 @@
+== RESOURCE: Skill Sheet ==
+
+Accessed by teachers and students
+
+{
+  UUID: String /* Unique Identifier */
+
+  Name: String, nullable /* User-defined display name */
+  NumberOfSkills: number
+  
+  /* Teacher Only Fields */
+  Visible: boolean
+  AvailableFrom: date, nullable
+  AvailableUntil: date, nullable
+  DueDate: date, nullable
+
+  AverageGrade: number
+
+  /* Student Only Fields */
+  DueDate: date, nullable
+  Grade: number
+}
+
+URL: /api/skillsheets/{UUID}
+
+Create		POST					header: id_token
+  -- Teachers only
+Read		GET		path-param: UUID	header: id_token
+  -- Teachers and students
+Update		PUT		path-param: UUID	header: id_token
+  -- Teachers only
+  -- JSON Object in body
+Delete		DELETE		path-param: UUID	header: id_token
+  -- Teachers only
+
+== RESOURCE: Roster ==
+
+Accessed by teachers only
+
+{
+  UUID: String /* Unique Identifier */
+
+  Name: String, Nullable  /* User-defined display name */
+}
+
+URL: /api/rosters/{UUID}
+
+Create		POST					header: id_token
+Read		GET		path-param: UUID	header: id_token
+Update		PUT		path-param: UUID	header: id_token
+  -- JSON Object in body
+Delete		DELETE		path-param: UUID	header: id_token
