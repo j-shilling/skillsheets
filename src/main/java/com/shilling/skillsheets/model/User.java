@@ -29,6 +29,7 @@ public class User {
 		private String firstName = null;
 		private String familyName = null;
 		private String email = null;
+		private boolean teacher = false;
 		
 		public Builder (String id) {
 			Preconditions.checkNotNull(id);
@@ -54,6 +55,11 @@ public class User {
 			return this;
 		}
 		
+		public Builder setTeacher (boolean teacher) {
+			this.teacher = teacher;
+			return this;
+		}
+		
 		/** Construct an instance of User */
 		public User build() {
 			return new User (
@@ -61,7 +67,8 @@ public class User {
 					this.name,
 					this.firstName,
 					this.familyName, 
-					this.email);
+					this.email,
+					this.teacher);
 		}
 	}
 	
@@ -71,13 +78,17 @@ public class User {
 	private final String familyName;
 	private final String email;
 	
+	private final boolean teacher;
+	
 	public User (
 			String id,
 			
 			@Nullable String name, 
 			@Nullable String firstName,
 			@Nullable String familyName, 
-			@Nullable String email) {
+			@Nullable String email,
+			
+			boolean teacher) {
 		
 		Preconditions.checkNotNull(id);
 		Preconditions.checkArgument(!id.isEmpty());
@@ -87,6 +98,7 @@ public class User {
 		this.firstName = firstName;
 		this.familyName = familyName;
 		this.email = email;
+		this.teacher = teacher;
 	
 	}
 
@@ -108,6 +120,10 @@ public class User {
 
 	public Optional<String> getEmail() {
 		return Optional.ofNullable(email);
+	}
+	
+	public boolean isTeacher() {
+		return this.teacher;
 	}
 	
 	@Override

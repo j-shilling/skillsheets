@@ -11,57 +11,97 @@ import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 
 @JsonAutoDetect(fieldVisibility=JsonAutoDetect.Visibility.NONE)
-public class Notification {
+public abstract class Notification {
 	
-	@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 	public static enum Action {
-		OK ("Ok", 0, "w3-blue"),
-		ACCEPT ("Accept", 1, "w3-green"),
-		REJECT ("Reject", 2, "w3-red");
+		OK,
+		ACCEPT,
+		REJECT,
+		CONFIRM,
+		DENY
+	}
+	
+	public static class Info extends Notification {
 		
-		private final String text;
-		private final int value;
-		private final String color;
+		private static final Action[] acts = new Action[] {
+				Action.OK
+		};
 		
-		private Action (String text, int value, String color) {
-			this.text = text;
-			this.value = value;
-			this.color = color;
+		public Info (
+				@Nullable Integer id,
+				@Nullable String timestamp,
+				String msg) {
+			super (id, timestamp, msg, Info.acts);
 		}
 		
-		@JsonProperty ("text")
-		public String getText() {
-			return this.text;
+		public Info (String msg) {
+			this (null, null, msg);
 		}
 		
-		@JsonProperty ("value")
-		public int getValue() {
-			return this.value;
+	}
+	
+	public static class Request extends Notification {
+		
+		private static final Action[] acts = new Action[] {
+				Action.ACCEPT,
+				Action.REJECT
+		};
+		
+		public Request (
+				@Nullable Integer id,
+				@Nullable String timestamp,
+				String msg) {
+			super (id, timestamp, msg, Request.acts);
 		}
 		
-		@JsonProperty ("color")
-		public String getColor() {
-			return this.color;
+		public Request (String msg) {
+			this (null, null, msg);
 		}
 		
-		@Override
-		public String toString() {
-			return this.getText();
+	}
+	
+	public static class Confirmation extends Notification {
+		
+		private static final Action[] acts = new Action[] {
+				Action.CONFIRM,
+				Action.DENY
+		};
+		
+		public Confirmation (
+				@Nullable Integer id,
+				@Nullable String timestamp,
+				String msg) {
+			super (id, timestamp, msg, Confirmation.acts);
 		}
 		
-		@JsonCreator
-		public static Action create (@JsonProperty ("value") int value) {
-			for (Action act : Action.values())
-				if (act.getValue() == value)
-					return act;
-			
-			return null;
+		public Confirmation (String msg) {
+			this (null, null, msg);
 		}
+		
+	}
+	
+	@JsonCreator
+	public static Notification create (
+			@JsonProperty ("id") @Nullable Integer id,
+			@JsonProperty ("timestamp") @Nullable String timestamp,
+			@JsonProperty ("text") String msg, 
+			@JsonProperty("actions") Notification.Action...acts) {
+		
+		Preconditions.checkNotNull(msg);
+		Preconditions.checkNotNull(acts);
+		
+		if (acts.equals(Info.acts))
+			return new Info (id, timestamp, msg);
+		if (acts.equals(Request.acts))
+			return new Request (id, timestamp, msg);
+		if (acts.equals(Confirmation.acts))
+			return new Confirmation (id, timestamp, msg);
+		
+		throw new IllegalArgumentException ("Cannot form a message for the actions " + acts);
 	}
 	
 	private final Logger logger;
@@ -104,12 +144,6 @@ public class Notification {
 			this.timestamp = time;
 	}
 	
-	public Notification (String msg) {
-		this (null, null, msg, new Notification.Action[] {
-				Action.OK
-		});
-	}
-	
 	@JsonProperty ("text")
 	public String getMessage() {
 		return this.msg;
@@ -131,6 +165,6 @@ public class Notification {
 	}
 	
 	public Notification setId(int id) {
-		return new Notification (id, this.getTimestamp(), this.getMessage(), this.getAction());
+		return Notification.create (id, this.getTimestamp(), this.getMessage(), this.getAction());
 	}
 }
