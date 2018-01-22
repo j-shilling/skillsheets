@@ -1,7 +1,6 @@
 package com.shilling.skillsheets.api.services;
 
 import java.util.Collection;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import com.shilling.skillsheets.model.SkillSheet;

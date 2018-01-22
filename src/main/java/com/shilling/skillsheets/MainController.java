@@ -18,12 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class MainController {
 	
 	private final Logger logger;
-	private final GoogleUserFactory users;
 	
 	@Autowired
-	private MainController (GoogleUserFactory users) {
+	private MainController () {
 		this.logger = LogManager.getLogger(MainController.class);
-		this.users = users;
 	}
 	
 	@RequestMapping(value="/", method = RequestMethod.GET)

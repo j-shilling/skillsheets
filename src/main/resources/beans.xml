@@ -10,11 +10,9 @@
 
 	<context:annotation-config/>
 	
-	<bean id="GoogleUserFactory" class="com.shilling.skillsheets.GoogleUserFactory" />
-	<bean id="UserNotifications" class="com.shilling.skillsheets.dao.UserNotificationsImpl" />
-	<bean id="UserResources" class="com.shilling.skillsheets.dao.UserResourcesImpl" />
-	<bean id="GoogleDriveFactory" class="com.shilling.skillsheets.GoogleDriveFactory" />
-	<bean id="GoogleCredentialFactory" class="com.shilling.skillsheets.GoogleCredentialFactory" />
+	<bean id="GoogleIdTokenVerifier" class="com.shilling.skillsheets.api.services.GoogleIdTokenVerifierFactory"/>
+	<bean id="SkillSheetService" class="com.shilling.skillsheets.api.services.LocalSkillSheetService"/>
+	<bean id="UserDao" class="com.shilling.skillsheets.dao.LocalUserDao"/>
 	<bean id="ModelEncoder" class="com.shilling.skillsheets.dao.xml.XMLModelEncoder" />
 	<bean id="ModelDecoder" class="com.shilling.skillsheets.dao.xml.XMLModelDecoder" />
 	<bean id="ModelWriter" class="com.shilling.skillsheets.dao.local.LocalModelWriter" />

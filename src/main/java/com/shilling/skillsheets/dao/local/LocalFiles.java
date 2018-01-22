@@ -38,7 +38,7 @@ public class LocalFiles {
 	private File getUserDir(User user) {
 		this.logger.traceEntry("Finding dir for " + user);
 
-		File ret = new File(this.basedir, user.getId());
+		File ret = new File(this.basedir, user.getId().get());
 		ret.mkdir();
 		return ret;
 	}

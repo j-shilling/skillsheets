@@ -23,19 +23,34 @@ public class User {
 	 *
 	 */
 	public static class Builder {
-		private final String id;
+		private String id;
+		private String name;
+		private String firstName;
+		private String familyName;
+		private String email;
+		private boolean teacher;
 		
-		private String name = null;
-		private String firstName = null;
-		private String familyName = null;
-		private String email = null;
-		private boolean teacher = false;
+		public Builder () {
+			this.id = null;
+			this.name = null;
+			this.firstName = null;
+			this.familyName = null;
+			this.email = null;
+			this.teacher = false;
+		}
 		
-		public Builder (String id) {
-			Preconditions.checkNotNull(id);
-			Preconditions.checkArgument(!id.isEmpty());
-			
+		public Builder (User user) {
+			this.id = user.id;
+			this.name = user.name;
+			this.firstName = user.firstName;
+			this.familyName = user.familyName;
+			this.email = user.email;
+			this.teacher = user.teacher;
+		}
+		
+		public Builder setId(String id) {
 			this.id = id;
+			return this;
 		}
 		
 		public Builder setName(String name) {
@@ -80,8 +95,8 @@ public class User {
 	
 	private final boolean teacher;
 	
-	public User (
-			String id,
+	private User (
+			@Nullable String id,
 			
 			@Nullable String name, 
 			@Nullable String firstName,
@@ -102,8 +117,8 @@ public class User {
 	
 	}
 
-	public String getId() {
-		return id;
+	public Optional<String> getId() {
+		return Optional.ofNullable(id);
 	}
 
 	public Optional<String> getName() {

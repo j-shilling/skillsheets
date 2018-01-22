@@ -39,8 +39,8 @@ public class SkillSheetControllerTest extends TestCase {
 	@MockBean
 	private UserService userService;
 	
-	private User teacher = new User.Builder("id").setTeacher(true).build();
-	private User student = new User.Builder("id").setTeacher(false).build();
+	private User teacher = new User.Builder().setTeacher(true).build();
+	private User student = new User.Builder().setTeacher(false).build();
 	
 	private SkillSheet mockSkillSheet = new SkillSheet.Builder().build();
 	
