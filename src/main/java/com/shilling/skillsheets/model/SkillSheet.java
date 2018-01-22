@@ -1,6 +1,7 @@
 package com.shilling.skillsheets.model;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -268,6 +269,31 @@ public class SkillSheet {
 				.setAvailableUntil(null)
 				.setAverageGrade(null)
 				.build();
+	}
+	
+	@Override
+	public String toString() {
+		if (this.getName().isPresent())
+			return this.getName().get();
+		else
+			return "SkillSheet: " + this.getUuid();
+	}
+	
+	@Override
+	public boolean equals (Object obj) {
+		if (obj instanceof SkillSheet)
+			return this.uuid.equals(((SkillSheet) obj).uuid);
+		if (obj instanceof UUID)
+			return this.uuid.equals(obj);
+		if (obj instanceof String)
+			return this.uuid.equals(UUID.fromString((String) obj));
+			
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.uuid);
 	}
 	
 }
