@@ -63,13 +63,8 @@ public class GoogleUserService implements UserService {
 		}
 		
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Optional<User> fromToken(String id_token) {
-		
+	
+	public Optional<User> parseIdToken (String id_token) {
 		/* Verify Id Token */
 		GoogleIdToken token = null;
 
@@ -97,10 +92,24 @@ public class GoogleUserService implements UserService {
 				.setFamilyName((String) payload.get("family_name"))
 				.setFirstName((String) payload.get("given_name"))
 				.build();
+		return Optional.of(user);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Optional<User> fromToken(String id_token) {
+		
+		Optional<User> fromToken = this.parseIdToken(id_token);
+		if (!fromToken.isPresent())
+			return Optional.empty();
+		
+		User user = fromToken.get();
 		
 		/* Get information from DAO */
 		Optional<User> result = this.dao.read(user.getId().get());
-		if (!result.isPresent()) {
+		if (result.isPresent()) {
 			/* This user is already on record. Get local information and
 			 * update any information from Google which might have changed.
 			 */
