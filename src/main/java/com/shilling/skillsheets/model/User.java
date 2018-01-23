@@ -105,9 +105,6 @@ public class User {
 			
 			boolean teacher) {
 		
-		Preconditions.checkNotNull(id);
-		Preconditions.checkArgument(!id.isEmpty());
-		
 		this.id = id;
 		this.name = name;
 		this.firstName = firstName;
