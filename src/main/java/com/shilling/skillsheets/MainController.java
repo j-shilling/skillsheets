@@ -29,12 +29,5 @@ public class MainController {
 		this.logger.traceEntry();
 		return "index.html";
 	}
-	
-	@RequestMapping(value="/oauth2callback")
-	@ResponseBody
-	public String oauth2callback() {
-		this.logger.traceEntry("Responding to /oauth2callback");
-		return "";
-	}
 
 }
