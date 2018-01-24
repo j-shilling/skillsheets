@@ -6,7 +6,7 @@ import java.util.Optional;
 import com.shilling.skillsheets.model.SkillSheet;
 import com.shilling.skillsheets.model.User;
 
-public class LocalSkillSheetService implements SkillSheetService {
+public class SkillSheetServiceImpl implements SkillSheetService {
 
 	@Override
 	public SkillSheet create(User user) {
