@@ -1,6 +1,9 @@
 package com.shilling.skillsheets.model;
 
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,13 +15,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE)
 public class SkillSheet {
 	
+	private static enum Access {
+		TEACHER,
+		STUDENT
+	}
+	
 	public static class Builder {
 		/* Available, but hidden */
 		private final UUID uuid;
+		private final Map<User, EnumSet<Access>> accessors;
 		
 		/* Available to everyone */
 		private @Nullable String name;
@@ -47,6 +57,8 @@ public class SkillSheet {
 			this.averageGrade = (float) 0.0;
 			
 			this.grade = (float) 0.0;
+			
+			this.accessors = new HashMap<>();
 		}
 		
 		public Builder (UUID uuid) {
@@ -62,6 +74,8 @@ public class SkillSheet {
 			this.averageGrade = (float) 0.0;
 			
 			this.grade = (float) 0.0;
+			
+			this.accessors = new HashMap<>();
 		}
 		
 		public Builder (SkillSheet skillsheet) {
@@ -74,6 +88,8 @@ public class SkillSheet {
 			this.availableUntil = skillsheet.availableUntil;
 			this.averageGrade = skillsheet.averageGrade;
 			this.grade = skillsheet.grade;
+			this.accessors = new HashMap<>();
+			this.accessors.putAll(skillsheet.accessors);
 		}
 		
 		public Builder setName (@Nullable String name) {
@@ -118,6 +134,62 @@ public class SkillSheet {
 			return this;
 		}
 		
+		public Builder addTeacher (User user) {
+			Preconditions.checkNotNull(user);
+			Preconditions.checkArgument(user.isTeacher());
+			
+			EnumSet<Access> access = null;
+			if (this.accessors.containsKey(user)) {
+				access = this.accessors.get(user);
+			} else {
+				access = EnumSet.noneOf(Access.class);
+			}
+			access.add(Access.TEACHER);
+			
+			this.accessors.put(user, access);
+			return this;
+		}
+		
+		public Builder delTeacher (User user) {
+			Preconditions.checkNotNull(user);
+			Preconditions.checkArgument(user.isTeacher());
+			
+			EnumSet<Access> access = this.accessors.get(user);
+			if (access != null) {
+				access.remove(Access.TEACHER);
+				this.accessors.put(user, access);
+			}
+			
+			return this;
+		}
+		
+		public Builder addStudent (User user) {
+			Preconditions.checkNotNull(user);
+			
+			EnumSet<Access> access = null;
+			if (this.accessors.containsKey(user)) {
+				access = this.accessors.get(user);
+			} else {
+				access = EnumSet.noneOf(Access.class);
+			}
+			access.add(Access.STUDENT);
+			
+			this.accessors.put(user, access);
+			return this;
+		}
+		
+		public Builder delStudent (User user) {
+			Preconditions.checkNotNull(user);
+			
+			EnumSet<Access> access = this.accessors.get(user);
+			if (access != null) {
+				access.remove(Access.STUDENT);
+				this.accessors.put(user, access);
+			}
+			
+			return this;
+		}
+		
 		public SkillSheet build() {
 			return new SkillSheet (
 					this.uuid,
@@ -128,13 +200,16 @@ public class SkillSheet {
 					this.availableFrom,
 					this.availableUntil,
 					this.averageGrade,
-					this.grade);
+					this.grade,
+					this.accessors);
 		}
 	}
 
 	/* Available, but hidden */
 	@JsonIgnore
 	private final UUID uuid;
+	@JsonProperty ("accessors")
+	private final Map<User, EnumSet<Access>> accessors;
 	
 	/* Available to everyone */
 	@JsonProperty ("name")
@@ -167,7 +242,8 @@ public class SkillSheet {
 			@Nullable Date availableFrom,
 			@Nullable Date availableUntil, 
 			@Nullable Float averageGrade,
-			@Nullable Float grade) {
+			@Nullable Float grade,
+			Map<User, EnumSet<Access>> accessors) {
 		
 		Preconditions.checkNotNull(uuid);
 		Preconditions.checkArgument(numberOfSkills >= 0);
@@ -184,6 +260,10 @@ public class SkillSheet {
 		this.averageGrade = averageGrade;
 		
 		this.grade = grade;
+		
+		this.accessors = new ImmutableMap.Builder<User, EnumSet<Access>>()
+				.putAll(accessors)
+				.build();
 	}
 	
 	@JsonCreator
@@ -196,7 +276,8 @@ public class SkillSheet {
 			@JsonProperty ("availableFrom") Date availableFrom,
 			@JsonProperty ("availableUntil") Date availableUntil,
 			@JsonProperty ("averageGrade") Float averageGrade,
-			@JsonProperty ("grade") Float grade) {
+			@JsonProperty ("grade") Float grade,
+			@JsonProperty ("accessors") Map<User, EnumSet<Access>> accessors) {
 		
 		this (UUID.fromString(uuidStr),
 				name,
@@ -206,7 +287,8 @@ public class SkillSheet {
 				availableFrom,
 				availableUntil,
 				averageGrade,
-				grade);
+				grade,
+				accessors);
 	}
 
 	@JsonProperty("uuid")
@@ -255,20 +337,21 @@ public class SkillSheet {
 	}
 	
 	@JsonIgnore
-	public SkillSheet getTeacherView() {
-		return new Builder(this)
-				.setGrade(null)
-				.build();
+	public boolean isTeacher(User user) {
+		EnumSet<Access> access = this.accessors.get(user);
+		if (access == null)
+			return false;
+		
+		return access.contains(Access.TEACHER);
 	}
 	
 	@JsonIgnore
-	public SkillSheet getStudentView() {
-		return new Builder (this)
-				.setVisible(null)
-				.setAvailableFrom(null)
-				.setAvailableUntil(null)
-				.setAverageGrade(null)
-				.build();
+	public boolean isStudent(User user) {
+		EnumSet<Access> access = this.accessors.get(user);
+		if (access == null)
+			return false;
+		
+		return access.contains(Access.STUDENT);
 	}
 	
 	@Override

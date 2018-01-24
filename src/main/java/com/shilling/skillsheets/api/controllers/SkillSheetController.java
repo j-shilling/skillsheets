@@ -1,10 +1,9 @@
 package com.shilling.skillsheets.api.controllers;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,9 +62,15 @@ public class SkillSheetController {
 			return null;
 		}
 		
-		SkillSheet skillsheet = this.service.create(user.get());
-		response.setStatus(HttpServletResponse.SC_CREATED);
-		return skillsheet.getTeacherView();
+		SkillSheet skillsheet = null;
+		try {
+			skillsheet = this.service.create(user.get());
+			response.setStatus(HttpServletResponse.SC_CREATED);
+		} catch (IOException e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		
+		return skillsheet;
 		
 	}
 	
@@ -91,14 +96,7 @@ public class SkillSheetController {
 		}
 		
 		Collection<SkillSheet> ret = this.service.read(user.get());
-		if (user.get().isTeacher())
-			return ret.stream()
-					.map(SkillSheet::getTeacherView)
-					.collect(Collectors.toSet());
-		else
-			return ret.stream()
-					.map(SkillSheet::getStudentView)
-					.collect(Collectors.toSet());
+		return ret;
 	}
 	
 	
@@ -127,10 +125,7 @@ public class SkillSheetController {
 			return null;
 		}
 		
-		if (user.get().isTeacher())
-			return result.get().getTeacherView();
-		else
-			return result.get().getStudentView();
+		return result.get();
 	}
 	
 	/**
