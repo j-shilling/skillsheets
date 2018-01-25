@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,8 +17,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.shilling.skillsheets.api.services.SkillSheetService;
 import com.shilling.skillsheets.api.services.UserService;
 import com.shilling.skillsheets.model.SkillSheet;
@@ -44,8 +41,6 @@ public class SkillSheetControllerTest extends TestCase {
 	
 	private SkillSheet mockSkillSheet = new SkillSheet.Builder().build();
 	
-	private ObjectMapper mapper = new ObjectMapper();
-	
 	/*
 	 * TESTS AS STUDENT
 	 */
@@ -62,6 +57,8 @@ public class SkillSheetControllerTest extends TestCase {
 		HttpStatus status = HttpStatus.valueOf(result.getResponse().getStatus());
 		
 		assertEquals (HttpStatus.FORBIDDEN, status);
+		
+		Mockito.verify(this.skillSheetService, Mockito.times(0)).create(Mockito.anyObject());
 	}
 	
 	@Test
@@ -78,9 +75,8 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.OK, status);
 		
-		JSONAssert.assertEquals(
-				"[{name:null,numberOfSkills:0,visible:null,availableFrom:null,availableUntil:null,dueDate:null,averageGrade:null,grade:0}]", 
-				result.getResponse().getContentAsString(), false);
+		Mockito.verify(this.skillSheetService, Mockito.timeout(1))
+			.read(Mockito.eq(this.student));
 	}
 	
 	@Test
@@ -97,28 +93,27 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.OK, status);
 		
-		JSONAssert.assertEquals(
-				"{name:null,numberOfSkills:0,visible:null,availableFrom:null,availableUntil:null,dueDate:null,averageGrade:null,grade:0}", 
-				result.getResponse().getContentAsString(), false);
+		Mockito.verify(this.skillSheetService, Mockito.timeout(1))
+			.read(Mockito.eq(this.student), Mockito.eq("testuuid"));
 	}
 	
 	@Test
-	public void testUpdateAsStudent() throws Exception {
+	public void testSetNameAsStudent () throws Exception {
 		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.student));
 		
-		ObjectWriter writer = this.mapper.writer();
-		byte[] body = writer.writeValueAsBytes(this.mockSkillSheet);
-		
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/skillsheets/testuuid")
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/skillsheets/testuuid/name")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
 				.header("Id-Token", "student")
-				.content(body);
+				.content("newname".getBytes());
 		
 		MvcResult result = this.mockMvc.perform(requestBuilder).andReturn();
 		HttpStatus status = HttpStatus.valueOf(result.getResponse().getStatus());
 		
 		assertEquals (HttpStatus.FORBIDDEN, status);
+		
+		Mockito.verify(this.skillSheetService, Mockito.times(0))
+			.setName(Mockito.any(), Mockito.any(), Mockito.any());
 	}
 	
 	@Test
@@ -133,6 +128,9 @@ public class SkillSheetControllerTest extends TestCase {
 		HttpStatus status = HttpStatus.valueOf(result.getResponse().getStatus());
 		
 		assertEquals (HttpStatus.FORBIDDEN, status);
+		
+		Mockito.verify(this.skillSheetService, Mockito.times(0))
+			.delete (Mockito.any(), Mockito.any());
 	}
 	
 	/*
@@ -153,9 +151,8 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.CREATED, status);
 		
-		JSONAssert.assertEquals(
-				"{name:null,numberOfSkills:0,visible:false,availableFrom:null,availableUntil:null,dueDate:null,averageGrade:0,grade:null}", 
-				result.getResponse().getContentAsString(), false);
+		Mockito.verify(this.skillSheetService, Mockito.times (1))
+			.create(Mockito.eq(this.teacher));
 	}
 	
 	@Test
@@ -172,9 +169,8 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.OK, status);
 		
-		JSONAssert.assertEquals(
-				"[{name:null,numberOfSkills:0,visible:false,availableFrom:null,availableUntil:null,dueDate:null,averageGrade:0,grade:null}]", 
-				result.getResponse().getContentAsString(), false);
+		Mockito.verify(this.skillSheetService, Mockito.times (1))
+			.read(Mockito.eq(this.teacher));
 	}
 	
 	@Test
@@ -191,29 +187,47 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.OK, status);
 		
-		JSONAssert.assertEquals(
-				"{name:null,numberOfSkills:0,visible:false,availableFrom:null,availableUntil:null,dueDate:null,averageGrade:0,grade:null}", 
-				result.getResponse().getContentAsString(), false);
+		Mockito.verify(this.skillSheetService, Mockito.times (1))
+			.read(Mockito.eq(this.teacher), Mockito.eq("testuuid"));
 	}
 	
 	@Test
-	public void testUpdateAsTeacher() throws Exception {
+	public void testSetNameAsTeacher() throws Exception {
 		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.teacher));
-		Mockito.when(this.skillSheetService.update(Mockito.anyObject(), Mockito.anyString(), Mockito.anyObject())).thenReturn(true);
+		Mockito.when(this.skillSheetService.setName(Mockito.anyObject(), Mockito.anyString(), Mockito.anyObject())).thenReturn(true);
 		
-		ObjectWriter writer = this.mapper.writer();
-		byte[] body = writer.writeValueAsBytes(this.mockSkillSheet);
-		
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/skillsheets/testuuid")
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/skillsheets/testuuid/name")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
 				.header("Id-Token", "teacher")
-				.content(body);
+				.content("newname".getBytes());
 		
 		MvcResult result = this.mockMvc.perform(requestBuilder).andReturn();
 		HttpStatus status = HttpStatus.valueOf(result.getResponse().getStatus());
 		
 		assertEquals (HttpStatus.OK, status);
+		
+		Mockito.verify(this.skillSheetService, Mockito.times(1))
+			.setName(Mockito.anyObject(), Mockito.eq("testuuid"), Mockito.eq("newname"));
+	}
+	
+	@Test
+	public void testSetNameNullAsTeacher() throws Exception {
+		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.teacher));
+		Mockito.when(this.skillSheetService.setName(Mockito.anyObject(), Mockito.anyString(), Mockito.anyObject())).thenReturn(true);
+		
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/skillsheets/testuuid/name")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
+				.header("Id-Token", "teacher");
+		
+		MvcResult result = this.mockMvc.perform(requestBuilder).andReturn();
+		HttpStatus status = HttpStatus.valueOf(result.getResponse().getStatus());
+		
+		assertEquals (HttpStatus.OK, status);
+		
+		Mockito.verify(this.skillSheetService, Mockito.times(1))
+			.setName(Mockito.anyObject(), Mockito.eq("testuuid"), Mockito.eq(null));
 	}
 	
 	@Test
@@ -222,7 +236,7 @@ public class SkillSheetControllerTest extends TestCase {
 		Mockito.when(this.skillSheetService.delete(Mockito.anyObject(), Mockito.anyString())).thenReturn(true);
 
 		
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/skillsheets/testuuit")
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/skillsheets/testuuid")
 				.header("Id-Token", "teacher")
 				.accept(MediaType.APPLICATION_JSON);
 		
@@ -230,6 +244,9 @@ public class SkillSheetControllerTest extends TestCase {
 		HttpStatus status = HttpStatus.valueOf(result.getResponse().getStatus());
 		
 		assertEquals (HttpStatus.OK, status);
+		
+		Mockito.verify(this.skillSheetService, Mockito.times (1))
+			.delete (Mockito.eq(this.teacher), Mockito.eq("testuuid"));
 	}
 	
 	/*
@@ -252,18 +269,15 @@ public class SkillSheetControllerTest extends TestCase {
 	}
 	
 	@Test
-	public void testUpdateNotFound() throws Exception {
+	public void testSetNameNotFound() throws Exception {
 		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.teacher));
-		Mockito.when(this.skillSheetService.update(Mockito.anyObject(), Mockito.anyString(), Mockito.anyObject())).thenReturn(false);
+		Mockito.when(this.skillSheetService.setName(Mockito.anyObject(), Mockito.anyString(), Mockito.anyString())).thenReturn(false);
 		
-		ObjectWriter writer = this.mapper.writer();
-		byte[] body = writer.writeValueAsBytes(this.mockSkillSheet);
-		
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/skillsheets/testuuid")
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/skillsheets/testuuid/name")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
 				.header("Id-Token", "teacher")
-				.content(body);
+				.content("newname".getBytes());
 		
 		MvcResult result = this.mockMvc.perform(requestBuilder).andReturn();
 		HttpStatus status = HttpStatus.valueOf(result.getResponse().getStatus());
@@ -274,7 +288,7 @@ public class SkillSheetControllerTest extends TestCase {
 	@Test
 	public void testDeleteNotFound() throws Exception {
 		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.teacher));
-		Mockito.when(this.skillSheetService.update(Mockito.anyObject(), Mockito.anyString(), Mockito.anyObject())).thenReturn(false);
+		Mockito.when(this.skillSheetService.delete(Mockito.anyObject(), Mockito.anyString())).thenReturn(false);
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/skillsheets/testuuid")
 				.header("Id-Token", "student")

@@ -95,7 +95,12 @@ public class SkillSheetController {
 			return Collections.emptyList();
 		}
 		
-		Collection<SkillSheet> ret = this.service.read(user.get());
+		Collection<SkillSheet> ret = null;
+		try {
+			ret = this.service.read(user.get());
+		} catch (IOException e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
 		return ret;
 	}
 	
@@ -119,43 +124,20 @@ public class SkillSheetController {
 			return null;
 		}
 		
-		Optional<SkillSheet> result = this.service.read(user.get(), uuid);
+		Optional<SkillSheet> result = Optional.empty();
+		try {
+			result = this.service.read(user.get(), uuid);
+		} catch (IOException e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return null;
+		}
+		
 		if (!result.isPresent()) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return null;
 		}
 		
 		return result.get();
-	}
-	
-	/**
-	 * Replaces a specific {@link SkillSheet} with a new one.
-	 * 
-	 * @param id_token		The Google ID Token to verify the user
-	 * @param uuid			A unique identifier for this {@link SkillSheet}
-	 * @param skillsheet	New value
-	 */
-	@PutMapping(value = "/api/skillsheets/{uuid}",
-			consumes ="application/json")
-	public void update (@RequestHeader (value = "Id-Token") String id_token,
-						@PathVariable String uuid, 
-						@RequestBody SkillSheet skillsheet,
-						HttpServletResponse response) {
-		
-		Optional<User> user = this.users.fromToken(id_token);
-		if (!user.isPresent()) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return;
-		}
-		
-		if (!user.get().isTeacher()) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return;
-		}
-		
-		if (!this.service.update(user.get(), uuid, skillsheet))
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-		
 	}
 	
 	/**
@@ -180,8 +162,47 @@ public class SkillSheetController {
 			return;
 		}
 		
-		if (!this.service.delete(user.get(), uuid))
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		try {
+			if (!this.service.delete(user.get(), uuid))
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		} catch (IOException e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	/**
+	 * Replaces the display name of a SkillSheet
+	 * 
+	 * @param id_token		The Google ID Token to verify the user
+	 * @param uuid			A unique identifier for this {@link SkillSheet}
+	 * @param name			New value
+	 */
+	@PutMapping(value = "/api/skillsheets/{uuid}/name",
+				consumes ="application/json")
+	public void setName (@RequestHeader (value = "Id-Token") String id_token,
+						 @PathVariable String uuid, 
+						 @RequestBody(required = false) String name,
+						 HttpServletResponse response) {
+		
+		Optional<User> user = this.users.fromToken(id_token);
+		if (!user.isPresent()) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+		}
+		
+		if (!user.get().isTeacher()) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return;
+		}
+		
+		try {
+			if (!this.service.setName (user.get(), uuid, name)) {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			}
+		} catch (IOException e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		
 	}
 
 }

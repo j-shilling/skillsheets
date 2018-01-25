@@ -57,27 +57,6 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean update(User user, SkillSheet skillSheet) throws IOException {
-		Preconditions.checkNotNull(user);
-		Preconditions.checkNotNull(skillSheet);
-		Preconditions.checkArgument(user.isTeacher());
-		Preconditions.checkArgument(skillSheet.isTeacher(user));
-		
-		try {
-			this.dao.update(skillSheet);
-		} catch (IOException e) {
-			throw e;
-		} catch (NoSuchElementException e) {
-			return false;
-		}
-		
-		return true;
-	}
-
 	@Override
 	public boolean delete(User user, String uuid) throws IOException {
 		Preconditions.checkNotNull(user);
@@ -92,6 +71,12 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 		}
 		
 		return true;
+	}
+
+	@Override
+	public boolean setName(User user, String uuid, String name) throws IOException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
