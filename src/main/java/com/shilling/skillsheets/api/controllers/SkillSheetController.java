@@ -51,7 +51,14 @@ public class SkillSheetController {
 	public SkillSheet create (@RequestHeader (value = "Id-Token") String id_token, 
 							  HttpServletResponse response) {
 		
-		Optional<User> user = this.users.fromToken(id_token);
+		Optional<User> user;
+		try {
+			user = this.users.fromToken(id_token);
+		} catch (IOException e1) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return null;
+		}
+		
 		if (!user.isPresent()) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return null;
@@ -89,7 +96,14 @@ public class SkillSheetController {
 			HttpServletResponse response) {
 		
 	
-		Optional<User> user = this.users.fromToken(id_token);
+		Optional<User> user;
+		try {
+			user = this.users.fromToken(id_token);
+		} catch (IOException e1) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return null;
+		}
+		
 		if (!user.isPresent()) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return Collections.emptyList();
@@ -118,7 +132,14 @@ public class SkillSheetController {
 							@PathVariable String uuid,
 							HttpServletResponse response) {
 		
-		Optional<User> user = this.users.fromToken(id_token);
+		Optional<User> user;
+		try {
+			user = this.users.fromToken(id_token);
+		} catch (IOException e1) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return null;
+		}
+		
 		if (!user.isPresent()) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return null;
@@ -151,7 +172,14 @@ public class SkillSheetController {
 						@PathVariable String uuid,
 						HttpServletResponse response) {
 		
-		Optional<User> user = this.users.fromToken(id_token);
+		Optional<User> user;
+		try {
+			user = this.users.fromToken(id_token);
+		} catch (IOException e1) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+		}
+		
 		if (!user.isPresent()) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return;
@@ -184,7 +212,14 @@ public class SkillSheetController {
 						 @RequestBody(required = false) String name,
 						 HttpServletResponse response) {
 		
-		Optional<User> user = this.users.fromToken(id_token);
+		Optional<User> user;
+		try {
+			user = this.users.fromToken(id_token);
+		} catch (IOException e1) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+		}
+		
 		if (!user.isPresent()) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return;

@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Optional;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -19,7 +18,6 @@ import com.shilling.skillsheets.dao.UserDao;
 import com.shilling.skillsheets.model.User;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
 public class GoogleUserServiceTest {
 	
 	@MockBean
@@ -27,25 +25,15 @@ public class GoogleUserServiceTest {
 	@MockBean
 	private UserDao dao;
 	
-	@Autowired
 	private UserService service;
 	
-	private final User fromGoogle = new User.Builder()
-			.setId("id")
-			.setEmail("some@email.com")
-			.setFamilyName("Name")
-			.setFirstName("Mr")
-			.setName("Mr Name")
-			.setTeacher(false)
-			.build();
-	private final User fromDao = new User.Builder(this.fromGoogle)
-			.setFirstName("Mrs.")
-			.setName("Mrs. Name")
-			.setTeacher(true)
-			.build();
+	@Before
+	public void setUp () {
+		this.service = new GoogleUserService (this.dao, this.verifier);
+	}
 
 	@Test
-	public void testNullToken() {
+	public void testNullToken() throws Exception {
 		Optional<User> result = this.service.fromToken(null);
 		assertFalse (result.isPresent());
 	}
@@ -69,38 +57,6 @@ public class GoogleUserServiceTest {
 		Mockito.when(this.verifier.verify(Mockito.anyString())).thenReturn(null);
 		Optional<User> result = this.service.fromToken("token");
 		assertFalse (result.isPresent());
-	}
-	
-	@Test
-	public void testNewUser() throws Exception {
-		GoogleUserService spy = (GoogleUserService) Mockito.spy(this.service);
-		Mockito.doReturn(Optional.of(this.fromGoogle)).when(spy).parseIdToken(Mockito.anyString());
-		Mockito.when(this.dao.read(Mockito.anyString())).thenReturn(Optional.empty());
-		
-		Optional<User> result = spy.fromToken("token");
-		assertTrue (result.isPresent());
-		assertEquals (this.fromGoogle.getId().get(), result.get().getId().get());
-		assertEquals (this.fromGoogle.getEmail().get(), result.get().getEmail().get());
-		assertEquals (this.fromGoogle.getName().get(), result.get().getName().get());
-		assertEquals (this.fromGoogle.getFirstName().get(), result.get().getFirstName().get());
-		assertEquals (this.fromGoogle.getFamilyName().get(), result.get().getFamilyName().get());
-		assertEquals (this.fromGoogle.isTeacher(), result.get().isTeacher());
-	}
-	
-	@Test
-	public void testUpdateUser() throws Exception {
-		GoogleUserService spy = (GoogleUserService) Mockito.spy(this.service);
-		Mockito.doReturn(Optional.of(this.fromGoogle)).when(spy).parseIdToken(Mockito.anyString());
-		Mockito.when(this.dao.read(Mockito.anyString())).thenReturn(Optional.of(this.fromDao));
-		
-		Optional<User> result = spy.fromToken("token");
-		assertTrue (result.isPresent());
-		assertEquals (this.fromGoogle.getId().get(), result.get().getId().get());
-		assertEquals (this.fromGoogle.getEmail().get(), result.get().getEmail().get());
-		assertEquals (this.fromGoogle.getName().get(), result.get().getName().get());
-		assertEquals (this.fromGoogle.getFirstName().get(), result.get().getFirstName().get());
-		assertEquals (this.fromGoogle.getFamilyName().get(), result.get().getFamilyName().get());
-		assertEquals (this.fromDao.isTeacher(), result.get().isTeacher());
 	}
 
 }

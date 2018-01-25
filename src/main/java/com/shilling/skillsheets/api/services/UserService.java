@@ -1,5 +1,6 @@
 package com.shilling.skillsheets.api.services;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import com.shilling.skillsheets.model.User;
@@ -18,7 +19,8 @@ public interface UserService {
 	 * 
 	 * @param id_token		String from the client
 	 * @return				Optional<User> or Optional.empty()
+	 * @throws IOException 
 	 */
-	public Optional<User> fromToken (String id_token);
+	public Optional<User> fromToken (String id_token) throws IOException;
 	
 }
