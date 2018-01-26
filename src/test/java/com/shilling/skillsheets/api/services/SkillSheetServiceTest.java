@@ -10,41 +10,43 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.shilling.skillsheets.dao.SkillSheetDao;
-import com.shilling.skillsheets.dao.UserDao;
+import com.shilling.skillsheets.dao.User;
 import com.shilling.skillsheets.model.SkillSheet;
-import com.shilling.skillsheets.model.User;
 
 @RunWith(SpringRunner.class)
 public class SkillSheetServiceTest {
 	
 	@MockBean
 	SkillSheetDao skillsheets;
-	@MockBean
-	UserDao users;
+	
+	@Mock
+	User mockUser;
 	
 	SkillSheetService service;
 	SkillSheet mockSkillSheet = new SkillSheet.Builder().build();
-	User mockUser = new User.Builder().setTeacher(true).build();
 	
 	@Before
 	public void setUp () {
-		this.service = new SkillSheetServiceImpl (this.skillsheets, this.users);
+		this.service = new SkillSheetServiceImpl (this.skillsheets);
 	}
 
 	@Test
 	public void testCreate() throws IOException {
 		Mockito.when(this.skillsheets.create()).thenReturn(this.mockSkillSheet);
+		Mockito.when(this.mockUser.isTeacher()).thenReturn(true);
+		
 		SkillSheet sheet = this.service.create(this.mockUser);
 		
 		assertEquals (this.mockSkillSheet, sheet);
 		
 		Mockito.verify(this.skillsheets, Mockito.times(1)).addTeacher(this.mockSkillSheet, this.mockUser);
-		Mockito.verify(this.users, Mockito.times(1)).addSkillSheet(this.mockUser, this.mockSkillSheet);
+		Mockito.verify(this.mockUser, Mockito.times(1)).addSkillSheet(this.mockSkillSheet);
 	}
 
 	@Test
@@ -52,7 +54,7 @@ public class SkillSheetServiceTest {
 		Mockito.when(this.skillsheets.read("test")).thenReturn(Optional.of(this.mockSkillSheet));
 		Mockito.when(this.skillsheets.isTeacher(this.mockSkillSheet, this.mockUser)).thenReturn(true);
 		Mockito.when(this.skillsheets.isStudents(this.mockSkillSheet, this.mockUser)).thenReturn(false);
-		Mockito.when(this.users.getSkillSheets(this.mockUser)).thenReturn(Collections.singleton("test"));
+		Mockito.when(this.mockUser.getSkillSheets()).thenReturn(Collections.singleton("test"));
 		
 		Collection<SkillSheet> result = this.service.read(this.mockUser);
 		
@@ -65,7 +67,7 @@ public class SkillSheetServiceTest {
 		Mockito.when(this.skillsheets.read("test")).thenReturn(Optional.of(this.mockSkillSheet));
 		Mockito.when(this.skillsheets.isTeacher(this.mockSkillSheet, this.mockUser)).thenReturn(true);
 		Mockito.when(this.skillsheets.isStudents(this.mockSkillSheet, this.mockUser)).thenReturn(false);
-		Mockito.when(this.users.getSkillSheets(this.mockUser)).thenReturn(Collections.emptyList());
+		Mockito.when(this.mockUser.getSkillSheets()).thenReturn(Collections.emptyList());
 		
 		Collection<SkillSheet> result = this.service.read(this.mockUser);
 		

@@ -13,22 +13,19 @@ import org.springframework.stereotype.Service;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.shilling.skillsheets.dao.SkillSheetDao;
-import com.shilling.skillsheets.dao.UserDao;
+import com.shilling.skillsheets.dao.User;
 import com.shilling.skillsheets.model.SkillSheet;
-import com.shilling.skillsheets.model.User;
 
 @Service
 public class SkillSheetServiceImpl implements SkillSheetService {
 	
 	private final Logger logger;
 	private final SkillSheetDao skillsheets;
-	private final UserDao users;
 	
 	@Autowired 
-	SkillSheetServiceImpl (SkillSheetDao skillsheets, UserDao users) {
+	SkillSheetServiceImpl (SkillSheetDao skillsheets) {
 		this.logger = LogManager.getLogger(SkillSheetServiceImpl.class);
 		this.skillsheets = skillsheets;
-		this.users = users;
 	}
 
 	/**
@@ -44,7 +41,7 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 		try {
 			SkillSheet skillsheet = this.skillsheets.create();
 			this.skillsheets.addTeacher (skillsheet, user);
-			this.users.addSkillSheet (user, skillsheet);
+			user.addSkillSheet (skillsheet);
 			return skillsheet;
 		} catch (IOException e) {
 			this.logger.warn("Could not create new SkillSheet");
@@ -60,7 +57,7 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 		Preconditions.checkNotNull(user);
 		
 		Collection<SkillSheet> ret = new HashSet<>();
-		Iterable<String> uuids = this.users.getSkillSheets (user);
+		Iterable<String> uuids = user.getSkillSheets ();
 		for (String uuid : uuids) {
 			Optional<SkillSheet> result = this.read(user, uuid);
 			if (result.isPresent())

@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shilling.skillsheets.api.services.SkillSheetService;
 import com.shilling.skillsheets.api.services.UserService;
+import com.shilling.skillsheets.dao.User;
 import com.shilling.skillsheets.model.SkillSheet;
-import com.shilling.skillsheets.model.User;
 
 /**
  * REST Controller for {@link com.shilling.skillsheets.api.services.SkillSheetService}

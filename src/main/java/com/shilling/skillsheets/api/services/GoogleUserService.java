@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.shilling.skillsheets.dao.User;
 import com.shilling.skillsheets.dao.UserDao;
-import com.shilling.skillsheets.model.User;
 
 /**
  * Implementation of {@link UserService} for Google Accounts
@@ -28,32 +28,11 @@ public class GoogleUserService implements UserService {
 	private final UserDao dao;
 	private final GoogleIdTokenVerifier verifier;
 	
-	@Autowired GoogleUserService (UserDao dao, GoogleIdTokenVerifier verifier) {
+	@Autowired 
+	GoogleUserService (UserDao dao, GoogleIdTokenVerifier verifier) {
 		this.logger = LogManager.getLogger(GoogleUserService.class);
 		this.dao = dao;
 		this.verifier = verifier;
-	}
-	
-	private class UpdateUser implements Runnable {
-		
-		private final User user;
-		private final Payload payload;
-		
-		private UpdateUser (User user, Payload payload) {
-			this.user = user;
-			this.payload = payload;
-		}
-
-		@Override
-		public void run() {
-			try {
-				GoogleUserService.this.dao.setUid (this.user, this.payload.getSubject());
-				GoogleUserService.this.dao.setEmail (this.user, this.payload.getEmail());
-				GoogleUserService.this.dao.setName (this.user, (String) this.payload.get ("name"));
-			} catch (IOException e) {
-				GoogleUserService.this.logger.warn("Could not update user data: " + e.getMessage());
-			}
-		}
 	}
 
 	/**
@@ -88,19 +67,18 @@ public class GoogleUserService implements UserService {
 			/* This user is already on record. Get local information and
 			 * update any information from Google which might have changed.
 			 */
-			new Thread (new UpdateUser (result.get(), payload));
-			User user = new User.Builder(result.get())
-							.setName((String) payload.get("name"))
-							.setId(payload.getSubject())
-							.setEmail(payload.getEmail())
-							.build();
+			User user = result.get()
+				.setName((String) payload.get("name"))
+				.setId(payload.getSubject())
+				.setEmail(payload.getEmail());
+			
 			return Optional.of(user);
 		} else {
-			User user = new User.Builder (this.dao.create())
-					.setName((String) payload.get("name"))
-					.setId(payload.getSubject())
-					.setEmail(payload.getEmail())
-					.build();
+			User user = this.dao.create()
+				.setName((String) payload.get("name"))
+				.setId(payload.getSubject())
+				.setEmail(payload.getEmail());
+			
 			return Optional.of(user);
 		}
 	

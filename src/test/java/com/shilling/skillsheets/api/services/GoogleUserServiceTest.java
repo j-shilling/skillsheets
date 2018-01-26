@@ -14,8 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.shilling.skillsheets.dao.User;
 import com.shilling.skillsheets.dao.UserDao;
-import com.shilling.skillsheets.model.User;
 
 @RunWith(SpringRunner.class)
 public class GoogleUserServiceTest {

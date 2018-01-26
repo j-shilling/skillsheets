@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.shilling.skillsheets.dao.User;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE)
 public class SkillSheet {

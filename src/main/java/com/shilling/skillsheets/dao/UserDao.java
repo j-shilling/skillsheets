@@ -1,11 +1,7 @@
 package com.shilling.skillsheets.dao;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Optional;
-
-import com.shilling.skillsheets.model.SkillSheet;
-import com.shilling.skillsheets.model.User;
 
 /**
  * Manages persistent storage of {@link User}s.
@@ -33,17 +29,11 @@ public interface UserDao {
 	 */
 	public Optional<User> read (String id) throws IOException;
 	
-	public void setName (User user, String name) throws IOException;
-	public void setEmail (User user, String email) throws IOException;
-	public void setUid (User user, String id) throws IOException;
-	
 	/**
 	 * 
 	 * @param user
 	 * @return
 	 */
 	public void delete (User user);
-	public void addSkillSheet(User user, SkillSheet skillsheet);
-	public Collection<String> getSkillSheets(User user);
 	
 }

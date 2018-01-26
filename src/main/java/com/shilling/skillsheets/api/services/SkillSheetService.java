@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 
+import com.shilling.skillsheets.dao.User;
 import com.shilling.skillsheets.model.SkillSheet;
-import com.shilling.skillsheets.model.User;
 
 /**
  * Service used to perform CRUD operations on 

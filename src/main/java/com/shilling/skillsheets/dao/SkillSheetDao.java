@@ -6,7 +6,6 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 import com.shilling.skillsheets.model.SkillSheet;
-import com.shilling.skillsheets.model.User;
 
 /**
  * Manages persistent storage of {@link SkillSheet}s.

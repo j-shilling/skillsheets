@@ -3,7 +3,7 @@ package com.shilling.skillsheets.api.services;
 import java.io.IOException;
 import java.util.Optional;
 
-import com.shilling.skillsheets.model.User;
+import com.shilling.skillsheets.dao.User;
 
 /**
  * Service to get user accounts from Id Tokens
