@@ -5,8 +5,6 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-import com.google.common.base.Preconditions;
-
 /**
  * A class to model user account information.
  * 
