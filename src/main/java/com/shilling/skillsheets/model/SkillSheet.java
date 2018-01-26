@@ -1,5 +1,6 @@
 package com.shilling.skillsheets.model;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -137,7 +138,11 @@ public class SkillSheet {
 		
 		public Builder addTeacher (User user) {
 			Preconditions.checkNotNull(user);
-			Preconditions.checkArgument(user.isTeacher());
+			try {
+				Preconditions.checkArgument(user.isTeacher());
+			} catch (IOException e) {
+				return this;
+			}
 			
 			EnumSet<Access> access = null;
 			if (this.accessors.containsKey(user)) {
@@ -153,7 +158,11 @@ public class SkillSheet {
 		
 		public Builder delTeacher (User user) {
 			Preconditions.checkNotNull(user);
-			Preconditions.checkArgument(user.isTeacher());
+			try {
+				Preconditions.checkArgument(user.isTeacher());
+			} catch (IOException e) {
+				return this;
+			}
 			
 			EnumSet<Access> access = this.accessors.get(user);
 			if (access != null) {

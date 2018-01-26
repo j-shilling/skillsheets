@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.shilling.skillsheets.dao.User;
 import com.shilling.skillsheets.model.SkillSheet;
 
@@ -14,6 +16,7 @@ import com.shilling.skillsheets.model.SkillSheet;
  * @author Jake Shilling
  *
  */
+@Service
 public interface SkillSheetService {
 
 	/**

@@ -64,8 +64,13 @@ public class SkillSheetController {
 			return null;
 		}
 		
-		if (!user.get().isTeacher()) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		try {
+			if (!user.get().isTeacher()) {
+				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+				return null;
+			}
+		} catch (IOException e1) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return null;
 		}
 		
@@ -185,8 +190,13 @@ public class SkillSheetController {
 			return;
 		}
 		
-		if (!user.get().isTeacher()) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		try {
+			if (!user.get().isTeacher()) {
+				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+				return;
+			}
+		} catch (IOException e1) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return;
 		}
 		
@@ -225,8 +235,13 @@ public class SkillSheetController {
 			return;
 		}
 		
-		if (!user.get().isTeacher()) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		try {
+			if (!user.get().isTeacher()) {
+				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+				return;
+			}
+		} catch (IOException e1) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return;
 		}
 		

@@ -7,8 +7,6 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
@@ -21,7 +19,6 @@ import com.shilling.skillsheets.dao.UserDao;
  * @author Jake Shilling
  *
  */
-@Service
 public class GoogleUserService implements UserService {
 
 	private final Logger logger;
@@ -74,9 +71,8 @@ public class GoogleUserService implements UserService {
 			
 			return Optional.of(user);
 		} else {
-			User user = this.dao.create()
+			User user = this.dao.createWithId(payload.getSubject())
 				.setName((String) payload.get("name"))
-				.setId(payload.getSubject())
 				.setEmail(payload.getEmail());
 			
 			return Optional.of(user);

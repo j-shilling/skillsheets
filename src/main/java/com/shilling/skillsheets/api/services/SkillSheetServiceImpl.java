@@ -8,15 +8,13 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.shilling.skillsheets.dao.SkillSheetDao;
 import com.shilling.skillsheets.dao.User;
 import com.shilling.skillsheets.model.SkillSheet;
 
-@Service
+
 public class SkillSheetServiceImpl implements SkillSheetService {
 	
 	private final Logger logger;

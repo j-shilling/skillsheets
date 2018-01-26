@@ -3,6 +3,8 @@ package com.shilling.skillsheets.api.services;
 import java.io.IOException;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.shilling.skillsheets.dao.User;
 
 /**
@@ -11,6 +13,7 @@ import com.shilling.skillsheets.dao.User;
  * @author Jake Shilling
  *
  */
+@Service
 public interface UserService {
 
 	/**

@@ -10,15 +10,6 @@ import java.util.Optional;
  *
  */
 public interface UserDao {
-
-	/**
-	 * Creates a new User entry
-	 * 
-	 * @return			A new instance of User corresponding to
-	 * 					the stored record
-	 * @throws IOException	if the storage could not be written
-	 */
-	public User create () throws IOException;
 	
 	/**
 	 * Creates an instance of User from a stored User entry.
@@ -35,5 +26,9 @@ public interface UserDao {
 	 * @return
 	 */
 	public void delete (User user);
+
+	User createWithId(String id) throws IOException;
+
+	User createWithEmail(String email) throws IOException;
 	
 }
