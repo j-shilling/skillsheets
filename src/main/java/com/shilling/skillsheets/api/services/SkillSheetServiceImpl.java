@@ -24,8 +24,8 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 	private final SkillSheetDao skillsheets;
 	private final UserDao users;
 	
-	@Autowired
-	private SkillSheetServiceImpl (SkillSheetDao skillsheets, UserDao users) {
+	@Autowired 
+	SkillSheetServiceImpl (SkillSheetDao skillsheets, UserDao users) {
 		this.logger = LogManager.getLogger(SkillSheetServiceImpl.class);
 		this.skillsheets = skillsheets;
 		this.users = users;
