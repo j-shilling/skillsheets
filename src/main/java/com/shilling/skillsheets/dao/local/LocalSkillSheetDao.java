@@ -18,7 +18,7 @@ import com.shilling.skillsheets.dao.SkillSheetDao;
  */
 public class LocalSkillSheetDao implements SkillSheetDao {
 	
-	private static final String EXTENSION = ".skillsheet.xml";
+	public static final String EXTENSION = ".skillsheet.xml";
 	
 	private final File dir;
 	private final Map<UUID, SkillSheet> skillsheets;
