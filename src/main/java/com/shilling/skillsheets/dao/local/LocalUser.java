@@ -11,8 +11,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,7 +30,6 @@ class LocalUser implements User {
 	private final UUID uuid;
 	private final File file;
 	private final LocalUserDao dao;
-	private final ReentrantLock lock;
 
 	public LocalUser(LocalUserDao dao, File file, UUID uuid) {
 		Preconditions.checkNotNull(file, "This user does not have a file");
@@ -42,15 +39,6 @@ class LocalUser implements User {
 		this.uuid = uuid;
 		this.file = file;
 		this.dao = dao;
-		this.lock = new ReentrantLock();
-	}
-
-	private void lock() {
-		this.lock.lock();
-	}
-
-	private void unlock() {
-		this.lock.unlock();
 	}
 
 	private File getFile() {
@@ -102,14 +90,7 @@ class LocalUser implements User {
 	 */
 	@Override
 	public boolean isTeacher() throws IOException {
-		this.lock();
-
-		try {
 			return Boolean.valueOf(this.getProperties().getProperty("teacher"));
-		} finally {
-			this.unlock();
-		}
-
 	}
 
 	/**
@@ -117,16 +98,7 @@ class LocalUser implements User {
 	 */
 	@Override
 	public User setName(String name) {
-
-		new Thread(() -> {
-			LocalUser.this.lock();
-			try {
-				LocalUser.this.setProperty("name", name);
-			} finally {
-				LocalUser.this.unlock();
-			}
-		}).start();
-
+		this.setProperty("name", name);
 		return this;
 	}
 
@@ -135,39 +107,19 @@ class LocalUser implements User {
 	 */
 	@Override
 	public Optional<String> getName() throws IOException {
-		this.lock();
-		try {
-			return Optional.ofNullable(this.getProperties().getProperty("name"));
-		} finally {
-			this.unlock();
-		}
+		return Optional.ofNullable(this.getProperties().getProperty("name"));
 	}
 
 	/**
 	 * {@inheritDoc}
+	 * @throws IOException 
 	 */
 	@Override
-	public User setId(String id) {
-		this.lock();
-
-		try {
-			String old = this.getProperties().getProperty("id");
-				new Thread(() -> {
-					LocalUser.this.dao.updateKey(old, id, LocalUser.this);
-				}).start();
-			
-			new Thread(() -> {
-				try {
-					LocalUser.this.setProperty("id", id);
-				} finally {
-					if (LocalUser.this.lock.isLocked())
-						LocalUser.this.unlock();
-				}
-			}).start();
-		} catch (IOException e) {
-			this.logger.error("Error trying to read id: " + e.getMessage());
-		}
-
+	public User setId(String id) throws IOException {
+		
+		this.dao.updateKey(this.getProperties().getProperty("id"), id, LocalUser.this);
+		this.setProperty("id", id);
+		
 		return this;
 	}
 
@@ -176,40 +128,18 @@ class LocalUser implements User {
 	 */
 	@Override
 	public Optional<String> getId() throws IOException {
-		this.lock();
-		try {
-			return Optional.ofNullable(this.getProperties().getProperty("id"));
-		} finally {
-			this.unlock();
-		}
+		return Optional.ofNullable(this.getProperties().getProperty("id"));
 	}
 
 	/**
 	 * {@inheritDoc}
+	 * @throws IOException 
 	 */
 	@Override
-	public User setEmail(String email) {
-		this.lock();
-
-		try {
-			Optional<String> old = Optional.ofNullable(this.getProperties().getProperty("email"));
-			if (old.isPresent()) {
-				new Thread(() -> {
-					LocalUser.this.dao.updateKey(old.get(), email, LocalUser.this);
-				}).start();
-			}
-			
-			new Thread(() -> {
-				try {
-					LocalUser.this.setProperty("email", email);
-				} finally {
-					LocalUser.this.unlock();
-				}
-			}).start();
-		} catch (IOException e) {
-			this.logger.error("Error trying to read id: " + e.getMessage());
-		}
-
+	public User setEmail(String email) throws IOException {
+		this.dao.updateKey(this.getProperties().getProperty("email"), email, this);
+		this.setProperty("email", email);
+		
 		return this;
 	}
 
@@ -218,12 +148,7 @@ class LocalUser implements User {
 	 */
 	@Override
 	public Optional<String> getEmail() throws IOException {
-		this.lock();
-		try {
-			return Optional.ofNullable(this.getProperties().getProperty("email"));
-		} finally {
-			this.unlock();
-		}
+		return Optional.ofNullable(this.getProperties().getProperty("email"));
 	}
 
 	/**
@@ -231,15 +156,8 @@ class LocalUser implements User {
 	 */
 	@Override
 	public User addSkillSheet(SkillSheet skillsheet) {
-		new Thread(() -> {
-			LocalUser.this.lock();
-			try {
-				LocalUser.this.addProperty("skillsheets", skillsheet.getUuid());
-			} finally {
-				LocalUser.this.unlock();
-			}
-		}).start();
-
+		addProperty("skillsheets", skillsheet.getUuid());
+		
 		return this;
 	}
 
@@ -248,13 +166,8 @@ class LocalUser implements User {
 	 */
 	@Override
 	public Collection<String> getSkillSheets() throws IOException {
-		this.lock();
-		try {
-			String values = this.getProperties().getProperty("skillsheets");
-			return new HashSet<>(Arrays.asList(values.split(",")));
-		} finally {
-			this.unlock();
-		}
+		String values = this.getProperties().getProperty("skillsheets");
+		return new HashSet<>(Arrays.asList(values.split(",")));
 	}
 
 	/**
@@ -262,12 +175,7 @@ class LocalUser implements User {
 	 */
 	@Override
 	public void delete() {
-		this.lock();
-		try {
-			this.getFile().delete();
-		} finally {
-			this.unlock();
-		}
+		this.getFile().delete();
 	}
 
 	/**

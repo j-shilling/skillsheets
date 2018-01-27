@@ -86,9 +86,9 @@ public class LocalUserDaoTest {
 		User email = this.dao.createWithEmail("test@email.com");
 		
 		assertTrue (this.dao.read("testid").isPresent());
-		assertEquals (id, this.dao.read("testid"));
+		assertEquals (id, this.dao.read("testid").get());
 		assertTrue (this.dao.read("test@email.com").isPresent());
-		assertEquals (email, this.dao.read("test@email.com"));
+		assertEquals (email, this.dao.read("test@email.com").get());
 		assertFalse (this.dao.read("badid").isPresent());
 	}
 

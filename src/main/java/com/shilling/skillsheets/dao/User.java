@@ -39,8 +39,9 @@ public interface User {
 	 * 
 	 * @param string	The new value to be saved. Nullable.
 	 * @return			<tt>this</tt> to enable method chaining
+	 * @throws IOException 
 	 */
-	public User setId(@Nullable String subject);
+	public User setId(@Nullable String subject) throws IOException;
 	
 	public Optional<String> getId() throws IOException;
 
@@ -49,8 +50,9 @@ public interface User {
 	 * 
 	 * @param string	The new value to be saved. Nullable.
 	 * @return			<tt>this</tt> to enable method chaining
+	 * @throws IOException 
 	 */
-	public User setEmail(@Nullable String email);
+	public User setEmail(@Nullable String email) throws IOException;
 	
 	public Optional<String> getEmail() throws IOException;
 
