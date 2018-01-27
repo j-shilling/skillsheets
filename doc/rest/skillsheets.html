@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>REST Interface - SkillSheets</title>
+</head>
+<body>
+
+<h1>REST Interface - SkillSheets</h1>
+
+<p>SkillSheets are a user resource used to group course objectives and track student 
+progress. The REST interface enables CRUD operations upon this resource. All operations
+must be performed by authenticated users. Authentication is performed on the client
+using <a href=https://developers.google.com/identity/sign-in/web/sign-in>Google Sign-In</a>.
+The client needs to get an <a href=https://developers.google.com/identity/sign-in/web/backend-auth>
+id token</a> and attach it to each request as a header parameter called 'Id-Token'. If the
+server is unable to validate the id token, a status code of 401 is returned. If the id token
+is valid, but the user is trying to perform an operation for which they do not have permission,
+a status code of 403 is returned. Some operations require that a UUID be sent as path parameter;
+if this UUID does not correspond to an existing object, 404 is returned.</p>
+
+<h2>Create</h2>
+
+<h3>POST /api/skillsheets</h3>
+<p>On success this operation response with a status code 201 an <a href="model/skillsheet.html">
+SkillSheet</a> in the body as a JSON object</p>
+<h4>Possible Errors</h4>
+<p><b>401</b> There is not valid header parameter 'Id-Token'</p>
+<p><b>403</b> The user has a student account</p>
+
+<h2>Read</h2>
+
+<h3>GET /api/skillsheets</h3>
+
+<p>On success this operation response with a status code of 200 and a JSON list of 
+<a href="model/skillsheet.html">SkillSheet</a> objects visible to the user. This list
+may be empty.
+
+<h4>Possible Errors</h4>
+<p><b>401</b> There is not valid header parameter 'Id-Token'</p>
+
+<h3>GET /api/skillsheets/{uuid}</h3>
+
+<p>On success this operation response with a status code of 200 and <a href="model/skillsheet.html">
+SkillSheet</a> as a JSON object.
+
+<h4>Possible Errors</h4>
+<p><b>401</b> There is not valid header parameter 'Id-Token'</p>
+<p><b>404</b> The UUID does not correspond to a real object</p>
+
+<h2>Update</h2>
+
+<h3>PUT /api/skillsheets/{uuid}</h3>
+
+<p>The request body most contain a JSON object representing the new state of the 
+<a href="model/skillsheet.html">SkillSheet</a> to be modified.</p>
+
+<p>On success this operation responses with a status code of 200.</p>
+
+<h4>Possible Errors</h4>
+<p><b>401</b> There is not valid header parameter 'Id-Token'</p>
+<p><b>403</b> The user has a student account</p>
+<p><b>404</b> The UUID does not correspond to a real object</p>
+
+<h2>Delete</h2>
+
+<h3>DELETE /api/skillsheets/{uuid}</h3>
+
+<p>On success this operation responses with a status code of 200.</p>
+
+<h4>Possible Errors</h4>
+<p><b>401</b> There is not valid header parameter 'Id-Token'</p>
+<p><b>403</b> The user has a student account</p>
+<p><b>404</b> The UUID does not correspond to a real object</p>
+
+</body>
+</html>
