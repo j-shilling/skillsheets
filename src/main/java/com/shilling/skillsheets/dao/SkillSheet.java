@@ -49,4 +49,6 @@ public interface SkillSheet {
 	 */
 	public void setName(@Nullable String name) throws IOException;
 	
+	public void delete ();
+	
 }
