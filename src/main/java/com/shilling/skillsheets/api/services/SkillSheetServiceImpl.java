@@ -10,9 +10,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import com.shilling.skillsheets.dao.SkillSheet;
 import com.shilling.skillsheets.dao.SkillSheetDao;
 import com.shilling.skillsheets.dao.User;
-import com.shilling.skillsheets.model.SkillSheet;
 
 
 public class SkillSheetServiceImpl implements SkillSheetService {
@@ -38,7 +38,7 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 				
 		try {
 			SkillSheet skillsheet = this.skillsheets.create();
-			this.skillsheets.addTeacher (skillsheet, user);
+			skillsheet.addTeacher(user);
 			user.addSkillSheet (skillsheet);
 			return skillsheet;
 		} catch (IOException e) {
@@ -77,12 +77,12 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 			return Optional.empty();
 		
 		/* Check visibility */
-		if (this.skillsheets.isTeacher(result.get(), user)) {
+		if (result.get().isTeacher(user)) {
 			/* User is a teacher on this SkillSheet */
 			return result;
 		}
 		
-		if (this.skillsheets.isStudents(result.get(), user)) {
+		if (result.get().isStudent(user)) {
 			/* User is a student on this SkillSheet */
 			return result;
 		}
@@ -103,7 +103,7 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 			return false;
 		
 		/* Check visibility */
-		if (this.skillsheets.isTeacher(result.get(), user)) {
+		if (result.get().isTeacher(user)) {
 			/* User is a teacher on this SkillSheet */
 			this.skillsheets.delete(result.get());
 			return true;
@@ -125,9 +125,9 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 			return false;
 		
 		/* Check visibility */
-		if (this.skillsheets.isTeacher(result.get(), user)) {
+		if (result.get().isTeacher(user)) {
 			/* User is a teacher on this SkillSheet */
-			this.skillsheets.setName (result.get(), name);
+			result.get().setName(name);
 			return true;
 		} else {
 			/* User cannot delete this SkillSheet */

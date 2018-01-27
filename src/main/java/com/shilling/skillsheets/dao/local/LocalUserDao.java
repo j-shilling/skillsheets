@@ -23,16 +23,23 @@ public class LocalUserDao implements UserDao {
 	
 	private final Logger logger = LogManager.getLogger(LocalUserDao.class);
 	private final Map<String, User> users;
+	private final File userdir;
 	
-	public LocalUserDao () {
+	public LocalUserDao (File userdir) {
 		this.users = new HashMap<>();
 		
-		File userdir = this.getUserDir();
-		File[] files = userdir.listFiles((dir, name) -> name.endsWith(".properties"));
+		this.userdir = userdir;
+		if (!this.userdir.exists())
+			this.userdir.mkdirs();
+		
+		Preconditions.checkArgument(this.userdir.isDirectory());
+		
+		File[] files = userdir.listFiles((dir, name) -> name.endsWith(".user.properties"));
 		
 		for (File file : files) {
 			try {
-				User user = new LocalUser (this, file);
+				UUID uuid = UUID.fromString(file.getName().substring(0, file.getName().indexOf(".user.properties")));
+				User user = new LocalUser (this, file, uuid);
 				Optional<String> id = user.getId();
 				if (id.isPresent())
 					this.users.put(id.get(), user);
@@ -47,19 +54,9 @@ public class LocalUserDao implements UserDao {
 		}
 	}
 	
-	private File getUserDir () {
-		Path path = Paths.get(System.getProperty("user.home"),
-				".skillsheets",
-				"users");
-		File ret = path.toFile();
-		if (!ret.exists())
-			ret.mkdirs();
-		return ret;
-	}
-	
-	private File newUserFile () throws IOException {
-		Path path = Paths.get(this.getUserDir().getAbsolutePath(),
-				UUID.randomUUID().toString() + ".properties");
+	private File newUserFile (UUID uuid) throws IOException {
+		Path path = Paths.get(this.userdir.getAbsolutePath(),
+				uuid.toString() + ".user.properties");
 		File ret = path.toFile();
 		ret.createNewFile();
 		return ret;
@@ -74,10 +71,13 @@ public class LocalUserDao implements UserDao {
 		Preconditions.checkArgument(!id.isEmpty());
 		Preconditions.checkState(this.users.get(id) == null);
 		
-		File file = this.newUserFile();
-		User user = new LocalUser(this, file).setId(id);
+		UUID uuid = UUID.randomUUID();
+		File file = this.newUserFile(uuid);
+		User user = new LocalUser(this, file, uuid);
+		
 		this.users.put(id, user);
-		return user;
+		
+		return user.setId(id);
 	}
 	
 	/**
@@ -89,9 +89,9 @@ public class LocalUserDao implements UserDao {
 		Preconditions.checkArgument(!email.isEmpty());
 		Preconditions.checkState(this.users.get(email) == null);
 		
-		File file = this.newUserFile();
-		User user = new LocalUser(this, file).setEmail(email);
-		this.users.put(email, user);
+		UUID uuid = UUID.randomUUID();
+		File file = this.newUserFile(uuid);
+		User user = new LocalUser(this, file, uuid).setEmail(email);
 		return user;
 	}
 
@@ -113,10 +113,9 @@ public class LocalUserDao implements UserDao {
 		this.users.values().removeIf (val -> user.equals(val));
 	}
 	
-	public void updateKey (String oldVal, String newVal) {
-		User user = this.users.remove(oldVal);
-		if (user != null)
-			this.users.put(newVal, user);
+	public void updateKey (String oldVal, String newVal, User user) {
+		this.users.remove(oldVal);
+		this.users.put(newVal, user);
 	}
 
 }

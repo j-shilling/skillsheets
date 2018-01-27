@@ -3,10 +3,9 @@ package com.shilling.skillsheets.dao;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
-
-import com.shilling.skillsheets.model.SkillSheet;
 
 /**
  * Represents an entry for a user in persistent storage.
@@ -16,6 +15,7 @@ import com.shilling.skillsheets.model.SkillSheet;
  */
 public interface User {
 	
+	public UUID getUuid();
 	/**
 	 * Check whether this user has a teacher account.
 	 * 

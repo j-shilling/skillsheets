@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.shilling.skillsheets.dao.SkillSheet;
 import com.shilling.skillsheets.dao.User;
-import com.shilling.skillsheets.model.SkillSheet;
 
 /**
  * Service used to perform CRUD operations on 

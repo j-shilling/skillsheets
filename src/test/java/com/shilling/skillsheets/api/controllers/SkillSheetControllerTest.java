@@ -20,8 +20,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.shilling.skillsheets.api.services.SkillSheetService;
 import com.shilling.skillsheets.api.services.UserService;
+import com.shilling.skillsheets.dao.SkillSheet;
 import com.shilling.skillsheets.dao.User;
-import com.shilling.skillsheets.model.SkillSheet;
 
 import junit.framework.TestCase;
 
@@ -39,8 +39,8 @@ public class SkillSheetControllerTest extends TestCase {
 	
 	@Mock
 	private User mockUser;
-	
-	private SkillSheet mockSkillSheet = new SkillSheet.Builder().build();
+	@Mock
+	private SkillSheet mockSkillSheet;
 	
 	/*
 	 * TESTS AS STUDENT

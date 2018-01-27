@@ -15,9 +15,9 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.shilling.skillsheets.dao.SkillSheet;
 import com.shilling.skillsheets.dao.SkillSheetDao;
 import com.shilling.skillsheets.dao.User;
-import com.shilling.skillsheets.model.SkillSheet;
 
 @RunWith(SpringRunner.class)
 public class SkillSheetServiceTest {
@@ -27,9 +27,10 @@ public class SkillSheetServiceTest {
 	
 	@Mock
 	User mockUser;
+	@Mock
+	SkillSheet mockSkillSheet;
 	
 	SkillSheetService service;
-	SkillSheet mockSkillSheet = new SkillSheet.Builder().build();
 	
 	@Before
 	public void setUp () {
@@ -45,15 +46,15 @@ public class SkillSheetServiceTest {
 		
 		assertEquals (this.mockSkillSheet, sheet);
 		
-		Mockito.verify(this.skillsheets, Mockito.times(1)).addTeacher(this.mockSkillSheet, this.mockUser);
+		Mockito.verify(this.mockSkillSheet, Mockito.times(1)).addTeacher(this.mockUser);
 		Mockito.verify(this.mockUser, Mockito.times(1)).addSkillSheet(this.mockSkillSheet);
 	}
 
 	@Test
 	public void testRead() throws IOException {
 		Mockito.when(this.skillsheets.read("test")).thenReturn(Optional.of(this.mockSkillSheet));
-		Mockito.when(this.skillsheets.isTeacher(this.mockSkillSheet, this.mockUser)).thenReturn(true);
-		Mockito.when(this.skillsheets.isStudents(this.mockSkillSheet, this.mockUser)).thenReturn(false);
+		Mockito.when(this.mockSkillSheet.isTeacher(this.mockUser)).thenReturn(true);
+		Mockito.when(this.mockSkillSheet.isStudent(this.mockUser)).thenReturn(false);
 		Mockito.when(this.mockUser.getSkillSheets()).thenReturn(Collections.singleton("test"));
 		
 		Collection<SkillSheet> result = this.service.read(this.mockUser);
@@ -65,8 +66,8 @@ public class SkillSheetServiceTest {
 	@Test
 	public void testReadEmpty() throws IOException {
 		Mockito.when(this.skillsheets.read("test")).thenReturn(Optional.of(this.mockSkillSheet));
-		Mockito.when(this.skillsheets.isTeacher(this.mockSkillSheet, this.mockUser)).thenReturn(true);
-		Mockito.when(this.skillsheets.isStudents(this.mockSkillSheet, this.mockUser)).thenReturn(false);
+		Mockito.when(this.mockSkillSheet.isTeacher(this.mockUser)).thenReturn(true);
+		Mockito.when(this.mockSkillSheet.isStudent(this.mockUser)).thenReturn(false);
 		Mockito.when(this.mockUser.getSkillSheets()).thenReturn(Collections.emptyList());
 		
 		Collection<SkillSheet> result = this.service.read(this.mockUser);
@@ -77,8 +78,8 @@ public class SkillSheetServiceTest {
 	@Test
 	public void testReadUuidTeacher() throws IOException {
 		Mockito.when(this.skillsheets.read(Mockito.anyString())).thenReturn(Optional.of(this.mockSkillSheet));
-		Mockito.when(this.skillsheets.isTeacher(this.mockSkillSheet, this.mockUser)).thenReturn(true);
-		Mockito.when(this.skillsheets.isStudents(this.mockSkillSheet, this.mockUser)).thenReturn(false);
+		Mockito.when(this.mockSkillSheet.isTeacher(this.mockUser)).thenReturn(true);
+		Mockito.when(this.mockSkillSheet.isStudent(this.mockUser)).thenReturn(false);
 		
 		Optional<SkillSheet> result = this.service.read(this.mockUser, "test");
 		assertTrue (result.isPresent());
@@ -88,8 +89,8 @@ public class SkillSheetServiceTest {
 	@Test
 	public void testReadUuidStudent() throws IOException {
 		Mockito.when(this.skillsheets.read(Mockito.anyString())).thenReturn(Optional.of(this.mockSkillSheet));
-		Mockito.when(this.skillsheets.isTeacher(this.mockSkillSheet, this.mockUser)).thenReturn(false);
-		Mockito.when(this.skillsheets.isStudents(this.mockSkillSheet, this.mockUser)).thenReturn(true);
+		Mockito.when(this.mockSkillSheet.isTeacher(this.mockUser)).thenReturn(false);
+		Mockito.when(this.mockSkillSheet.isStudent(this.mockUser)).thenReturn(true);
 		
 		Optional<SkillSheet> result = this.service.read(this.mockUser, "test");
 		assertTrue (result.isPresent());
@@ -99,8 +100,8 @@ public class SkillSheetServiceTest {
 	@Test
 	public void testReadUuidNotVisible() throws IOException {
 		Mockito.when(this.skillsheets.read(Mockito.anyString())).thenReturn(Optional.of(this.mockSkillSheet));
-		Mockito.when(this.skillsheets.isTeacher(this.mockSkillSheet, this.mockUser)).thenReturn(false);
-		Mockito.when(this.skillsheets.isStudents(this.mockSkillSheet, this.mockUser)).thenReturn(false);
+		Mockito.when(this.mockSkillSheet.isTeacher(this.mockUser)).thenReturn(false);
+		Mockito.when(this.mockSkillSheet.isStudent(this.mockUser)).thenReturn(false);
 		
 		Optional<SkillSheet> result = this.service.read(this.mockUser, "test");
 		assertFalse (result.isPresent());
@@ -109,8 +110,8 @@ public class SkillSheetServiceTest {
 	@Test
 	public void testReadUuidNotFound() throws IOException {
 		Mockito.when(this.skillsheets.read(Mockito.anyString())).thenReturn(Optional.empty());
-		Mockito.when(this.skillsheets.isTeacher(this.mockSkillSheet, this.mockUser)).thenReturn(true);
-		Mockito.when(this.skillsheets.isStudents(this.mockSkillSheet, this.mockUser)).thenReturn(false);
+		Mockito.when(this.mockSkillSheet.isTeacher(this.mockUser)).thenReturn(true);
+		Mockito.when(this.mockSkillSheet.isStudent(this.mockUser)).thenReturn(false);
 		
 		Optional<SkillSheet> result = this.service.read(this.mockUser, "test");
 		assertFalse (result.isPresent());
@@ -119,7 +120,7 @@ public class SkillSheetServiceTest {
 	@Test
 	public void testDelete() throws IOException {
 		Mockito.when(this.skillsheets.read(Mockito.anyString())).thenReturn(Optional.of(this.mockSkillSheet));
-		Mockito.when(this.skillsheets.isTeacher(this.mockSkillSheet, this.mockUser)).thenReturn(true);
+		Mockito.when(this.mockSkillSheet.isTeacher(this.mockUser)).thenReturn(true);
 		
 		assertTrue (this.service.delete(this.mockUser, "test"));
 		
@@ -138,7 +139,7 @@ public class SkillSheetServiceTest {
 	@Test
 	public void testDeleteNotVisible() throws IOException {
 		Mockito.when(this.skillsheets.read(Mockito.anyString())).thenReturn(Optional.of(this.mockSkillSheet));
-		Mockito.when(this.skillsheets.isTeacher(this.mockSkillSheet, this.mockUser)).thenReturn(false);
+		Mockito.when(this.mockSkillSheet.isTeacher(this.mockUser)).thenReturn(false);
 		
 		assertFalse (this.service.delete(this.mockUser, "test"));
 		
@@ -148,11 +149,11 @@ public class SkillSheetServiceTest {
 	@Test
 	public void testSetName() throws IOException {
 		Mockito.when(this.skillsheets.read(Mockito.anyString())).thenReturn(Optional.of(this.mockSkillSheet));
-		Mockito.when(this.skillsheets.isTeacher(this.mockSkillSheet, this.mockUser)).thenReturn(true);
+		Mockito.when(this.mockSkillSheet.isTeacher(this.mockUser)).thenReturn(true);
 		
 		assertTrue (this.service.setName(this.mockUser, "test", "test"));
 		
-		Mockito.verify(this.skillsheets, Mockito.times(1)).setName(this.mockSkillSheet, "test");
+		Mockito.verify(this.mockSkillSheet, Mockito.times(1)).setName("test");
 	}
 	
 	@Test
@@ -161,17 +162,17 @@ public class SkillSheetServiceTest {
 		
 		assertFalse (this.service.setName(this.mockUser, "test", "test"));
 		
-		Mockito.verify(this.skillsheets, Mockito.times(0)).setName(this.mockSkillSheet, "test");
+		Mockito.verify(this.mockSkillSheet, Mockito.times(0)).setName("test");
 	}
 	
 	@Test
 	public void testSetNameNotVisible() throws IOException {
 		Mockito.when(this.skillsheets.read(Mockito.anyString())).thenReturn(Optional.of(this.mockSkillSheet));
-		Mockito.when(this.skillsheets.isTeacher(this.mockSkillSheet, this.mockUser)).thenReturn(false);
+		Mockito.when(this.mockSkillSheet.isTeacher(this.mockUser)).thenReturn(false);
 		
 		assertFalse (this.service.setName(this.mockUser, "test", "test"));
 		
-		Mockito.verify(this.skillsheets, Mockito.times(0)).setName(this.mockSkillSheet, "test");
+		Mockito.verify(this.mockSkillSheet, Mockito.times(0)).setName("test");
 	}
 
 }
