@@ -23,7 +23,7 @@ public class LocalSkillSheetDao implements SkillSheetDao {
 	private final File dir;
 	private final Map<UUID, SkillSheet> skillsheets;
 	
-	private LocalSkillSheetDao (File dir) {
+	LocalSkillSheetDao (File dir) {
 		if (!dir.exists())
 			dir.mkdirs();
 		

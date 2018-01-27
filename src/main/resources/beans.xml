@@ -14,6 +14,6 @@
 	<bean id="Userservice" class="com.shilling.skillsheets.api.services.GoogleUserService"/>
 	<bean id="SkillSheetService" class="com.shilling.skillsheets.api.services.SkillSheetServiceImpl"/>
 	<bean id="UserDao" class="com.shilling.skillsheets.dao.local.LocalUserDaoFactory"/>
-	<bean id="SkillSheetDao" class="com.shilling.skillsheets.dao.local.LocalSkillSheetDao"/>
+	<bean id="SkillSheetDao" class="com.shilling.skillsheets.dao.local.LocalSkillSheetDaoFactory"/>
    
 </beans>

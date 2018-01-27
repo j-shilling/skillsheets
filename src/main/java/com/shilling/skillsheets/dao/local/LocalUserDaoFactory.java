@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.shilling.skillsheets.dao.local;
 
 import java.nio.file.Paths;
