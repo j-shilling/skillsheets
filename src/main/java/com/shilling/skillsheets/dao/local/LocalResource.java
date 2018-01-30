@@ -2,19 +2,81 @@ package com.shilling.skillsheets.dao.local;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.base.Preconditions;
 import com.shilling.skillsheets.dao.Resource;
 
-abstract class LocalResource<T> implements Resource {
+abstract class LocalResource<T extends LocalResource.Data> implements Resource {
+	
+	static class Data {
+		private @Nullable String name;
+		private UUID owner;
+		private Collection<UUID> editors;
+		private Collection<UUID> viewers;
+		
+		protected Data() {
+			this.name = null;
+			this.owner = null;
+			this.editors = new HashSet<>();
+			this.viewers = new HashSet<>();
+		}
+		
+		@JsonCreator
+		protected Data (
+				@JsonProperty ("name") String name,
+				@JsonProperty ("owner") UUID owner,
+				@JsonProperty ("editors") Collection<UUID> editors,
+				@JsonProperty ("viewers") Collection<UUID> viewers) {
+			this.name = name;
+			this.owner = owner;
+			this.editors = new HashSet<>();
+			this.viewers = new HashSet<>();
+			
+			if (editors != null)
+				this.editors.addAll(editors);
+			if (viewers != null)
+				this.viewers.addAll(viewers);
+		}
+
+		public Optional<String> getName() {
+			return Optional.ofNullable(name);
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Optional<UUID> getOwner() {
+			return Optional.ofNullable(owner);
+		}
+
+		public void setOwner(UUID owner) {
+			this.owner = owner;
+		}
+
+		public Collection<UUID> getEditors() {
+			return editors;
+		}
+
+		public Collection<UUID> getViewers() {
+			return viewers;
+		}
+	}
 
 	private final UUID uuid;
 	private final File file;
@@ -124,5 +186,54 @@ abstract class LocalResource<T> implements Resource {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.uuid);
+	}
+
+	@Override
+	public synchronized Optional<UUID> getOwner() throws IOException {
+		return this.read().getOwner();
+	}
+
+	@Override
+	public synchronized void setOwner(UUID uuid) throws IOException {
+		T data = this.read();
+		data.setOwner(uuid);
+		this.write(data);
+	}
+
+	@Override
+	public synchronized Optional<String> getName() throws IOException {
+		return this.read().getName();
+	}
+
+	@Override
+	public synchronized void setName(String name) throws IOException {
+		T data = this.read();
+		data.setName(name);
+		this.write(data);
+	}
+
+	@Override
+	public void addEditor(UUID uuid) throws IOException {
+		T data = this.read();
+		data.getEditors().add(uuid);
+		this.write(data);
+	}
+
+	@Override
+	public void addViewer(UUID uuid) throws IOException {
+		T data = this.read();
+		data.getViewers().add(uuid);
+		this.write(data);
+	}
+
+	@Override
+	public boolean canEdit(UUID uuid) throws IOException {
+		return this.read().getEditors().contains(uuid);
+	}
+
+	@Override
+	public boolean canView(UUID uuid) throws IOException {
+		return this.read().getViewers().contains(uuid)
+				|| this.canEdit(uuid);
 	}
 }

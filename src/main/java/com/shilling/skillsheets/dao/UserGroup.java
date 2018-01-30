@@ -1,12 +1,11 @@
 package com.shilling.skillsheets.dao;
 
+import java.io.IOException;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.UUID;
 
-public interface UserGroup extends UserEditableResource, UserReadableResource {
+public interface UserGroup extends Resource {
 
-	public Optional<String> getName();
-	public Collection<UUID> getMembers();
+	public Collection<UUID> getMembers() throws IOException;
 	
 }

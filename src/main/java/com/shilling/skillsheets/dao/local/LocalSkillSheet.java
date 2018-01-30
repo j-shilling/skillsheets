@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.shilling.skillsheets.api.model.ResourceModel;
 import com.shilling.skillsheets.dao.SkillSheet;
 import com.shilling.skillsheets.dao.User;
 
@@ -19,7 +18,7 @@ import com.shilling.skillsheets.dao.User;
  */
 class LocalSkillSheet extends LocalResource<LocalSkillSheet.Data> implements SkillSheet {
 
-	class Data {
+	class Data extends LocalResource.Data {
 		private @Nullable String name = null;
 		private Collection<UUID> teachers = new HashSet<>();
 		private Collection<UUID> students = new HashSet<>();
@@ -46,25 +45,10 @@ class LocalSkillSheet extends LocalResource<LocalSkillSheet.Data> implements Ski
 	}
 
 	@Override
-	public boolean canWrite(User user) throws IOException {
-		return this.isTeacher(user);
-	}
-
-	@Override
-	public boolean canRead(User user) throws IOException {
-		return this.isTeacher(user) || this.isStudent(user);
-	}
-
-	@Override
-	public ResourceModel getModel(User user) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public SkillSheet addTeacher(User user) throws IOException {
 		Data data = this.read();
 		data.getTeacher().add(user.getUuid());
+		this.addViewer(user.getUuid());
 		this.write(data);
 		
 		return this;
@@ -78,15 +62,6 @@ class LocalSkillSheet extends LocalResource<LocalSkillSheet.Data> implements Ski
 	@Override
 	public boolean isStudent(User user) throws IOException {
 		return this.read().getStudents().contains(user.getUuid());
-	}
-
-	@Override
-	public SkillSheet setName(String name) throws IOException {
-		Data data = this.read();
-		data.setName(name);
-		this.write(data);
-		
-		return this;
 	}
 
 	@Override

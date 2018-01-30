@@ -24,17 +24,6 @@ public interface User extends Resource {
 	public boolean isTeacher() throws IOException;
 
 	/**
-	 * Updates the name of this user in storage.
-	 * 
-	 * @param string	The new value to be saved. Nullable.
-	 * @return			<tt>this</tt> to enable method chaining
-	 * @throws IOException 
-	 */
-	public User setName(@Nullable String string) throws IOException;
-	
-	public Optional<String> getName () throws IOException;
-
-	/**
 	 * Updates the id of this user in storage.
 	 * 
 	 * @param string	The new value to be saved. Nullable.

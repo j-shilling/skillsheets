@@ -23,8 +23,7 @@ import com.shilling.skillsheets.dao.User;
  */
 class LocalUser extends LocalResource<LocalUser.Data> implements User {
 
-	static class Data {
-		private @Nullable String name;
+	static class Data extends LocalResource.Data {
 		private @Nullable String id;
 		private @Nullable String email;
 		private @Nullable Boolean teacher;
@@ -37,13 +36,11 @@ class LocalUser extends LocalResource<LocalUser.Data> implements User {
 
 		@JsonCreator
 		private Data (
-				@JsonProperty ("name") String name,
 				@JsonProperty ("id") String id,
 				@JsonProperty ("email") String email,
 				@JsonProperty ("teacher") Boolean teacher,
 				@JsonProperty ("skillSheets") Collection<UUID> skillSheets,
 				@JsonProperty ("userGroups") Collection<UUID> userGroups) {
-			this.name = name;
 			this.id = id;
 			this.email = email;
 			this.teacher = teacher;
@@ -56,14 +53,6 @@ class LocalUser extends LocalResource<LocalUser.Data> implements User {
 				
 				if (userGroups != null)
 					this.groups.addAll(userGroups);
-		}
-
-		public Optional<String> getName() {
-			return Optional.ofNullable(this.name);
-		}
-
-		public void setName(@Nullable String name) {
-			this.name = name;
 		}
 
 		public Optional<String> getId() {
@@ -115,26 +104,6 @@ class LocalUser extends LocalResource<LocalUser.Data> implements User {
 	@Override
 	public synchronized boolean isTeacher() throws IOException {
 		return this.read().isTeacher();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public synchronized User setName(String name) throws IOException {
-		Data data = this.read();
-		data.setName(name);
-		this.write(data);
-
-		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public synchronized Optional<String> getName() throws IOException {
-		return this.read().getName();
 	}
 
 	/**

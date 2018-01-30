@@ -2,9 +2,7 @@ package com.shilling.skillsheets.dao;
 
 import java.io.IOException;
 
-import javax.annotation.Nullable;
-
-public interface SkillSheet extends UserEditableResource, UserReadableResource {
+public interface SkillSheet extends Resource {
 	
 	/**
 	 * Save a association between a user and a skill sheet signifying
@@ -37,14 +35,5 @@ public interface SkillSheet extends UserEditableResource, UserReadableResource {
 	 * @throws IOException		If the storage could not be read
 	 */
 	public boolean isStudent(User user) throws IOException;
-	
-	/**
-	 * Set the display name for a given SkillSheet in storage.
-	 * 
-	 * @param skillSheet		SkillSheet in question
-	 * @param name				New name; may be null
-	 * @throws IOException		If the storage could not be written
-	 */
-	public SkillSheet setName(@Nullable String name) throws IOException;
 	
 }
