@@ -2,6 +2,7 @@ package com.shilling.skillsheets.api.services;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -25,5 +26,7 @@ public interface UserService {
 	 * @throws IOException 
 	 */
 	public Optional<User> fromToken (String id_token) throws IOException;
+
+	public Optional<User> fromUuid(UUID id);
 	
 }

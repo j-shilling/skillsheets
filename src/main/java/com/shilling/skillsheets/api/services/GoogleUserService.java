@@ -3,6 +3,7 @@ package com.shilling.skillsheets.api.services;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -78,6 +79,12 @@ public class GoogleUserService implements UserService {
 			return Optional.of(user);
 		}
 	
+	}
+
+	@Override
+	public Optional<User> fromUuid(UUID id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
