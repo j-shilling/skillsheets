@@ -1,12 +1,8 @@
 package com.shilling.skillsheets.api.controllers;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.shilling.skillsheets.api.controllers.exceptions.BadUuidException;
 import com.shilling.skillsheets.api.controllers.exceptions.InternalErrorException;
 import com.shilling.skillsheets.api.controllers.exceptions.NotFoundException;
-import com.shilling.skillsheets.api.model.UserGroupModel;
-import com.shilling.skillsheets.api.model.UserModel;
+import com.shilling.skillsheets.api.model.ResourceModel;
 import com.shilling.skillsheets.api.services.UserGroupService;
 import com.shilling.skillsheets.api.services.UserService;
 import com.shilling.skillsheets.dao.User;
@@ -42,7 +37,6 @@ public class RosterController {
 	
 	private final UuidValidator uuids;
 	private final UserValidator validator;
-	private final UserService users;
 	private final UserGroupService service;
 	
 	@Autowired
@@ -53,31 +47,7 @@ public class RosterController {
 			UserGroupService service) {
 		this.uuids = uuids;
 		this.validator = validator;
-		this.users = users;
 		this.service = service;
-	}
-	
-	private UserGroupModel getModel (UserGroup userGroup) {
-		UUID uuid = userGroup.getUuid();
-		Optional<String> name = userGroup.getName();
-		Set<UserModel> members = new HashSet<>();
-		
-		for (UUID id : userGroup.getMembers()) {
-			Optional<User> user = this.users.fromUuid (id);
-			if (user.isPresent()) {
-				try {
-					members.add(
-							new UserModel (user.get().getUuid(), 
-									user.get().getId(), 
-									user.get().getEmail(), 
-									user.get().getName()));
-				} catch (IOException e) {
-					throw new InternalErrorException (e);
-				}
-			}
-		}
-		
-		return new UserGroupModel (uuid, name, members);
 	}
 	
 	/**
@@ -91,7 +61,7 @@ public class RosterController {
 	 */
 	@PostMapping(value = "/api/rosters",
 			produces="application/json")
-	public UserGroupModel create (
+	public ResourceModel create (
 			@RequestHeader (value = "Id-Token") String id_token,
 			HttpServletResponse response) {
 		
@@ -100,7 +70,7 @@ public class RosterController {
 		try {
 			UserGroup group = this.service.create (user);
 			response.setStatus(HttpServletResponse.SC_CREATED);
-			return this.getModel(group);
+			return group.getModel(user);
 		} catch (Exception e) {
 			throw new InternalErrorException (e);
 		}
@@ -116,16 +86,16 @@ public class RosterController {
 	 */
 	@GetMapping(value = "/api/rosters",
 			produces="application/json")
-	public Collection<UserGroupModel> read (
+	public Collection<ResourceModel> read (
 			@RequestHeader (value = "Id-Token") String id_token) {
 		User user = this.validator.getAny(id_token);
 		
 		try {
 			Collection<UserGroup> groups = this.service.read (user);
-			Collection<UserGroupModel> ret = new HashSet<>();
+			Collection<ResourceModel> ret = new HashSet<>();
 			
 			for (UserGroup group : groups) {
-				ret.add(this.getModel(group));
+				ret.add(group.getModel (user));
 			}
 			
 			return ret;
@@ -144,7 +114,7 @@ public class RosterController {
 	 */
 	@GetMapping(value = "/api/rosters/{uuid}",
 			produces="application/json")
-	public UserGroupModel read (
+	public ResourceModel read (
 			@RequestHeader (value = "Id-Token") String id_token, 
 			@PathVariable String uuid) {
 		User user = this.validator.getAny(id_token);
@@ -152,7 +122,7 @@ public class RosterController {
 		try {
 			Optional<UserGroup> group = this.service.read (user, this.uuids.validate(uuid));
 			if (group.isPresent())
-				return this.getModel(group.get());
+				return group.get().getModel(user);
 			else
 				throw new NotFoundException();
 		} catch (BadUuidException e) {

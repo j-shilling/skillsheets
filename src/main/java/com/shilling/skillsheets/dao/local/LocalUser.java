@@ -1,21 +1,18 @@
 package com.shilling.skillsheets.dao.local;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.UUID;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.function.BiConsumer;
 
+import javax.annotation.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
-import com.shilling.skillsheets.dao.SkillSheet;
 import com.shilling.skillsheets.dao.User;
 
 /**
@@ -24,81 +21,111 @@ import com.shilling.skillsheets.dao.User;
  * @author Jake Shilling
  *
  */
-class LocalUser implements User {
+class LocalUser extends LocalResource<LocalUser.Data> implements User {
 
-	private final Logger logger = LogManager.getLogger(LocalUser.class);
-	private final UUID uuid;
-	private final File file;
-	private final LocalUserDao dao;
+	static class Data {
+		private @Nullable String name;
+		private @Nullable String id;
+		private @Nullable String email;
+		private @Nullable Boolean teacher;
 
-	public LocalUser(LocalUserDao dao, File file, UUID uuid) {
-		Preconditions.checkNotNull(file, "This user does not have a file");
-		Preconditions.checkArgument(file.exists(), "This user's file does not exist");
-		Preconditions.checkArgument(file.isFile(), "This user's file is not a normal file");
+		private Collection<UUID> skillsheets = new HashSet<>();
+		private Collection<UUID> groups = new HashSet<>();
 
-		this.uuid = uuid;
-		this.file = file;
-		this.dao = dao;
-	}
-
-	private File getFile() {
-		Preconditions.checkState(this.file.exists(), "This user has been deleted");
-		return this.file;
-	}
-
-	private Properties getProperties() throws IOException {
-		Properties ret = new Properties();
-
-		try {
-			ret.load(new FileInputStream(this.getFile()));
-		} catch (IOException e) {
-			throw new IOException("Could not load properties file", e);
+		private Data() {
 		}
 
-		return ret;
-	}
-
-	private void setProperty(String key, String value) {
-
-		try {
-			Properties props = this.getProperties();
-			props.setProperty(key, value);
-			props.store(new FileWriter(this.getFile()), "Setting " + key + " to " + value);
-		} catch (IOException e) {
-			this.logger.error("Could not update user: " + e.getMessage());
-			return;
+		@JsonCreator
+		private Data (
+				@JsonProperty ("name") String name,
+				@JsonProperty ("id") String id,
+				@JsonProperty ("email") String email,
+				@JsonProperty ("teacher") Boolean teacher,
+				@JsonProperty ("skillSheets") Collection<UUID> skillSheets,
+				@JsonProperty ("userGroups") Collection<UUID> userGroups) {
+			this.name = name;
+			this.id = id;
+			this.email = email;
+			this.teacher = teacher;
+			
+			this.skillsheets = new HashSet<>();
+			this.groups = new HashSet<>();
+			
+			if (skillSheets != null)
+				this.skillsheets.addAll(skillSheets);
+				
+				if (userGroups != null)
+					this.groups.addAll(userGroups);
 		}
 
-	}
-
-	private void addProperty(String key, String item) {
-
-		try {
-			Properties props = this.getProperties();
-			String value = props.getProperty(key) + "," + item;
-			props.setProperty(key, value);
-			props.store(new FileWriter(this.getFile()), "Setting " + key + " to " + value);
-		} catch (IOException e) {
-			this.logger.error("Could not update user: " + e.getMessage());
-			return;
+		public Optional<String> getName() {
+			return Optional.ofNullable(this.name);
 		}
 
+		public void setName(@Nullable String name) {
+			this.name = name;
+		}
+
+		public Optional<String> getId() {
+			return Optional.ofNullable(this.id);
+		}
+
+		public void setId(@Nullable String id) {
+			this.id = id;
+		}
+
+		public Optional<String> getEmail() {
+			return Optional.ofNullable(this.email);
+		}
+
+		public void setEmail(@Nullable String email) {
+			this.email = email;
+		}
+
+		public boolean isTeacher() {
+			return this.teacher == null ? false : this.teacher;
+		}
+
+		public void setTeacher(boolean val) {
+			this.teacher = val;
+		}
+
+		public Collection<UUID> getSkillSheets() {
+			return this.skillsheets;
+		}
+
+		public Collection<UUID> getUserGroups() {
+			return this.groups;
+		}
+	}
+
+	private final Collection<BiConsumer<Optional<String>, Optional<String>>> onIdChange;
+	private final Collection<BiConsumer<Optional<String>, Optional<String>>> onEmailChange;
+
+	public LocalUser(UUID uuid, File file) {
+		super(uuid, file);
+
+		this.onIdChange = new HashSet<>();
+		this.onEmailChange = new HashSet<>();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean isTeacher() throws IOException {
-			return Boolean.valueOf(this.getProperties().getProperty("teacher"));
+	public synchronized boolean isTeacher() throws IOException {
+		return this.read().isTeacher();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public User setName(String name) {
-		this.setProperty("name", name);
+	public synchronized User setName(String name) throws IOException {
+		Data data = this.read();
+		data.setName(name);
+		this.write(data);
+
 		return this;
 	}
 
@@ -106,20 +133,107 @@ class LocalUser implements User {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<String> getName() throws IOException {
-		return Optional.ofNullable(this.getProperties().getProperty("name"));
+	public synchronized Optional<String> getName() throws IOException {
+		return this.read().getName();
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * @throws IOException 
 	 */
 	@Override
-	public User setId(String id) throws IOException {
-		
-		this.dao.updateKey(this.getProperties().getProperty("id"), id, LocalUser.this);
-		this.setProperty("id", id);
-		
+	public synchronized User setId(String id) throws IOException {
+		Data data = this.read();
+
+		Optional<String> oldVal = data.getId();
+		data.setId(id);
+		this.write(data);
+
+		Optional<String> newVal = data.getId();
+
+		if (!oldVal.equals(newVal)) {
+			for (BiConsumer<Optional<String>, Optional<String>> consumer : this.onIdChange) {
+				consumer.accept(oldVal, newVal);
+			}
+		}
+
+		return this;
+	}
+
+	public synchronized void addIdListener(BiConsumer<Optional<String>, Optional<String>> consumer) {
+		if (consumer != null)
+			this.onIdChange.add(consumer);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public synchronized Optional<String> getId() throws IOException {
+		return this.read().getId();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public synchronized User setEmail(String email) throws IOException {
+		Data data = this.read();
+
+		Optional<String> oldVal = data.getEmail();
+		data.setEmail(email);
+		this.write(data);
+
+		Optional<String> newVal = data.getEmail();
+
+		if (!oldVal.equals(newVal)) {
+			for (BiConsumer<Optional<String>, Optional<String>> consumer : this.onEmailChange) {
+				consumer.accept(oldVal, newVal);
+			}
+		}
+
+		return this;
+	}
+
+	public synchronized void addEmailListener(BiConsumer<Optional<String>, Optional<String>> consumer) {
+		if (consumer != null)
+			this.onEmailChange.add(consumer);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public synchronized Optional<String> getEmail() throws IOException {
+		return this.read().getEmail();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public synchronized Collection<UUID> getSkillSheets() throws IOException {
+		return this.read().getSkillSheets();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public synchronized Collection<UUID> getUserGroups() throws IOException {
+		return this.read().getUserGroups();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public synchronized User addSkillSheet(UUID uuid) throws IOException {
+		Preconditions.checkNotNull(uuid);
+
+		Data data = this.read();
+		data.getSkillSheets().add(uuid);
+		this.write(data);
+
 		return this;
 	}
 
@@ -127,19 +241,13 @@ class LocalUser implements User {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<String> getId() throws IOException {
-		return Optional.ofNullable(this.getProperties().getProperty("id"));
-	}
+	public synchronized User delSkillSheet(UUID uuid) throws IOException {
+		Preconditions.checkNotNull(uuid);
 
-	/**
-	 * {@inheritDoc}
-	 * @throws IOException 
-	 */
-	@Override
-	public User setEmail(String email) throws IOException {
-		this.dao.updateKey(this.getProperties().getProperty("email"), email, this);
-		this.setProperty("email", email);
-		
+		Data data = this.read();
+		data.getSkillSheets().remove(uuid);
+		this.write(data);
+
 		return this;
 	}
 
@@ -147,17 +255,13 @@ class LocalUser implements User {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<String> getEmail() throws IOException {
-		return Optional.ofNullable(this.getProperties().getProperty("email"));
-	}
+	public synchronized User addUserGroup(UUID uuid) throws IOException {
+		Preconditions.checkNotNull(uuid);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public User addSkillSheet(SkillSheet skillsheet) {
-		addProperty("skillsheets", skillsheet.getUuid());
-		
+		Data data = this.read();
+		data.getUserGroups().add(uuid);
+		this.write(data);
+
 		return this;
 	}
 
@@ -165,40 +269,19 @@ class LocalUser implements User {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Collection<String> getSkillSheets() throws IOException {
-		String values = this.getProperties().getProperty("skillsheets");
-		return new HashSet<>(Arrays.asList(values.split(",")));
-	}
+	public synchronized User delUserGroup(UUID uuid) throws IOException {
+		Preconditions.checkNotNull(uuid);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void delete() {
-		this.getFile().delete();
-	}
+		Data data = this.read();
+		data.getUserGroups().remove(uuid);
+		this.write(data);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof LocalUser)
-			return this.uuid.equals(((LocalUser) obj).uuid);
-		return false;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.uuid);
+		return this;
 	}
 
 	@Override
-	public UUID getUuid() {
-		return this.uuid;
+	protected Data initial() {
+		return new Data();
 	}
 
 }

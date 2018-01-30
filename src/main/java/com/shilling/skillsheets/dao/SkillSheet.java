@@ -4,9 +4,7 @@ import java.io.IOException;
 
 import javax.annotation.Nullable;
 
-public interface SkillSheet {
-
-	public String getUuid();
+public interface SkillSheet extends UserEditableResource, UserReadableResource {
 	
 	/**
 	 * Save a association between a user and a skill sheet signifying
@@ -16,7 +14,7 @@ public interface SkillSheet {
 	 * @param user			The user account
 	 * @throws IOException	If the association could not be written
 	 */
-	public void addTeacher(User user) throws IOException;
+	public SkillSheet addTeacher(User user) throws IOException;
 	
 	/**
 	 * Read the association saved for a particular SkillSheet to see
@@ -47,8 +45,6 @@ public interface SkillSheet {
 	 * @param name				New name; may be null
 	 * @throws IOException		If the storage could not be written
 	 */
-	public void setName(@Nullable String name) throws IOException;
-	
-	public void delete ();
+	public SkillSheet setName(@Nullable String name) throws IOException;
 	
 }

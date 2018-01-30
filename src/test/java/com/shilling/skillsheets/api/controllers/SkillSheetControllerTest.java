@@ -1,8 +1,11 @@
 package com.shilling.skillsheets.api.controllers;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -33,14 +36,24 @@ public class SkillSheetControllerTest extends TestCase {
 	private MockMvc mockMvc;
 	
 	@MockBean
-	private SkillSheetService skillSheetService;
+	private SkillSheetService service;
 	@MockBean
-	private UserService userService;
+	private UserService users;
+	@MockBean
+	private UuidValidator uuids;
 	
 	@Mock
-	private User mockUser;
-	@Mock
 	private SkillSheet mockSkillSheet;
+	@Mock
+	private User mockUser;
+	
+	private UUID uuid = UUID.randomUUID();
+	
+	@Before
+	public void setUp() throws IOException {
+		Mockito.when(this.users.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
+		Mockito.when(this.uuids.validate(Mockito.anyString())).thenReturn(this.uuid);
+	}
 	
 	/*
 	 * TESTS AS STUDENT
@@ -48,7 +61,6 @@ public class SkillSheetControllerTest extends TestCase {
 	
 	@Test
 	public void testCreateAsStudent() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(false);
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/skillsheets")
@@ -60,14 +72,13 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.FORBIDDEN, status);
 		
-		Mockito.verify(this.skillSheetService, Mockito.times(0)).create(Mockito.anyObject());
+		Mockito.verify(this.service, Mockito.times(0)).create(Mockito.anyObject());
 	}
 	
 	@Test
 	public void testReadAsStudent() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(false);
-		Mockito.when(this.skillSheetService.read(Mockito.anyObject())).thenReturn(Collections.singleton(this.mockSkillSheet));
+		Mockito.when(this.service.read(this.mockUser)).thenReturn(Collections.singleton(this.mockSkillSheet));
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/skillsheets")
 				.header("Id-Token", "student")
@@ -78,15 +89,14 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.OK, status);
 		
-		Mockito.verify(this.skillSheetService, Mockito.timeout(1))
+		Mockito.verify(this.service, Mockito.times(1))
 			.read(Mockito.eq(this.mockUser));
 	}
 	
 	@Test
 	public void testReadUuidAsStudent() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(false);
-		Mockito.when(this.skillSheetService.read(Mockito.anyObject(), Mockito.anyString())).thenReturn(Optional.of(this.mockSkillSheet));
+		Mockito.when(this.service.read(this.mockUser, this.uuid)).thenReturn(Optional.of(this.mockSkillSheet));
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/skillsheets/testuuid")
 				.header("Id-Token", "student")
@@ -97,13 +107,12 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.OK, status);
 		
-		Mockito.verify(this.skillSheetService, Mockito.timeout(1))
-			.read(Mockito.eq(this.mockUser), Mockito.eq("testuuid"));
+		Mockito.verify(this.service, Mockito.times(1))
+			.read(this.mockUser, this.uuid);
 	}
 	
 	@Test
 	public void testSetNameAsStudent () throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(false);
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/skillsheets/testuuid/name")
@@ -117,13 +126,12 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.FORBIDDEN, status);
 		
-		Mockito.verify(this.skillSheetService, Mockito.times(0))
+		Mockito.verify(this.service, Mockito.times(0))
 			.setName(Mockito.any(), Mockito.any(), Mockito.any());
 	}
 	
 	@Test
 	public void testDeleteAsStudent() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(false);
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/skillsheets/testuuid")
@@ -135,7 +143,7 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.FORBIDDEN, status);
 		
-		Mockito.verify(this.skillSheetService, Mockito.times(0))
+		Mockito.verify(this.service, Mockito.times(0))
 			.delete (Mockito.any(), Mockito.any());
 	}
 	
@@ -145,9 +153,8 @@ public class SkillSheetControllerTest extends TestCase {
 	
 	@Test
 	public void testCreateAsTeacher() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(true);
-		Mockito.when(this.skillSheetService.create(Mockito.anyObject())).thenReturn(this.mockSkillSheet);
+		Mockito.when(this.service.create(this.mockUser)).thenReturn(this.mockSkillSheet);
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/skillsheets")
 				.header("Id-Token", "teacher")
@@ -158,15 +165,14 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.CREATED, status);
 		
-		Mockito.verify(this.skillSheetService, Mockito.times (1))
+		Mockito.verify(this.service, Mockito.times (1))
 			.create(Mockito.eq(this.mockUser));
 	}
 	
 	@Test
 	public void testReadAsTeacher() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(true);
-		Mockito.when(this.skillSheetService.read(Mockito.anyObject())).thenReturn(Collections.singleton(this.mockSkillSheet));
+		Mockito.when(this.service.read(this.mockUser)).thenReturn(Collections.singleton(this.mockSkillSheet));
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/skillsheets")
 				.header("Id-Token", "teacher")
@@ -177,15 +183,14 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.OK, status);
 		
-		Mockito.verify(this.skillSheetService, Mockito.times (1))
+		Mockito.verify(this.service, Mockito.times (1))
 			.read(Mockito.eq(this.mockUser));
 	}
 	
 	@Test
 	public void testReadUuidAsTeacher() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(true);
-		Mockito.when(this.skillSheetService.read(Mockito.anyObject(), Mockito.anyString())).thenReturn(Optional.of(this.mockSkillSheet));
+		Mockito.when(this.service.read(this.mockUser, this.uuid)).thenReturn(Optional.of(this.mockSkillSheet));
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/skillsheets/testuuid")
 				.header("Id-Token", "teacher")
@@ -196,15 +201,14 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.OK, status);
 		
-		Mockito.verify(this.skillSheetService, Mockito.times (1))
-			.read(Mockito.eq(this.mockUser), Mockito.eq("testuuid"));
+		Mockito.verify(this.service, Mockito.times (1))
+			.read(this.mockUser, this.uuid);
 	}
 	
 	@Test
 	public void testSetNameAsTeacher() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(true);
-		Mockito.when(this.skillSheetService.setName(Mockito.anyObject(), Mockito.anyString(), Mockito.anyObject())).thenReturn(true);
+		Mockito.when(this.service.setName(Mockito.eq(this.mockUser), Mockito.eq(this.uuid), Mockito.anyString())).thenReturn(true);
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/skillsheets/testuuid/name")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -217,15 +221,14 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.OK, status);
 		
-		Mockito.verify(this.skillSheetService, Mockito.times(1))
-			.setName(Mockito.anyObject(), Mockito.eq("testuuid"), Mockito.eq("newname"));
+		Mockito.verify(this.service, Mockito.times(1))
+			.setName(Mockito.eq(this.mockUser), Mockito.eq(this.uuid), Mockito.eq("newname"));
 	}
 	
 	@Test
 	public void testSetNameNullAsTeacher() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(true);
-		Mockito.when(this.skillSheetService.setName(Mockito.anyObject(), Mockito.anyString(), Mockito.anyObject())).thenReturn(true);
+		Mockito.when(this.service.setName(this.mockUser, this.uuid, null)).thenReturn(true);
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/skillsheets/testuuid/name")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -237,15 +240,14 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.OK, status);
 		
-		Mockito.verify(this.skillSheetService, Mockito.times(1))
-			.setName(Mockito.anyObject(), Mockito.eq("testuuid"), Mockito.eq(null));
+		Mockito.verify(this.service, Mockito.times(1))
+			.setName(Mockito.eq(this.mockUser), Mockito.eq(this.uuid), Mockito.eq(null));
 	}
 	
 	@Test
 	public void testDeleteAsTeacher() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(true);
-		Mockito.when(this.skillSheetService.delete(Mockito.anyObject(), Mockito.anyString())).thenReturn(true);
+		Mockito.when(this.service.delete(this.mockUser, this.uuid)).thenReturn(true);
 
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/skillsheets/testuuid")
@@ -257,8 +259,8 @@ public class SkillSheetControllerTest extends TestCase {
 		
 		assertEquals (HttpStatus.OK, status);
 		
-		Mockito.verify(this.skillSheetService, Mockito.times (1))
-			.delete (Mockito.eq(this.mockUser), Mockito.eq("testuuid"));
+		Mockito.verify(this.service, Mockito.times (1))
+			.delete (this.mockUser, this.uuid);
 	}
 	
 	/*
@@ -267,9 +269,8 @@ public class SkillSheetControllerTest extends TestCase {
 	
 	@Test
 	public void testReadNotFound() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(true);
-		Mockito.when(this.skillSheetService.read(Mockito.anyObject(),  Mockito.anyString())).thenReturn(Optional.empty());
+		Mockito.when(this.service.read(this.mockUser,  this.uuid)).thenReturn(Optional.empty());
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/skillsheets/testuuid")
 				.header("Id-Token", "student")
@@ -283,9 +284,8 @@ public class SkillSheetControllerTest extends TestCase {
 	
 	@Test
 	public void testSetNameNotFound() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(true);
-		Mockito.when(this.skillSheetService.setName(Mockito.anyObject(), Mockito.anyString(), Mockito.anyString())).thenReturn(false);
+		Mockito.when(this.service.setName(Mockito.eq(this.mockUser), Mockito.eq(this.uuid), Mockito.anyString())).thenReturn(false);
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/skillsheets/testuuid/name")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -301,9 +301,8 @@ public class SkillSheetControllerTest extends TestCase {
 	
 	@Test
 	public void testDeleteNotFound() throws Exception {
-		Mockito.when(this.userService.fromToken(Mockito.anyString())).thenReturn(Optional.of(this.mockUser));
 		Mockito.when(this.mockUser.isTeacher()).thenReturn(true);
-		Mockito.when(this.skillSheetService.delete(Mockito.anyObject(), Mockito.anyString())).thenReturn(false);
+		Mockito.when(this.service.delete(this.mockUser, this.uuid)).thenReturn(false);
 		
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/skillsheets/testuuid")
 				.header("Id-Token", "student")

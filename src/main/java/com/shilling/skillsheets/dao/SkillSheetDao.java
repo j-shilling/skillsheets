@@ -2,6 +2,7 @@ package com.shilling.skillsheets.dao;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Manages persistent storage of {@link SkillSheet}s.
@@ -29,7 +30,7 @@ public interface SkillSheetDao {
 	 * 						the UUID could not be found.
 	 * @throws IOException	If the storage could not be read.
 	 */
-	public Optional<SkillSheet> read(String uuid) throws IOException;
+	public Optional<SkillSheet> read(UUID uuid) throws IOException;
 	
 	/**
 	 * Delete an entry from permanent storage.

@@ -6,7 +6,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-abstract class ResourceModel {
+public abstract class ResourceModel {
 
 	@JsonIgnore
 	private final UUID uuid;

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,8 +56,8 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 		Preconditions.checkNotNull(user);
 		
 		Collection<SkillSheet> ret = new HashSet<>();
-		Iterable<String> uuids = user.getSkillSheets ();
-		for (String uuid : uuids) {
+		Iterable<UUID> uuids = user.getSkillSheets ();
+		for (UUID uuid : uuids) {
 			Optional<SkillSheet> result = this.read(user, uuid);
 			if (result.isPresent())
 				ret.add(result.get());
@@ -69,7 +70,7 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<SkillSheet> read(User user, String uuid)  throws IOException {
+	public Optional<SkillSheet> read(User user, UUID uuid)  throws IOException {
 		Preconditions.checkNotNull(user);
 		
 		Optional<SkillSheet> result = this.skillsheets.read (uuid);
@@ -95,7 +96,7 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean delete(User user, String uuid) throws IOException {
+	public boolean delete(User user, UUID uuid) throws IOException {
 		Preconditions.checkNotNull(user);
 		
 		Optional<SkillSheet> result = this.skillsheets.read (uuid);
@@ -117,7 +118,7 @@ public class SkillSheetServiceImpl implements SkillSheetService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean setName(User user, String uuid, String name) throws IOException {
+	public boolean setName(User user, UUID uuid, String name) throws IOException {
 		Preconditions.checkNotNull(user);
 		
 		Optional<SkillSheet> result = this.skillsheets.read (uuid);

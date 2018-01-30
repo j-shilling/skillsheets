@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shilling.skillsheets.api.controllers.exceptions.InternalErrorException;
+import com.shilling.skillsheets.api.controllers.exceptions.NotFoundException;
+import com.shilling.skillsheets.api.model.ResourceModel;
 import com.shilling.skillsheets.api.services.SkillSheetService;
-import com.shilling.skillsheets.api.services.UserService;
 import com.shilling.skillsheets.dao.SkillSheet;
 import com.shilling.skillsheets.dao.User;
 
@@ -31,12 +36,18 @@ import com.shilling.skillsheets.dao.User;
 public class SkillSheetController {
 	
 	private final SkillSheetService service;
-	private final UserService users;
+	private final UserValidator users;
+	private final UuidValidator uuids;
 	
 	@Autowired
-	private SkillSheetController (SkillSheetService service, UserService users) {
+	private SkillSheetController (
+			SkillSheetService service, 
+			UserValidator users, 
+			UuidValidator uuids) {
+		
 		this.service = service;
 		this.users = users;
+		this.uuids = uuids;
 	}
 	
 	/**
@@ -48,41 +59,21 @@ public class SkillSheetController {
 	 */
 	@PostMapping(value = "/api/skillsheets",
 			produces="application/json")
-	public SkillSheet create (@RequestHeader (value = "Id-Token") String id_token, 
-							  HttpServletResponse response) {
+	public ResourceModel create (
+			@RequestHeader (value = "Id-Token") String id_token, 
+			HttpServletResponse response) {
 		
-		Optional<User> user;
-		try {
-			user = this.users.fromToken(id_token);
-		} catch (IOException e1) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return null;
-		}
-		
-		if (!user.isPresent()) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return null;
-		}
-		
-		try {
-			if (!user.get().isTeacher()) {
-				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-				return null;
-			}
-		} catch (IOException e1) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return null;
-		}
+		User user = users.getTeacher(id_token);
 		
 		SkillSheet skillsheet = null;
 		try {
-			skillsheet = this.service.create(user.get());
+			skillsheet = this.service.create(user);
 			response.setStatus(HttpServletResponse.SC_CREATED);
 		} catch (IOException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 		
-		return skillsheet;
+		return skillsheet.getModel(user);
 		
 	}
 	
@@ -96,30 +87,23 @@ public class SkillSheetController {
 	 */
 	@GetMapping(value = "/api/skillsheets",
 			produces="application/json")
-	public Collection<SkillSheet> read (
-			@RequestHeader (value = "Id-Token") String id_token,
-			HttpServletResponse response) {
+	public Collection<ResourceModel> read (
+			@RequestHeader (value = "Id-Token") String id_token) {
 		
 	
-		Optional<User> user;
-		try {
-			user = this.users.fromToken(id_token);
-		} catch (IOException e1) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return null;
-		}
+		User user = users.getAny(id_token);
 		
-		if (!user.isPresent()) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return Collections.emptyList();
-		}
+		Collection<ResourceModel> ret = Collections.emptySet();
 		
-		Collection<SkillSheet> ret = null;
 		try {
-			ret = this.service.read(user.get());
+			ret = this.service.read(user)
+					.stream()
+					.map(s -> s.getModel(user))
+					.collect(Collectors.toSet());
 		} catch (IOException e) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			throw new InternalErrorException (e);
 		}
+		
 		return ret;
 	}
 	
@@ -131,39 +115,24 @@ public class SkillSheetController {
 	 * @param uuid		A unique identifier for this {@link SkillSheet}
 	 * @return			Resulting {@link SkillSheet} or null.
 	 */
-	@GetMapping(value = "/api/skillsheets/{uuid}",
+	@GetMapping(value = "/api/skillsheets/{id}",
 			produces="application/json")
-	public SkillSheet read (@RequestHeader (value = "Id-Token") String id_token, 
-							@PathVariable String uuid,
-							HttpServletResponse response) {
+	public ResourceModel read (
+			@RequestHeader (value = "Id-Token") String id_token, 
+			@PathVariable String id) {
 		
-		Optional<User> user;
+		User user = users.getAny(id_token);
+		UUID uuid = uuids.validate(id);
+		
 		try {
-			user = this.users.fromToken(id_token);
-		} catch (IOException e1) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return null;
-		}
-		
-		if (!user.isPresent()) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return null;
-		}
-		
-		Optional<SkillSheet> result = Optional.empty();
-		try {
-			result = this.service.read(user.get(), uuid);
+			Optional<SkillSheet> result = this.service.read(user, uuid);
+			if (result.isPresent())
+				return result.get().getModel(user);
+			else
+				throw new NotFoundException ();
 		} catch (IOException e) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return null;
+			throw new InternalErrorException (e);
 		}
-		
-		if (!result.isPresent()) {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			return null;
-		}
-		
-		return result.get();
 	}
 	
 	/**
@@ -172,39 +141,19 @@ public class SkillSheetController {
 	 * @param id_token		The Google ID Token to verify the user
 	 * @param uuid			A unique identifier for this {@link SkillSheet}
 	 */
-	@DeleteMapping(value = "/api/skillsheets/{uuid}")
-	public void delete (@RequestHeader (value = "Id-Token") String id_token, 
-						@PathVariable String uuid,
-						HttpServletResponse response) {
+	@DeleteMapping(value = "/api/skillsheets/{id}")
+	public void delete (
+			@RequestHeader (value = "Id-Token") String id_token, 
+			@PathVariable String id) {
 		
-		Optional<User> user;
-		try {
-			user = this.users.fromToken(id_token);
-		} catch (IOException e1) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return;
-		}
-		
-		if (!user.isPresent()) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return;
-		}
+		User user = this.users.getTeacher(id_token);
+		UUID uuid = this.uuids.validate(id); 
 		
 		try {
-			if (!user.get().isTeacher()) {
-				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-				return;
-			}
-		} catch (IOException e1) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return;
-		}
-		
-		try {
-			if (!this.service.delete(user.get(), uuid))
-				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			if (!this.service.delete(user, uuid))
+				throw new NotFoundException ();
 		} catch (IOException e) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			throw new InternalErrorException (e);
 		}
 	}
 	
@@ -215,42 +164,22 @@ public class SkillSheetController {
 	 * @param uuid			A unique identifier for this {@link SkillSheet}
 	 * @param name			New value
 	 */
-	@PutMapping(value = "/api/skillsheets/{uuid}/name",
+	@PutMapping(value = "/api/skillsheets/{id}/name",
 				consumes ="application/json")
-	public void setName (@RequestHeader (value = "Id-Token") String id_token,
-						 @PathVariable String uuid, 
-						 @RequestBody(required = false) String name,
-						 HttpServletResponse response) {
+	public void setName (
+			@RequestHeader (value = "Id-Token") String id_token,
+			@PathVariable String id, 
+			@RequestBody(required = false) String name) {
 		
-		Optional<User> user;
-		try {
-			user = this.users.fromToken(id_token);
-		} catch (IOException e1) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return;
-		}
-		
-		if (!user.isPresent()) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return;
-		}
+		User user = this.users.getTeacher(id_token);
+		UUID uuid = this.uuids.validate(id);
 		
 		try {
-			if (!user.get().isTeacher()) {
-				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-				return;
-			}
-		} catch (IOException e1) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return;
-		}
-		
-		try {
-			if (!this.service.setName (user.get(), uuid, name)) {
-				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			if (!this.service.setName (user, uuid, name)) {
+				throw new NotFoundException();
 			}
 		} catch (IOException e) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			throw new InternalErrorException (e);
 		}
 		
 	}

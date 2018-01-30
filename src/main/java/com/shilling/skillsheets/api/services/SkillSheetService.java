@@ -3,6 +3,7 @@ package com.shilling.skillsheets.api.services;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -49,7 +50,7 @@ public interface SkillSheetService {
 	 * @return				The result or Optional.empty()
 	 * @throws IOException	If an error occured while reading
 	 */
-	public Optional<SkillSheet> read (User user, String uuid) throws IOException;
+	public Optional<SkillSheet> read (User user, UUID uuid) throws IOException;
 	
 	/**
 	 * Delete any record with a match UUID
@@ -61,7 +62,7 @@ public interface SkillSheetService {
 	 * @throws IOException	May be thrown when new data is being
 	 * 						written
 	 */
-	public boolean delete (User user, String uuid) throws IOException;
+	public boolean delete (User user, UUID uuid) throws IOException;
 	
 	/**
 	 * Sets the display name of the specified SkillSheet. This name may
@@ -73,6 +74,6 @@ public interface SkillSheetService {
 	 * @return				<tt>true</tt>if the corresponding SkillSheet was found
 	 * @throws IOException	If an error occured saving the updated
 	 */
-	public boolean setName(User user, String uuid, String name) throws IOException;
+	public boolean setName(User user, UUID uuid, String name) throws IOException;
 	
 }

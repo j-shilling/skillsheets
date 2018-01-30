@@ -54,7 +54,7 @@ public class LocalUserDaoTest {
 		assertFalse (user.getName().isPresent());
 		
 		File file = 
-				Paths.get(this.userdir.getPath(), user.getUuid().toString() + ".user.properties").toFile();
+				Paths.get(this.userdir.getPath(), user.getUuid().toString() + ".user.xml").toFile();
 		assertTrue (file.exists());
 		assertTrue (file.isFile());
 		assertTrue (file.canRead());
@@ -73,7 +73,7 @@ public class LocalUserDaoTest {
 		assertFalse (user.getName().isPresent());
 		
 		File file = 
-				Paths.get(this.userdir.getPath(), user.getUuid().toString() + ".user.properties").toFile();
+				Paths.get(this.userdir.getPath(), user.getUuid().toString() + ".user.xml").toFile();
 		assertTrue (file.exists());
 		assertTrue (file.isFile());
 		assertTrue (file.canRead());
@@ -97,7 +97,7 @@ public class LocalUserDaoTest {
 		User user = this.dao.createWithId("testid");
 		
 		File file = 
-				Paths.get(this.userdir.getPath(), user.getUuid().toString() + ".user.properties").toFile();
+				Paths.get(this.userdir.getPath(), user.getUuid().toString() + ".user.xml").toFile();
 		assertTrue (file.exists());
 		
 		this.dao.delete(user);

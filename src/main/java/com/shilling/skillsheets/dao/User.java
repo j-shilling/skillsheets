@@ -13,9 +13,8 @@ import javax.annotation.Nullable;
  * @author Jake Shilling
  *
  */
-public interface User {
+public interface User extends Resource {
 	
-	public UUID getUuid();
 	/**
 	 * Check whether this user has a teacher account.
 	 * 
@@ -29,8 +28,9 @@ public interface User {
 	 * 
 	 * @param string	The new value to be saved. Nullable.
 	 * @return			<tt>this</tt> to enable method chaining
+	 * @throws IOException 
 	 */
-	public User setName(@Nullable String string);
+	public User setName(@Nullable String string) throws IOException;
 	
 	public Optional<String> getName () throws IOException;
 
@@ -56,14 +56,19 @@ public interface User {
 	
 	public Optional<String> getEmail() throws IOException;
 
-	/**
-	 * Declares in storage that a SkillSheet is visible to this
-	 * user.
-	 * 
-	 * @param SkillSheet	The visible SkillSheet
-	 * @return				<tt>this</tt> to enable method chaining
-	 */
-	public User addSkillSheet(SkillSheet skillsheet);
+	public User addSkillSheet(UUID uuid) throws IOException;
+	
+	public User delSkillSheet(UUID uuid) throws IOException;
+	
+	default public User addSkillSheet (SkillSheet resource)  throws IOException {
+		this.addSkillSheet(resource.getUuid());
+		return this;
+	}
+	
+	default public User delSkillSheet (SkillSheet resource)  throws IOException {
+		this.delSkillSheet(resource.getUuid());
+		return this;
+	}
 
 	/**
 	 * Get a collection of UUIDs corresponding to the SkillSheets
@@ -73,11 +78,22 @@ public interface User {
 	 * 						may not be null.
 	 * @throws IOException 
 	 */
-	public Collection<String> getSkillSheets() throws IOException;
+	public Collection<UUID> getSkillSheets() throws IOException;
 	
-	/**
-	 * Delete this user's information
-	 */
-	public void delete();
+	public User addUserGroup(UUID uuid) throws IOException;
+	
+	public User delUserGroup(UUID uuid) throws IOException;
+	
+	default public User addUserGroup (UserGroup resource) throws IOException {
+		this.addUserGroup(resource.getUuid());
+		return this;
+	}
+	
+	default public User delUserGroup (UserGroup resource) throws IOException {
+		this.delUserGroup(resource.getUuid());
+		return this;
+	}
+	
+	public Collection<UUID> getUserGroups () throws IOException;
 
 }

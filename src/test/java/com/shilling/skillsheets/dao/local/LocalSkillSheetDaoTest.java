@@ -17,6 +17,7 @@ import com.shilling.skillsheets.dao.SkillSheetDao;
 
 public class LocalSkillSheetDaoTest {
 	
+	private static final String EXTENSION = ".sheet.xml";
 	private final File dir =
 			Paths.get(System.getProperty("user.dir"), "localskillsheettest").toFile();
 	
@@ -45,7 +46,7 @@ public class LocalSkillSheetDaoTest {
 	public void testCreate() throws IOException {
 		SkillSheet sheet = this.dao.create();
 		File file = Paths.get(this.dir.getAbsolutePath(), 
-				sheet.getUuid() + LocalSkillSheetDao.EXTENSION).toFile();
+				sheet.getUuid() + EXTENSION).toFile();
 		assertTrue (file.isFile());
 	}
 
@@ -56,14 +57,14 @@ public class LocalSkillSheetDaoTest {
 		
 		assertEquals (Optional.of(sheet1), this.dao.read(sheet1.getUuid()));
 		assertEquals (Optional.of(sheet2), this.dao.read(sheet2.getUuid()));
-		assertEquals (Optional.empty(), this.dao.read(UUID.randomUUID().toString()));
+		assertEquals (Optional.empty(), this.dao.read(UUID.randomUUID()));
 	}
 
 	@Test
 	public void testDelete() throws IOException {
 		SkillSheet sheet = this.dao.create();
 		File file = Paths.get(this.dir.getAbsolutePath(), 
-				sheet.getUuid() + LocalSkillSheetDao.EXTENSION).toFile();
+				sheet.getUuid() + EXTENSION).toFile();
 		assertTrue (file.isFile());
 		
 		this.dao.delete(sheet);
