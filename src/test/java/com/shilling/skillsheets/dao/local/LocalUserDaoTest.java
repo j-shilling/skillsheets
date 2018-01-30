@@ -57,8 +57,6 @@ public class LocalUserDaoTest {
 				Paths.get(this.userdir.getPath(), user.getUuid().toString() + ".user.xml").toFile();
 		assertTrue (file.exists());
 		assertTrue (file.isFile());
-		assertTrue (file.canRead());
-		assertTrue (file.canWrite());
 	}
 
 	@Test
@@ -76,8 +74,22 @@ public class LocalUserDaoTest {
 				Paths.get(this.userdir.getPath(), user.getUuid().toString() + ".user.xml").toFile();
 		assertTrue (file.exists());
 		assertTrue (file.isFile());
-		assertTrue (file.canRead());
-		assertTrue (file.canWrite());
+	}
+	
+	@Test
+	public void testIdChanged() throws IOException {
+		User user = this.dao.createWithEmail("test@email.com");
+		user.setId("id");
+		
+		assertEquals (Optional.of(user), this.dao.read("id"));
+	}
+	
+	@Test
+	public void testEmailChanged() throws IOException {
+		User user = this.dao.createWithId("test");
+		user.setEmail("test@mail.com");
+		
+		assertEquals (Optional.of(user), this.dao.read("test@mail.com"));
 	}
 
 	@Test
@@ -93,7 +105,7 @@ public class LocalUserDaoTest {
 	}
 
 	@Test
-	public void testDelete() throws IOException {
+	public void testDeleteDao() throws IOException {
 		User user = this.dao.createWithId("testid");
 		
 		File file = 
@@ -101,6 +113,20 @@ public class LocalUserDaoTest {
 		assertTrue (file.exists());
 		
 		this.dao.delete(user);
+		
+		assertFalse (file.exists());
+		assertFalse (this.dao.read("testid").isPresent());
+	}
+	
+	@Test
+	public void testDeleteObject() throws IOException {
+		User user = this.dao.createWithId("testid");
+		
+		File file = 
+				Paths.get(this.userdir.getPath(), user.getUuid().toString() + ".user.xml").toFile();
+		assertTrue (file.exists());
+		
+		user.delete();
 		
 		assertFalse (file.exists());
 		assertFalse (this.dao.read("testid").isPresent());
