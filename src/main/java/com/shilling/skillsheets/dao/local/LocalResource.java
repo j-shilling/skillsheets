@@ -4,13 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.UUID;
-import java.util.function.Consumer;
-
 import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -81,7 +77,6 @@ abstract class LocalResource<T extends LocalResource.Data> implements Resource {
 	private final UUID uuid;
 	private final File file;
 	
-	private final Queue<Consumer<UUID>> onDelete;
 	private final Class<T> type;
 	
 	@SuppressWarnings("unchecked")
@@ -91,7 +86,6 @@ abstract class LocalResource<T extends LocalResource.Data> implements Resource {
 		
 		this.uuid = uuid;
 		this.file = file;
-		this.onDelete = new LinkedList<>();
 		
 		T data = this.initial();
 		
@@ -156,14 +150,7 @@ abstract class LocalResource<T extends LocalResource.Data> implements Resource {
 	public synchronized void delete () {
 		if (this.file.exists()) {
 			this.file.delete();
-			
-			while (!this.onDelete.isEmpty())
-				this.onDelete.poll().accept(this.getUuid());
 		}
-	}
-	
-	public synchronized void addDeleteListener (Consumer<UUID> onDelete) {
-		this.onDelete.add(onDelete);
 	}
 	
 	public UUID getUuid () {
@@ -218,6 +205,13 @@ abstract class LocalResource<T extends LocalResource.Data> implements Resource {
 		data.getEditors().add(uuid);
 		this.write(data);
 	}
+        
+        @Override
+        public void delEditor (UUID uuid) throws IOException {
+            T data = this.read();
+            data.getEditors().remove(uuid);
+            this.write (data);
+        }
 
 	@Override
 	public void addViewer(UUID uuid) throws IOException {
@@ -225,6 +219,13 @@ abstract class LocalResource<T extends LocalResource.Data> implements Resource {
 		data.getViewers().add(uuid);
 		this.write(data);
 	}
+        
+        @Override
+        public void delViewer (UUID uuid) throws IOException {
+            T data = this.read();
+            data.getViewers().remove(uuid);
+            this.write (data);
+        }
 
 	@Override
 	public boolean canEdit(UUID uuid) throws IOException {
@@ -235,5 +236,20 @@ abstract class LocalResource<T extends LocalResource.Data> implements Resource {
 	public boolean canView(UUID uuid) throws IOException {
 		return this.read().getViewers().contains(uuid)
 				|| this.canEdit(uuid);
+	}
+	
+	@Override
+	public synchronized void copy (Resource other) throws IOException {
+		if (other instanceof LocalResource<?>) {
+			LocalResource<?> local = (LocalResource<?>) other;
+			if (this.type.equals(local.type)) {
+				@SuppressWarnings("unchecked")
+				LocalResource<T> that = (LocalResource<T>) local;
+				that.write(this.read());
+				return;
+			}
+		}
+			
+		throw new IOException ("Cannot copy to incompatible type");
 	}
 }

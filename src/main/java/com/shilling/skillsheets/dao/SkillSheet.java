@@ -8,7 +8,6 @@ public interface SkillSheet extends Resource {
 	 * Save a association between a user and a skill sheet signifying
 	 * the user's permission to edit the sheet.
 	 * 
-	 * @param skillsheet	The editable item
 	 * @param user			The user account
 	 * @throws IOException	If the association could not be written
 	 */
@@ -18,7 +17,6 @@ public interface SkillSheet extends Resource {
 	 * Read the association saved for a particular SkillSheet to see
 	 * if a user has been defined as a teacher.
 	 * 
-	 * @param skillSheet		SkillSheet to look up
 	 * @param user				User to look for
 	 * @return					<tt>true</tt> if the association is found
 	 * @throws IOException		If the storage could not be read
@@ -29,7 +27,6 @@ public interface SkillSheet extends Resource {
 	 * Read the association saved for a particular SkillSheet to see
 	 * if a user has been defined as a student.
 	 * 
-	 * @param skillSheet		SkillSheet to look up
 	 * @param user				User to look for
 	 * @return					<tt>true</tt> if the association is found
 	 * @throws IOException		If the storage could not be read

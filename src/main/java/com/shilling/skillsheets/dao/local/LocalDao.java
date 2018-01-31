@@ -57,8 +57,6 @@ abstract class LocalDao<T extends Resource> {
 				Paths.get(this.dir.getAbsolutePath(), uuid.toString() + this.getFileExtension()).toFile();
 		
 		T item = this.getInstance(uuid, file);
-		if (item instanceof LocalResource)
-			((LocalResource<?>) item).addDeleteListener(x -> LocalDao.this.delete(x));
 		
 		this.values.put(uuid, item);
 		

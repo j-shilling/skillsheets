@@ -8,14 +8,14 @@ import org.springframework.beans.factory.FactoryBean;
  * @author Jake Shilling
  *
  */
-public class LocalUserGroupDaoFactory implements FactoryBean<LocalUserGroupDao> {
+public class LocalUserDaoFactory implements FactoryBean<LocalUserDao> {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LocalUserGroupDao getObject() throws Exception {
-		return new LocalUserGroupDao (Paths.get(System.getProperty("user.home"), "groups").toFile());
+	public LocalUserDao getObject() throws Exception {
+		return new LocalUserDao (Paths.get(System.getProperty("user.home"), "users").toFile());
 	}
 
 	/**
@@ -23,7 +23,7 @@ public class LocalUserGroupDaoFactory implements FactoryBean<LocalUserGroupDao> 
 	 */
 	@Override
 	public Class<?> getObjectType() {
-		return LocalUserGroupDao.class;
+		return LocalUserDao.class;
 	}
 
 	/**

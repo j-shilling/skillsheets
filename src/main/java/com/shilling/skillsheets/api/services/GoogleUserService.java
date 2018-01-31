@@ -25,9 +25,9 @@ public class GoogleUserService implements UserService {
 	private final Logger logger;
 	private final UserDao dao;
 	private final GoogleIdTokenVerifier verifier;
-	
-	@Autowired 
-	GoogleUserService (UserDao dao, GoogleIdTokenVerifier verifier) {
+
+	@Autowired
+	GoogleUserService(UserDao dao, GoogleIdTokenVerifier verifier) {
 		this.logger = LogManager.getLogger(GoogleUserService.class);
 		this.dao = dao;
 		this.verifier = verifier;
@@ -58,27 +58,28 @@ public class GoogleUserService implements UserService {
 
 		/* Get information from token */
 		Payload payload = token.getPayload();
-		
+
 		/* Get information from DAO */
 		Optional<User> result = this.dao.read(payload.getSubject());
 		if (result.isPresent()) {
-			/* This user is already on record. Get local information and
-			 * update any information from Google which might have changed.
+			/*
+			 * This user is already on record. Get local information and update any
+			 * information from Google which might have changed.
 			 */
-			User user = result.get()
-				.setName((String) payload.get("name"))
-				.setId(payload.getSubject())
-				.setEmail(payload.getEmail());
-			
+			User user = result.get();
+			user.setName((String) payload.get("name"));
+			user.setId(payload.getSubject());
+			user.setEmail(payload.getEmail());
+
 			return Optional.of(user);
 		} else {
-			User user = this.dao.createWithId(payload.getSubject())
-				.setName((String) payload.get("name"))
-				.setEmail(payload.getEmail());
-			
+			User user = this.dao.createWithId(payload.getSubject());
+			user.setName((String) payload.get("name"));
+			user.setEmail(payload.getEmail());
+
 			return Optional.of(user);
 		}
-	
+
 	}
 
 	@Override

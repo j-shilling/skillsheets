@@ -129,7 +129,6 @@ public class LocalUserDaoTest {
 		user.delete();
 		
 		assertFalse (file.exists());
-		assertFalse (this.dao.read("testid").isPresent());
 	}
 
 }

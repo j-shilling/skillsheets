@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
 
+import com.shilling.skillsheets.api.model.ResourceModel;
 import com.shilling.skillsheets.dao.UserGroup;
 
 public class LocalUserGroup extends LocalResource<LocalUserGroup.Data> implements UserGroup {
@@ -31,6 +32,18 @@ public class LocalUserGroup extends LocalResource<LocalUserGroup.Data> implement
 	@Override
 	protected Data initial() {
 		return new Data();
+	}
+
+	@Override
+	public ResourceModel getModel(UUID uuid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addMember(UUID uuid) throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.shilling.skillsheets.api.model.ResourceModel;
 import com.shilling.skillsheets.dao.SkillSheet;
 import com.shilling.skillsheets.dao.User;
 
@@ -67,6 +68,12 @@ class LocalSkillSheet extends LocalResource<LocalSkillSheet.Data> implements Ski
 	@Override
 	protected Data initial() {
 		return new Data();
+	}
+
+	@Override
+	public ResourceModel getModel(UUID uuid) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

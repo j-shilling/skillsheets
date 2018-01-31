@@ -17,7 +17,6 @@ import com.shilling.skillsheets.dao.User;
  * @author Jake Shilling
  *
  */
-@Service
 public interface SkillSheetService {
 
 	/**
