@@ -17,10 +17,14 @@
  */
 package com.shilling.skillsheets.api.services;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
  *
  * @author Jake Shilling <shilling.jake@gmail.com>
  */
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Teacher {
     
 }

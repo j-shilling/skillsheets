@@ -91,6 +91,11 @@ public interface Resource {
         public void delEditor (UUID uuid) throws IOException;
         
         /**
+         * Remove all editors
+         */
+        public void clearEditors () throws IOException;
+        
+        /**
          * Removes editing permission from a user
          */
         default public void delEditor (User user) throws IOException {
@@ -120,6 +125,11 @@ public interface Resource {
 	default public void addViewer (User user) throws IOException {
 		this.addViewer(user.getUuid());
 	}
+        
+        /**
+         * Remove all editors
+         */
+        public void clearViewers () throws IOException;
         
         /**
          * Removes viewing permission from a user

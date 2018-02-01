@@ -40,7 +40,7 @@ public class ResourceServiceImpl implements ResourceService {
     private final ResourceIndex index;
     
     @Autowired
-    private ResourceServiceImpl (ResourceIndex index) {
+     ResourceServiceImpl (ResourceIndex index) {
         this.index = index;
     }
     
@@ -65,8 +65,12 @@ public class ResourceServiceImpl implements ResourceService {
         Preconditions.checkNotNull (requester);
         Preconditions.checkNotNull (uuid);
         
-        Resource res = this.get(uuid);
         try {
+            if (!requester.isTeacher())
+                throw new ForbiddenException();
+            
+            Resource res = this.get(uuid);
+            
             if (!res.canView(requester)) {
                 throw new ForbiddenException ();
             }
@@ -75,6 +79,8 @@ public class ResourceServiceImpl implements ResourceService {
             Resource copy = dao.create();
             
             res.copy(copy);
+            copy.setOwner(requester);
+            
             return copy;
         } catch (IOException e) {
             throw new InternalErrorException (e);
