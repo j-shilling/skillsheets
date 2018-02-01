@@ -13,6 +13,7 @@
 	<bean id="UserValidator" class="com.shilling.skillsheets.api.controllers.UserValidator"/>
 	<bean id="UuidValidator" class="com.shilling.skillsheets.api.controllers.UuidValidator"/>
 	<bean id="GoogleIdTokenVerifier" class="com.shilling.skillsheets.api.services.GoogleIdTokenVerifierFactory"/>
+	<bean id="ResourceService" class="com.shilling.skillsheets.api.services.ResourceServiceImpl"/>
 	<bean id="UserService" class="com.shilling.skillsheets.api.services.GoogleUserService"/>
 	<bean id="SkillSheetService" class="com.shilling.skillsheets.api.services.SkillSheetServiceImpl"/>
 	<bean id="UserGroupService" class="com.shilling.skillsheets.api.services.UserGroupServiceImpl"/>
