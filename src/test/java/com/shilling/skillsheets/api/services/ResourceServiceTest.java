@@ -48,75 +48,190 @@ public class ResourceServiceTest {
         }
     }
 
-	@Test
-	public void testSendTo(
-                @Teacher User requester,
-                @CanView UUID uuid,
-                @Teacher User user) {
-            
-		fail("Not yet implemented");
+    @Test
+    public void testSendTo(
+            @Teacher User requester,
+            @CanView UUID uuid,
+            @Teacher User user) throws Exception {
+        
+        ResourceService service = this.service();
+        ResourceService spy = Mockito.spy(service);
+        
+        Resource mock = null;
+        
+        Optional<ResourceDao<?>> dao = this.index.get(uuid);
+        if (dao.isPresent()) {
+            Mockito.when(dao.get().create()).thenReturn (mock);
+        }
+        
+        Resource copy = spy.sendTo(requester, uuid, user);
+        Mockito.verify(spy, Mockito.times(1)).copy(requester, uuid);
+        Mockito.verify(copy, Mockito.times(1)).setOwner(user);
                 
-	}
+    }
 
-	@Test
-	public void testRead(
-                User requester,
-                @CanView UUID uuid) {
+    @Test
+    public void testRead(
+            User requester,
+            @CanView UUID uuid) throws Exception {
+        
+        ResourceService service = this.service();
+        Resource mock = Mockito.mock(Resource.class);
+        
+        Optional<ResourceDao<?>> dao = this.index.get(uuid);
+        if (dao.isPresent()) {
+            if (dao.get().read(uuid).isPresent())
+                mock = dao.get().read(uuid).get();
+        }
+        
+        service.read(requester, uuid);
+        
+        Mockito.verify (mock, Mockito.times(1)).getModel(requester);
+    }
+
+    @Test
+    public void testSetOwner(
+            @Teacher User requester,
+            @Owner UUID uuid,
+            @Teacher @Nullable User user) throws Exception {
             
-		fail("Not yet implemented");
-	}
+        ResourceService service = this.service();
+        Resource mock = Mockito.mock(Resource.class);
+        
+        Optional<ResourceDao<?>> dao = this.index.get(uuid);
+        if (dao.isPresent()) {
+            if (dao.get().read(uuid).isPresent())
+                mock = dao.get().read(uuid).get();
+        }
+        
+        service.read(requester, uuid);
+        
+        Mockito.verify (mock, Mockito.times(1)).setOwner(user);
+        
+    }
 
-	@Test
-	public void testSetOwner(
-                @Teacher User requester,
-                @Owner UUID uuid,
-                @Teacher @Nullable User user) {
+    @Test
+    public void testSetName(
+            @Teacher User requester,
+            @CanEdit UUID uuid,
+            @Nullable String name) throws Exception {
             
-		fail("Not yet implemented");
-	}
+        ResourceService service = this.service();
+        Resource mock = Mockito.mock(Resource.class);
+        
+        Optional<ResourceDao<?>> dao = this.index.get(uuid);
+        if (dao.isPresent()) {
+            if (dao.get().read(uuid).isPresent())
+                mock = dao.get().read(uuid).get();
+        }
+        
+        service.read(requester, uuid);
+        
+        Mockito.verify (mock, Mockito.times(1)).setName (name);
+    }
 
-	@Test
-	public void testSetName(
-                @Teacher User requester,
-                @CanEdit UUID user,
-                @Nullable String name) {
-            
-		fail("Not yet implemented");
-	}
+    @Test
+    public void testAddEditor(
+            @Teacher User requester,
+            @CanEdit UUID uuid,
+            @Teacher User user) throws Exception {
 
-	@Test
-	public void testAddEditor(
-                @Teacher User requester,
-                @CanEdit UUID user) {
-		fail("Not yet implemented");
-	}
+        ResourceService service = this.service();
+        Resource mock = Mockito.mock(Resource.class);
+        
+        Optional<ResourceDao<?>> dao = this.index.get(uuid);
+        if (dao.isPresent()) {
+            if (dao.get().read(uuid).isPresent())
+                mock = dao.get().read(uuid).get();
+        }
+        
+        service.read(requester, uuid);
+        
+        Mockito.verify (mock, Mockito.times(1)).addEditor(user);
+        
+    }
 
-	@Test
-	public void testDelEditor(
-                @Teacher User requester,
-                @CanEdit UUID user) {
-		fail("Not yet implemented");
-	}
+    @Test
+    public void testDelEditor(
+            @Teacher User requester,
+            @CanEdit UUID uuid,
+            @Teacher User user) throws Exception {
 
-	@Test
-	public void testAddViewer(
-                @Teacher User requester,
-                @CanEdit UUID user) {
-		fail("Not yet implemented");
-	}
+        ResourceService service = this.service();
+        Resource mock = Mockito.mock(Resource.class);
+        
+        Optional<ResourceDao<?>> dao = this.index.get(uuid);
+        if (dao.isPresent()) {
+            if (dao.get().read(uuid).isPresent())
+                mock = dao.get().read(uuid).get();
+        }
+        
+        service.read(requester, uuid);
+        
+        Mockito.verify (mock, Mockito.times(1)).delEditor(user);
+        
+    }
 
-	@Test
-	public void testDelViewer(
-                @Teacher User requester,
-                @CanEdit UUID user) {
-		fail("Not yet implemented");
-	}
+    @Test
+    public void testAddViewer(
+            @Teacher User requester,
+            @CanEdit UUID uuid,
+            @Teacher User user) throws Exception {
 
-	@Test
-	public void testDelete(
-                @Teacher User requester,
-                @Owner UUID user) {
-		fail("Not yet implemented");
-	}
+        ResourceService service = this.service();
+        Resource mock = Mockito.mock(Resource.class);
+        
+        Optional<ResourceDao<?>> dao = this.index.get(uuid);
+        if (dao.isPresent()) {
+            if (dao.get().read(uuid).isPresent())
+                mock = dao.get().read(uuid).get();
+        }
+        
+        service.read(requester, uuid);
+        
+        Mockito.verify (mock, Mockito.times(1)).addViewer(user);
+        
+    }
+
+    @Test
+    public void testDelViewer(
+            @Teacher User requester,
+            @CanEdit UUID uuid,
+            @Teacher User user) throws Exception {
+
+        ResourceService service = this.service();
+        Resource mock = Mockito.mock(Resource.class);
+        
+        Optional<ResourceDao<?>> dao = this.index.get(uuid);
+        if (dao.isPresent()) {
+            if (dao.get().read(uuid).isPresent())
+                mock = dao.get().read(uuid).get();
+        }
+        
+        service.read(requester, uuid);
+        
+        Mockito.verify (mock, Mockito.times(1)).delViewer(user);
+        
+    }
+
+    @Test
+    public void testDelete(
+            @Teacher User requester,
+            @Owner UUID uuid) throws Exception {
+
+        ResourceService service = this.service();
+        Resource mock = Mockito.mock(Resource.class);
+        
+        Optional<ResourceDao<?>> dao = this.index.get(uuid);
+        if (dao.isPresent()) {
+            if (dao.get().read(uuid).isPresent())
+                mock = dao.get().read(uuid).get();
+        }
+        
+        service.read(requester, uuid);
+        
+        Mockito.verify (mock, Mockito.times(1)).delete ();
+        Mockito.verify (dao.get(), Mockito.times(1)).delete (uuid);
+    }
 
 }

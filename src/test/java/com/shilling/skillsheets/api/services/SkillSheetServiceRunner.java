@@ -92,7 +92,6 @@ public class SkillSheetServiceRunner extends Runner {
         try {
             /* Mock Resource Methods */
             Mockito.when(res.getUuid()).thenReturn (uuid);
-            Mockito.when(res.getOwner()).thenReturn (Optional.empty());
             Mockito.when(res.getName()).thenReturn (Optional.empty());
             Mockito.when(res.canEdit(Mockito.any(UUID.class)))
                     .thenReturn (false);
@@ -116,7 +115,6 @@ public class SkillSheetServiceRunner extends Runner {
         try {
             /* Mock Resource Methods */
             Mockito.when(user.getUuid()).thenReturn (uuid);
-            Mockito.when(user.getOwner()).thenReturn (Optional.empty());
             Mockito.when(user.getName()).thenReturn (Optional.empty());
             Mockito.when(user.canEdit(Mockito.any(UUID.class)))
                     .thenReturn (false);

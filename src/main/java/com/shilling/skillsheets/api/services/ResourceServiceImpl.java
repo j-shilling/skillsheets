@@ -128,8 +128,7 @@ public class ResourceServiceImpl implements ResourceService {
         Resource res = this.get (uuid);
         
         try {
-            if (!res.getOwner().isPresent() 
-                    || !res.getOwner().get().equals (requester.getUuid())) {
+            if (!res.isOwner(requester)) {
                 throw new ForbiddenException();
             }
             
@@ -241,8 +240,7 @@ public class ResourceServiceImpl implements ResourceService {
         Resource res = this.get(uuid);
         
         try {
-            if (res.getOwner().isPresent() 
-                    && res.getOwner().get().equals(requester.getUuid())) {
+            if (res.isOwner(requester)) {
                 
                 res.delete();
                 ResourceDao<? extends Resource> dao = this.index.get (uuid).get();

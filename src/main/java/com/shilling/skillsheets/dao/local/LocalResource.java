@@ -147,109 +147,127 @@ abstract class LocalResource<T extends LocalResource.Data> implements Resource {
 		
 	}
 	
-	public synchronized void delete () {
-		if (this.file.exists()) {
-			this.file.delete();
-		}
-	}
-	
-	public UUID getUuid () {
-		return this.uuid;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals (Object obj) {
-		if (obj instanceof LocalResource)
-			return this.uuid.equals(((LocalResource<?>) obj).uuid);
-		return false;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.uuid);
-	}
-
-	@Override
-	public synchronized Optional<UUID> getOwner() throws IOException {
-		return this.read().getOwner();
-	}
-
-	@Override
-	public synchronized void setOwner(UUID uuid) throws IOException {
-		T data = this.read();
-		data.setOwner(uuid);
-		this.write(data);
-	}
-
-	@Override
-	public synchronized Optional<String> getName() throws IOException {
-		return this.read().getName();
-	}
-
-	@Override
-	public synchronized void setName(String name) throws IOException {
-		T data = this.read();
-		data.setName(name);
-		this.write(data);
-	}
-
-	@Override
-	public void addEditor(UUID uuid) throws IOException {
-		T data = this.read();
-		data.getEditors().add(uuid);
-		this.write(data);
-	}
         
-        @Override
-        public void delEditor (UUID uuid) throws IOException {
-            T data = this.read();
-            data.getEditors().remove(uuid);
-            this.write (data);
-        }
-
-	@Override
-	public void addViewer(UUID uuid) throws IOException {
-		T data = this.read();
-		data.getViewers().add(uuid);
-		this.write(data);
-	}
-        
-        @Override
-        public void delViewer (UUID uuid) throws IOException {
-            T data = this.read();
-            data.getViewers().remove(uuid);
-            this.write (data);
-        }
-
-	@Override
-	public boolean canEdit(UUID uuid) throws IOException {
-		return this.read().getEditors().contains(uuid);
-	}
-
-	@Override
-	public boolean canView(UUID uuid) throws IOException {
-		return this.read().getViewers().contains(uuid)
-				|| this.canEdit(uuid);
-	}
 	
-	@Override
-	public synchronized void copy (Resource other) throws IOException {
-		if (other instanceof LocalResource<?>) {
-			LocalResource<?> local = (LocalResource<?>) other;
-			if (this.type.equals(local.type)) {
-				@SuppressWarnings("unchecked")
-				LocalResource<T> that = (LocalResource<T>) local;
-				that.write(this.read());
-				return;
-			}
-		}
+    @Override
+    public UUID getUuid () {
+        return this.uuid;
+    }
+        
+    @Override
+    public synchronized boolean isOwner(@Nullable UUID uuid) throws IOException {
+        return this.read().getOwner().equals(Optional.ofNullable (uuid));
+    }
+    
+    @Override
+    public synchronized void setOwner(UUID uuid) throws IOException {
+	T data = this.read();
+	data.setOwner(uuid);
+	this.write(data);
+    }
+    
+    @Override
+    public synchronized Optional<String> getName() throws IOException {
+	return this.read().getName();
+    }
+
+    @Override
+    public synchronized void setName(String name) throws IOException {
+	T data = this.read();
+	data.setName(name);
+	this.write(data);
+    }
+    
+    @Override
+    public synchronized boolean canEdit(UUID uuid) throws IOException {
+	return this.read().getEditors().contains(uuid);
+    }
+    
+    @Override
+    public synchronized void addEditor(UUID uuid) throws IOException {
+        T data = this.read();
+	data.getEditors().add(uuid);
+	this.write(data);
+    }
+        
+    @Override
+    public synchronized void delEditor (UUID uuid) throws IOException {
+        T data = this.read();
+        data.getEditors().remove(uuid);
+        this.write (data);
+    }
+
+    @Override
+    public synchronized void clearEditors() throws IOException {
+        T data = this.read();
+        data.getEditors().clear();
+        this.write (data);
+    }
+    
+    @Override
+    public synchronized boolean canView(UUID uuid) throws IOException {
+	return this.read().getViewers().contains(uuid)
+		|| this.canEdit(uuid);
+    }
+    
+    @Override
+    public synchronized void addViewer(UUID uuid) throws IOException {
+	T data = this.read();
+	data.getViewers().add(uuid);
+	this.write(data);
+    }
+        
+    @Override
+    public synchronized void delViewer (UUID uuid) throws IOException {
+        T data = this.read();
+        data.getViewers().remove(uuid);
+        this.write (data);
+    }
+
+    @Override
+    public synchronized void clearViewers() throws IOException {
+        T data = this.read();
+        data.getViewers().clear();
+        this.write (data);
+    }
+    
+    @Override
+    public synchronized void copy (Resource other) throws IOException {
+	if (other instanceof LocalResource<?>) {
+            LocalResource<?> local = (LocalResource<?>) other;
+            if (this.type.equals(local.type)) {
+                @SuppressWarnings("unchecked")
+		LocalResource<T> that = (LocalResource<T>) local;
+		that.write(this.read());
+		return;
+            }
+        }
 			
-		throw new IOException ("Cannot copy to incompatible type");
+	throw new IOException ("Cannot copy to incompatible type");
+    }
+    
+    @Override
+    public synchronized void delete () {
+        if (this.file.exists()) {
+            this.file.delete();
 	}
+    }
+	
+    /**
+    * {@inheritDoc}
+    */
+    @Override
+    public boolean equals (Object obj) {
+	if (obj instanceof LocalResource)
+            return this.uuid.equals(((LocalResource<?>) obj).uuid);
+        return false;
+    }
+	
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+	return Objects.hash(this.uuid);
+    }
 }

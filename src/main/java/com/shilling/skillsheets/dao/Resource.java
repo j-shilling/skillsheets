@@ -21,13 +21,11 @@ public interface Resource {
 	 */
 	public UUID getUuid();
 	
-	/**
-	 * Get the UUID of the user who owns this resource. Only
-	 * the user can delete this resource permanently. A resource
-	 * created automatically by the server will not have an
-	 * owner.
-	 */
-	public Optional<UUID> getOwner() throws IOException;
+	public boolean isOwner(UUID uuid) throws IOException;
+        
+        default public boolean isOwner (User user) throws IOException {
+            return this.isOwner(user.getUuid());
+        }
 	
 	/**
 	 * Set the UUID of the user who owns this resource. Only
