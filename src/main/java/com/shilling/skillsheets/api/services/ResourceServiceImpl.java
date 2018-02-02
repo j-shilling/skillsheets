@@ -79,6 +79,8 @@ public class ResourceServiceImpl implements ResourceService {
             Resource copy = dao.create();
             
             res.copy(copy);
+            copy.clearEditors();
+            copy.clearViewers();
             copy.setOwner(requester);
             
             return copy;
@@ -93,8 +95,11 @@ public class ResourceServiceImpl implements ResourceService {
         Preconditions.checkNotNull (uuid);
         Preconditions.checkNotNull (user);
         
-        Resource res = this.copy (requester, uuid);
         try {
+            if (!user.isTeacher())
+                throw new ForbiddenException();
+        
+            Resource res = this.copy (requester, uuid);
             res.setOwner(user);
             return res;
         } catch (IOException e) {
@@ -128,7 +133,9 @@ public class ResourceServiceImpl implements ResourceService {
         Resource res = this.get (uuid);
         
         try {
-            if (!res.isOwner(requester)) {
+            if (!requester.isTeacher()
+                    || !res.isOwner(requester)
+                    || ((user != null) && !user.isTeacher())) {
                 throw new ForbiddenException();
             }
             
@@ -146,7 +153,7 @@ public class ResourceServiceImpl implements ResourceService {
         Resource res = this.get (uuid);
         
         try {
-            if (!res.canEdit (requester)) {
+            if (!requester.isTeacher() || !res.canEdit (requester)) {
                 throw new ForbiddenException();
             }
             
@@ -165,7 +172,9 @@ public class ResourceServiceImpl implements ResourceService {
         Resource res = this.get (uuid);
         
         try {
-            if (!res.canEdit (requester)) {
+            if (!requester.isTeacher()
+                    || !user.isTeacher()
+                    || !res.canEdit (requester)) {
                 throw new ForbiddenException();
             }
             
@@ -184,7 +193,9 @@ public class ResourceServiceImpl implements ResourceService {
         Resource res = this.get (uuid);
         
         try {
-            if (!res.canEdit (requester)) {
+            if (!requester.isTeacher()
+                    || !user.isTeacher()
+                    || !res.canEdit (requester)) {
                 throw new ForbiddenException();
             }
             
@@ -203,7 +214,9 @@ public class ResourceServiceImpl implements ResourceService {
         Resource res = this.get (uuid);
         
         try {
-            if (!res.canEdit (requester)) {
+            if (!requester.isTeacher()
+                    || !user.isTeacher()
+                    || !res.canEdit (requester)) {
                 throw new ForbiddenException();
             }
             
@@ -222,7 +235,9 @@ public class ResourceServiceImpl implements ResourceService {
         Resource res = this.get (uuid);
         
         try {
-            if (!res.canEdit (requester)) {
+            if (!requester.isTeacher()
+                    || !user.isTeacher()
+                    || !res.canEdit (requester)) {
                 throw new ForbiddenException();
             }
             

@@ -57,7 +57,7 @@ public class ResourceServiceTest {
         ResourceService service = this.service();
         ResourceService spy = Mockito.spy(service);
         
-        Resource mock = null;
+        Resource mock = Mockito.mock(Resource.class);
         
         Optional<ResourceDao<?>> dao = this.index.get(uuid);
         if (dao.isPresent()) {
@@ -104,7 +104,7 @@ public class ResourceServiceTest {
                 mock = dao.get().read(uuid).get();
         }
         
-        service.read(requester, uuid);
+        service.setOwner(requester, uuid, user);
         
         Mockito.verify (mock, Mockito.times(1)).setOwner(user);
         
@@ -125,7 +125,7 @@ public class ResourceServiceTest {
                 mock = dao.get().read(uuid).get();
         }
         
-        service.read(requester, uuid);
+        service.setName(requester, uuid, name);
         
         Mockito.verify (mock, Mockito.times(1)).setName (name);
     }
@@ -145,7 +145,7 @@ public class ResourceServiceTest {
                 mock = dao.get().read(uuid).get();
         }
         
-        service.read(requester, uuid);
+        service.addEditor(requester, uuid, user);
         
         Mockito.verify (mock, Mockito.times(1)).addEditor(user);
         
@@ -166,7 +166,7 @@ public class ResourceServiceTest {
                 mock = dao.get().read(uuid).get();
         }
         
-        service.read(requester, uuid);
+        service.delEditor(requester, uuid, user);
         
         Mockito.verify (mock, Mockito.times(1)).delEditor(user);
         
@@ -187,7 +187,7 @@ public class ResourceServiceTest {
                 mock = dao.get().read(uuid).get();
         }
         
-        service.read(requester, uuid);
+        service.addViewer(requester, uuid, user);
         
         Mockito.verify (mock, Mockito.times(1)).addViewer(user);
         
@@ -208,7 +208,7 @@ public class ResourceServiceTest {
                 mock = dao.get().read(uuid).get();
         }
         
-        service.read(requester, uuid);
+        service.delViewer(requester, uuid, user);
         
         Mockito.verify (mock, Mockito.times(1)).delViewer(user);
         
@@ -228,7 +228,7 @@ public class ResourceServiceTest {
                 mock = dao.get().read(uuid).get();
         }
         
-        service.read(requester, uuid);
+        service.delete (requester, uuid);
         
         Mockito.verify (mock, Mockito.times(1)).delete ();
         Mockito.verify (dao.get(), Mockito.times(1)).delete (uuid);
