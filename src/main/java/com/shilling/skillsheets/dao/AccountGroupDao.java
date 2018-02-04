@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jake Shilling
+ * Copyright (C) 2018 Pivotal Software, Inc.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,18 +17,9 @@
  */
 package com.shilling.skillsheets.dao;
 
-import com.shilling.skillsheets.HasUuid;
-import java.io.IOException;
-import java.util.Optional;
-import javax.annotation.Nullable;
-
 /**
  *
  * @author jake
  */
-public interface Resource<T extends Resource> extends HasUuid {
-    
-    public Optional<String> getDisplayName() throws IOException;
-    public T setDisplayName (@Nullable String displayName) throws IOException;
-    
+public interface AccountGroupDao extends Dao<AccountGroup> {
 }

@@ -1,5 +1,7 @@
 package com.shilling.skillsheets.api.controllers;
 
+import com.shilling.skillsheets.controllers.UuidValidator;
+import com.shilling.skillsheets.controllers.SkillSheetController;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
@@ -21,12 +23,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.shilling.skillsheets.api.services.SkillSheetService;
-import com.shilling.skillsheets.api.services.UserService;
+import com.shilling.skillsheets.services.SkillSheetService;
+import com.shilling.skillsheets.services.impl.UserService;
 import com.shilling.skillsheets.dao.SkillSheet;
-import com.shilling.skillsheets.dao.User;
 
 import junit.framework.TestCase;
+import com.shilling.skillsheets.dao.Account;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = SkillSheetController.class, secure = false)
@@ -45,7 +47,7 @@ public class SkillSheetControllerTest extends TestCase {
 	@Mock
 	private SkillSheet mockSkillSheet;
 	@Mock
-	private User mockUser;
+	private Account mockUser;
 	
 	private UUID uuid = UUID.randomUUID();
 	

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jake Shilling
+ * Copyright (C) 2018 Pivotal Software, Inc.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,20 +15,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.shilling.skillsheets.dao;
+package com.shilling.skillsheets.services.impl;
 
-import com.shilling.skillsheets.HasUuid;
-import java.io.IOException;
-import java.util.Optional;
-import javax.annotation.Nullable;
+import com.shilling.skillsheets.AbstractHasUuid;
+import com.shilling.skillsheets.dao.AccountGroup;
+import com.shilling.skillsheets.services.Group;
 
 /**
  *
  * @author jake
  */
-public interface Resource<T extends Resource> extends HasUuid {
+public class AbstractGroup extends AbstractHasUuid implements Group {
     
-    public Optional<String> getDisplayName() throws IOException;
-    public T setDisplayName (@Nullable String displayName) throws IOException;
+    private final AccountGroup group;
     
+    protected AbstractGroup (AccountGroup group) {
+        super (group.getUuid());
+        
+        this.group = group;
+    }
 }

@@ -15,20 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.shilling.skillsheets.dao;
+package com.shilling.skillsheets.services;
 
 import com.shilling.skillsheets.HasUuid;
-import java.io.IOException;
-import java.util.Optional;
-import javax.annotation.Nullable;
 
 /**
- *
- * @author jake
+ * 
+ * @author Jake Shilling
  */
-public interface Resource<T extends Resource> extends HasUuid {
+public interface User extends HasUuid {
     
-    public Optional<String> getDisplayName() throws IOException;
-    public T setDisplayName (@Nullable String displayName) throws IOException;
-    
+    public Team newTeam() throws IllegalAccessException;
+
 }

@@ -11,8 +11,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.shilling.skillsheets.dao.User;
 import com.shilling.skillsheets.dao.UserDao;
+import com.shilling.skillsheets.dao.Account;
 
 public class LocalUserDaoTest {
 	
@@ -44,7 +44,7 @@ public class LocalUserDaoTest {
 
 	@Test
 	public void testCreateWithId() throws IOException {
-		User user = this.dao.createWithId("testid");
+		Account user = this.dao.createWithId("testid");
 		Optional<String> id = user.getId();
 		
 		assertTrue (id.isPresent());
@@ -61,7 +61,7 @@ public class LocalUserDaoTest {
 
 	@Test
 	public void testCreateWithEmail() throws IOException {
-		User user = this.dao.createWithEmail("test@email.com");
+		Account user = this.dao.createWithEmail("test@email.com");
 		Optional<String> email = user.getEmail();
 		
 		assertTrue (email.isPresent());
@@ -78,7 +78,7 @@ public class LocalUserDaoTest {
 	
 	@Test
 	public void testIdChanged() throws IOException {
-		User user = this.dao.createWithEmail("test@email.com");
+		Account user = this.dao.createWithEmail("test@email.com");
 		user.setId("id");
 		
 		assertEquals (Optional.of(user), this.dao.read("id"));
@@ -86,7 +86,7 @@ public class LocalUserDaoTest {
 	
 	@Test
 	public void testEmailChanged() throws IOException {
-		User user = this.dao.createWithId("test");
+		Account user = this.dao.createWithId("test");
 		user.setEmail("test@mail.com");
 		
 		assertEquals (Optional.of(user), this.dao.read("test@mail.com"));
@@ -94,8 +94,8 @@ public class LocalUserDaoTest {
 
 	@Test
 	public void testRead() throws IOException {
-		User id = this.dao.createWithId("testid");
-		User email = this.dao.createWithEmail("test@email.com");
+		Account id = this.dao.createWithId("testid");
+		Account email = this.dao.createWithEmail("test@email.com");
 		
 		assertTrue (this.dao.read("testid").isPresent());
 		assertEquals (id, this.dao.read("testid").get());
@@ -106,7 +106,7 @@ public class LocalUserDaoTest {
 
 	@Test
 	public void testDeleteDao() throws IOException {
-		User user = this.dao.createWithId("testid");
+		Account user = this.dao.createWithId("testid");
 		
 		File file = 
 				Paths.get(this.userdir.getPath(), user.getUuid().toString() + ".user.xml").toFile();
@@ -120,7 +120,7 @@ public class LocalUserDaoTest {
 	
 	@Test
 	public void testDeleteObject() throws IOException {
-		User user = this.dao.createWithId("testid");
+		Account user = this.dao.createWithId("testid");
 		
 		File file = 
 				Paths.get(this.userdir.getPath(), user.getUuid().toString() + ".user.xml").toFile();

@@ -1,24 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <beans xmlns = "http://www.springframework.org/schema/beans"
-   xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:context = "http://www.springframework.org/schema/context"
-   xsi:schemaLocation = "http://www.springframework.org/schema/beans
+       xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context = "http://www.springframework.org/schema/context"
+       xsi:schemaLocation = "http://www.springframework.org/schema/beans
    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
    http://www.springframework.org/schema/context
    http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<context:annotation-config/>
-	
-	<bean id="UserValidator" class="com.shilling.skillsheets.api.controllers.UserValidator"/>
-	<bean id="UuidValidator" class="com.shilling.skillsheets.api.controllers.UuidValidator"/>
-	<bean id="GoogleIdTokenVerifier" class="com.shilling.skillsheets.api.services.GoogleIdTokenVerifierFactory"/>
-        <bean id="ResourceIndex" class="com.shilling.skillsheets.dao.ResourceIndex"/>
-	<bean id="ResourceService" class="com.shilling.skillsheets.api.services.ResourceServiceImpl"/>
-	<bean id="UserService" class="com.shilling.skillsheets.api.services.GoogleUserService"/>
-	<bean id="SkillSheetService" class="com.shilling.skillsheets.api.services.SkillSheetServiceImpl"/>
-	<bean id="UserGroupService" class="com.shilling.skillsheets.api.services.UserGroupServiceImpl"/>
-	<bean id="UserDao" class="com.shilling.skillsheets.dao.local.LocalUserDaoFactory"/>
-	<bean id="SkillSheetDao" class="com.shilling.skillsheets.dao.local.LocalSkillSheetDaoFactory"/>
+    <context:annotation-config/>
+        
+    <import resource="service-beans.xml"/>
    
 </beans>

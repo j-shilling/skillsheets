@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jake Shilling
+ * Copyright (C) 2018 Pivotal Software, Inc.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,10 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.shilling.skillsheets.dao;
+package com.shilling.skillsheets.services;
 
-import com.shilling.skillsheets.HasUuid;
-import java.io.IOException;
+import com.shilling.skillsheets.dao.Account;
+import com.shilling.skillsheets.dao.Resource;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -26,9 +26,13 @@ import javax.annotation.Nullable;
  *
  * @author jake
  */
-public interface Resource<T extends Resource> extends HasUuid {
+public interface ResourceWrapper<T extends Resource> {
     
-    public Optional<String> getDisplayName() throws IOException;
-    public T setDisplayName (@Nullable String displayName) throws IOException;
+    public Optional<String> getDisplayName ();
+    public T setDisplayName (@Nullable String displayName);
+    public T giveTo (Account account);
+    public T letEdit (Account account);
+    public T letView (Account account);
+    public void delete ();
     
 }

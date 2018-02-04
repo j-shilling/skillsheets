@@ -15,20 +15,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.shilling.skillsheets.dao;
+package com.shilling.skillsheets.services;
 
-import com.shilling.skillsheets.HasUuid;
-import java.io.IOException;
 import java.util.Optional;
-import javax.annotation.Nullable;
 
 /**
  *
  * @author jake
  */
-public interface Resource<T extends Resource> extends HasUuid {
+public interface UserService {
     
-    public Optional<String> getDisplayName() throws IOException;
-    public T setDisplayName (@Nullable String displayName) throws IOException;
-    
+    /**
+     * Converts an ID Token from the client to a {@link User}.
+     * 
+     * @param id_token      Google ID Token
+     * @return              {@link java.util.Optional} of the result.
+     *                      Will be empty if the Id Token was invalid or
+     *                      an error occurred while reading account information.
+     */
+    Optional<User> fromToken (String id_token);
 }

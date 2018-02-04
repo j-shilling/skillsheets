@@ -1,9 +1,10 @@
 package com.shilling.skillsheets.api.services;
 
+import com.shilling.skillsheets.services.ResourceService;
+import com.shilling.skillsheets.services.ResourceServiceImpl;
 import com.shilling.skillsheets.dao.Resource;
 import com.shilling.skillsheets.dao.ResourceDao;
 import com.shilling.skillsheets.dao.ResourceIndex;
-import com.shilling.skillsheets.dao.User;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -12,6 +13,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import com.shilling.skillsheets.dao.Account;
 
 @RunWith(SkillSheetServiceRunner.class)
 public class ResourceServiceTest {
@@ -24,7 +26,7 @@ public class ResourceServiceTest {
 
     @Test
     public void testCopy(
-            @Teacher User requester,
+            @Teacher Account requester,
             @CanView UUID uuid) throws Exception {
         
         ResourceService service = this.service();
@@ -50,9 +52,9 @@ public class ResourceServiceTest {
 
     @Test
     public void testSendTo(
-            @Teacher User requester,
+            @Teacher Account requester,
             @CanView UUID uuid,
-            @Teacher User user) throws Exception {
+            @Teacher Account user) throws Exception {
         
         ResourceService service = this.service();
         ResourceService spy = Mockito.spy(service);
@@ -72,7 +74,7 @@ public class ResourceServiceTest {
 
     @Test
     public void testRead(
-            User requester,
+            Account requester,
             @CanView UUID uuid) throws Exception {
         
         ResourceService service = this.service();
@@ -91,9 +93,9 @@ public class ResourceServiceTest {
 
     @Test
     public void testSetOwner(
-            @Teacher User requester,
+            @Teacher Account requester,
             @Owner UUID uuid,
-            @Teacher @Nullable User user) throws Exception {
+            @Teacher @Nullable Account user) throws Exception {
             
         ResourceService service = this.service();
         Resource mock = Mockito.mock(Resource.class);
@@ -112,7 +114,7 @@ public class ResourceServiceTest {
 
     @Test
     public void testSetName(
-            @Teacher User requester,
+            @Teacher Account requester,
             @CanEdit UUID uuid,
             @Nullable String name) throws Exception {
             
@@ -132,9 +134,9 @@ public class ResourceServiceTest {
 
     @Test
     public void testAddEditor(
-            @Teacher User requester,
+            @Teacher Account requester,
             @CanEdit UUID uuid,
-            @Teacher User user) throws Exception {
+            @Teacher Account user) throws Exception {
 
         ResourceService service = this.service();
         Resource mock = Mockito.mock(Resource.class);
@@ -153,9 +155,9 @@ public class ResourceServiceTest {
 
     @Test
     public void testDelEditor(
-            @Teacher User requester,
+            @Teacher Account requester,
             @CanEdit UUID uuid,
-            @Teacher User user) throws Exception {
+            @Teacher Account user) throws Exception {
 
         ResourceService service = this.service();
         Resource mock = Mockito.mock(Resource.class);
@@ -174,9 +176,9 @@ public class ResourceServiceTest {
 
     @Test
     public void testAddViewer(
-            @Teacher User requester,
+            @Teacher Account requester,
             @CanEdit UUID uuid,
-            @Teacher User user) throws Exception {
+            @Teacher Account user) throws Exception {
 
         ResourceService service = this.service();
         Resource mock = Mockito.mock(Resource.class);
@@ -195,9 +197,9 @@ public class ResourceServiceTest {
 
     @Test
     public void testDelViewer(
-            @Teacher User requester,
+            @Teacher Account requester,
             @CanEdit UUID uuid,
-            @Teacher User user) throws Exception {
+            @Teacher Account user) throws Exception {
 
         ResourceService service = this.service();
         Resource mock = Mockito.mock(Resource.class);
@@ -216,7 +218,7 @@ public class ResourceServiceTest {
 
     @Test
     public void testDelete(
-            @Teacher User requester,
+            @Teacher Account requester,
             @Owner UUID uuid) throws Exception {
 
         ResourceService service = this.service();

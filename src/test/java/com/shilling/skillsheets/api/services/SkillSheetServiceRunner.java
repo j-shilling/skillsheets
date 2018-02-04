@@ -23,7 +23,6 @@ import com.shilling.skillsheets.api.model.ResourceModel;
 import com.shilling.skillsheets.dao.Resource;
 import com.shilling.skillsheets.dao.ResourceDao;
 import com.shilling.skillsheets.dao.ResourceIndex;
-import com.shilling.skillsheets.dao.User;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -40,6 +39,7 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import com.shilling.skillsheets.dao.Account;
 
 /**
  * JUnit Runner specialized for Service Layer classes. This
@@ -108,8 +108,8 @@ public class SkillSheetServiceRunner extends Runner {
     }
     
     /* Build a mock User with default values */
-    private User getUser() {
-        User user = Mockito.mock (User.class);
+    private Account getUser() {
+        Account user = Mockito.mock (Account.class);
         UUID uuid = UUID.randomUUID();
         
         try {
@@ -227,9 +227,9 @@ public class SkillSheetServiceRunner extends Runner {
             for (int i = 0; i < params.length; i ++) {
                 Parameter param = params[i];
 
-                if (param.getType().equals(User.class)) {
+                if (param.getType().equals(Account.class)) {
                     
-                    User user = this.getUser();
+                    Account user = this.getUser();
                     if (param.getAnnotation(Teacher.class) != null) {
                         Mockito.when(user.isTeacher()).thenReturn(true);
                     } else {
@@ -251,27 +251,27 @@ public class SkillSheetServiceRunner extends Runner {
                                 .thenReturn(true);
                         Mockito.when(resource.canView(Mockito.any(UUID.class)))
                                 .thenReturn(true);
-                        Mockito.when(resource.canEdit(Mockito.any(User.class)))
+                        Mockito.when(resource.canEdit(Mockito.any(Account.class)))
                                 .thenReturn(true);
-                        Mockito.when(resource.canView(Mockito.any(User.class)))
+                        Mockito.when(resource.canView(Mockito.any(Account.class)))
                                 .thenReturn(true);
                     } else if (param.getAnnotation(CanView.class) != null) {
                         Mockito.when(resource.canEdit(Mockito.any(UUID.class)))
                                 .thenReturn(false);
                         Mockito.when(resource.canView(Mockito.any(UUID.class)))
                                 .thenReturn(true);
-                        Mockito.when(resource.canEdit(Mockito.any(User.class)))
+                        Mockito.when(resource.canEdit(Mockito.any(Account.class)))
                                 .thenReturn(false);
-                        Mockito.when(resource.canView(Mockito.any(User.class)))
+                        Mockito.when(resource.canView(Mockito.any(Account.class)))
                                 .thenReturn(true);
                     } else {
                         Mockito.when(resource.canEdit(Mockito.any(UUID.class)))
                                 .thenReturn(false);
                         Mockito.when(resource.canView(Mockito.any(UUID.class)))
                                 .thenReturn(false);
-                        Mockito.when(resource.canEdit(Mockito.any(User.class)))
+                        Mockito.when(resource.canEdit(Mockito.any(Account.class)))
                                 .thenReturn(false);
-                        Mockito.when(resource.canView(Mockito.any(User.class)))
+                        Mockito.when(resource.canView(Mockito.any(Account.class)))
                                 .thenReturn(false);
                     }
                     
@@ -326,8 +326,8 @@ public class SkillSheetServiceRunner extends Runner {
                         Parameter param = params[i];
                         String name = param.getName();
                         
-                        if (param.getType().equals(User.class)) {
-                            User user = this.getUser();
+                        if (param.getType().equals(Account.class)) {
+                            Account user = this.getUser();
                             Object[] args = this.getSuccess(method);
                             args[i] = user;
                             if (param.getAnnotation(Teacher.class) != null) {
@@ -393,7 +393,7 @@ public class SkillSheetServiceRunner extends Runner {
                             res = this.getResource();
                             Mockito.when(dao.read(uuid)).thenReturn(Optional.of(res));
                             Mockito.when(res.canView(Mockito.any(UUID.class))).thenReturn (true);
-                            Mockito.when(res.canView(Mockito.any(User.class))).thenReturn (true);
+                            Mockito.when(res.canView(Mockito.any(Account.class))).thenReturn (true);
                             
                             if (param.getAnnotation(CanEdit.class) == null
                                     && param.getAnnotation(Owner.class) == null) {
@@ -415,9 +415,9 @@ public class SkillSheetServiceRunner extends Runner {
                             res = this.getResource();
                             Mockito.when(dao.read(uuid)).thenReturn(Optional.of(res));
                             Mockito.when(res.canView(Mockito.any(UUID.class))).thenReturn (true);
-                            Mockito.when(res.canView(Mockito.any(User.class))).thenReturn (true);
+                            Mockito.when(res.canView(Mockito.any(Account.class))).thenReturn (true);
                             Mockito.when(res.canView(Mockito.any(UUID.class))).thenReturn (true);
-                            Mockito.when(res.canView(Mockito.any(User.class))).thenReturn (true);
+                            Mockito.when(res.canView(Mockito.any(Account.class))).thenReturn (true);
                             
                             if (param.getAnnotation(Owner.class) == null) {
                            

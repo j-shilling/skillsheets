@@ -17,18 +17,22 @@
  */
 package com.shilling.skillsheets.dao;
 
-import com.shilling.skillsheets.HasUuid;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.UUID;
 import javax.annotation.Nullable;
 
 /**
  *
  * @author jake
  */
-public interface Resource<T extends Resource> extends HasUuid {
+public interface Account extends Resource {
     
-    public Optional<String> getDisplayName() throws IOException;
-    public T setDisplayName (@Nullable String displayName) throws IOException;
+    public Account setName (@Nullable String name) throws IOException;
+    public Account setId (String id) throws IOException;
+    public Account setEmail (String email) throws IOException;
+    
+    public boolean isTeacher () throws IOException;
+
+    public void addOwnedTeam(UUID uuid) throws IOException;
     
 }

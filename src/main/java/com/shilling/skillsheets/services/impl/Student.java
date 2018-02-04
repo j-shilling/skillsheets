@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jake Shilling
+ * Copyright (C) 2018 Pivotal Software, Inc.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,20 +15,34 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.shilling.skillsheets.dao;
+package com.shilling.skillsheets.services.impl;
 
-import com.shilling.skillsheets.HasUuid;
-import java.io.IOException;
-import java.util.Optional;
-import javax.annotation.Nullable;
+import com.shilling.skillsheets.AbstractHasUuid;
+import com.shilling.skillsheets.dao.Account;
+import com.shilling.skillsheets.services.Team;
+import com.shilling.skillsheets.services.User;
 
 /**
  *
  * @author jake
  */
-public interface Resource<T extends Resource> extends HasUuid {
+public class Student extends AbstractHasUuid implements User {
     
-    public Optional<String> getDisplayName() throws IOException;
-    public T setDisplayName (@Nullable String displayName) throws IOException;
+    private final Account account;
+
+    public Student(Account account) {
+        super (account.getUuid());
+        
+        this.account = account;
+    }
+    
+    protected final Account getAccount() {
+        return this.account;
+    }
+
+    @Override
+    public Team newTeam() throws IllegalAccessException {
+        throw new IllegalAccessException ("Student accounts cannot create teams");
+    }
     
 }

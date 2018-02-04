@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jake Shilling
+ * Copyright (C) 2018 Pivotal Software, Inc.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,20 +15,38 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.shilling.skillsheets.dao;
+package com.shilling.skillsheets;
 
-import com.shilling.skillsheets.HasUuid;
-import java.io.IOException;
-import java.util.Optional;
-import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  *
  * @author jake
  */
-public interface Resource<T extends Resource> extends HasUuid {
+public class AbstractHasUuid implements HasUuid {
     
-    public Optional<String> getDisplayName() throws IOException;
-    public T setDisplayName (@Nullable String displayName) throws IOException;
+    private final UUID uuid;
+    
+    protected AbstractHasUuid (UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    @Override
+    public final UUID getUuid() {
+        return this.uuid;
+    }
+    
+    @Override
+    public final boolean equals (Object o) {
+        if (o instanceof HasUuid)
+            return this.getUuid().equals(((HasUuid) o).getUuid());
+        return false;
+    }
+    
+    @Override
+    public final int hashCode() {
+        return Objects.hash(this.getUuid());
+    }
     
 }

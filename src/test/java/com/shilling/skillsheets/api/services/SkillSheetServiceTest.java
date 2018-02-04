@@ -1,5 +1,7 @@
 package com.shilling.skillsheets.api.services;
 
+import com.shilling.skillsheets.services.SkillSheetService;
+import com.shilling.skillsheets.services.SkillSheetServiceImpl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -18,7 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.shilling.skillsheets.dao.SkillSheet;
 import com.shilling.skillsheets.dao.SkillSheetDao;
-import com.shilling.skillsheets.dao.User;
+import com.shilling.skillsheets.dao.Account;
 
 @RunWith(SpringRunner.class)
 public class SkillSheetServiceTest {
@@ -27,7 +29,7 @@ public class SkillSheetServiceTest {
 	SkillSheetDao skillsheets;
 	
 	@Mock
-	User mockUser;
+	Account mockUser;
 	@Mock
 	SkillSheet mockSkillSheet;
 	
