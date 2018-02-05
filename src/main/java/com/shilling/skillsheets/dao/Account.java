@@ -18,6 +18,7 @@
 package com.shilling.skillsheets.dao;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
@@ -35,5 +36,13 @@ public interface Account extends Resource {
 
     public void addOwnedTeam(UUID uuid) throws IOException;
     public Account addKnownResource (UUID uuid) throws IOException;
+    public Account delKnownResource (UUID uuid) throws IOException;
+    
+    public Collection<UUID> getGroups () throws IOException;
+    public Collection<UUID> getKnownResources () throws IOException;
+
+    public Account addGroup(UUID uuid) throws IOException;
+
+    public Account delGroup(UUID uuid) throws IOException;
     
 }

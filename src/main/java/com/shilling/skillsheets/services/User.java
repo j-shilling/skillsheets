@@ -18,6 +18,9 @@
 package com.shilling.skillsheets.services;
 
 import com.shilling.skillsheets.HasUuid;
+import java.util.Collection;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 /**
  * 
@@ -26,5 +29,7 @@ import com.shilling.skillsheets.HasUuid;
 public interface User extends HasUuid {
     
     public Team newTeam() throws IllegalAccessException;
+    public Team team (UUID uuid) throws NoSuchElementException, IllegalAccessException;
+    public Collection<Team> teams () throws IllegalAccessException;
 
 }

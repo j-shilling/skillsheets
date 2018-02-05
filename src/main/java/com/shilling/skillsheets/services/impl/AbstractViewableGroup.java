@@ -29,7 +29,7 @@ import java.util.UUID;
  *
  * @author jake
  */
-public class AbstractViewableGroup <T extends AbstractViewableGroup>
+abstract class AbstractViewableGroup <T extends AbstractViewableGroup>
         extends AbstractViewableResource<AccountGroup, T> 
         implements Group<T> {
     

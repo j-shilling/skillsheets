@@ -26,11 +26,17 @@ public class UserServiceImpl implements UserService {
     private final Logger logger = LogManager.getLogger(UserServiceImpl.class);
     private final AccountDao dao;
     private final GoogleIdTokenVerifier verifier;
+    
+    private final UserFactory users;
 
     @Autowired
-    private UserServiceImpl(AccountDao dao, GoogleIdTokenVerifier verifier) {
+    private UserServiceImpl(
+            AccountDao dao,
+            GoogleIdTokenVerifier verifier,
+            UserFactory users) {
         this.dao = dao;
         this.verifier = verifier;
+        this.users = users;
     }
 
     /**
@@ -74,11 +80,11 @@ public class UserServiceImpl implements UserService {
         
 
             User user;
+            
             if (account.isTeacher()) {
-               // user = new Teacher (account);
-               user = null;
+               user = this.users.teacher(account);
             } else {
-                user = new Student (account);
+                user = this.users.student(account);
             }
 
             return Optional.of(user);

@@ -21,5 +21,5 @@ package com.shilling.skillsheets.services;
  *
  * @author jake
  */
-public interface Team extends Group {
+public interface Team<T extends Team> extends Group<T> {
 }
