@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jake Shilling
+ * Copyright (C) 2018 Pivotal Software, Inc.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,25 +17,14 @@
  */
 package com.shilling.skillsheets.services;
 
-import com.shilling.skillsheets.HasUuid;
-import com.shilling.skillsheets.dao.Account;
-import com.shilling.skillsheets.dao.AccountGroup;
-import java.util.UUID;
+import com.shilling.skillsheets.dao.Resource;
 
 /**
  *
  * @author jake
  */
-public interface Group<T extends Group> extends HasUuid, ResourceWrapper<T> {
-
-    public T add (Account account) throws IllegalAccessException ;
-    public T add (AccountGroup group) throws IllegalAccessException ;
-    public T remove (Account account) throws IllegalAccessException ;
-    public T remove (AccountGroup group) throws IllegalAccessException ;
+public interface Serializer<T extends Resource> {
     
-    public boolean contains (UUID uuid);
-    default public boolean contains (HasUuid hasUuid) {
-        return this.contains (hasUuid.getUuid());
-    }
+    public String writeValueAsString (T resource);
     
 }
