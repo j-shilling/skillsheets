@@ -75,7 +75,8 @@ public class UserServiceImpl implements UserService {
 
             User user;
             if (account.isTeacher()) {
-                user = new Teacher (account);
+               // user = new Teacher (account);
+               user = null;
             } else {
                 user = new Student (account);
             }

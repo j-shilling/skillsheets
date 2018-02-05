@@ -45,7 +45,7 @@ public class Teacher extends Student {
             AccountGroup group = this.accountGroupDao.create().setTeam(true);
             this.getAccount().addOwnedTeam (group.getUuid());
             
-            return new OwnedTeam (group);
+            return null;
         } catch (IOException e) {
             throw new RuntimeException (e);
         }

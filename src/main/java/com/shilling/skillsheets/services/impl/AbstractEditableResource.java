@@ -17,13 +17,79 @@
  */
 package com.shilling.skillsheets.services.impl;
 
+import com.shilling.skillsheets.dao.Account;
+import com.shilling.skillsheets.dao.AccountGroup;
 import com.shilling.skillsheets.dao.Resource;
+import java.io.IOException;
 
 /**
  *
  * @author jake
  */
-class AbstractEditableResource<T extends Resource> 
-       extends AbstractViewableResource<T> {
+abstract class AbstractEditableResource<T extends Resource, W extends AbstractEditableResource>
+       extends AbstractViewableResource<T, W> {
+    
+    public AbstractEditableResource(T resource) {
+        super(resource);
+    }
+    
+    @Override
+    public final W setDisplayName(String displayName) throws IllegalAccessException{
+        try {
+            this.getResource().setDisplayName(displayName);
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        }
+        
+        return (W) this;
+    }
+    
+    @Override
+    public final W letEdit(Account account)  throws IllegalAccessException{
+        try {
+            this.getResource().addEditor(account.getUuid());
+            account.addKnownResource(this.getUuid());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        return (W) this;
+    }
+    
+    @Override
+    public final W letEdit(AccountGroup group)  throws IllegalAccessException{
+        try {
+            this.getResource().addEditor(group.getUuid());
+            group.addKnownResource(this.getUuid());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        return (W) this;
+    }
+
+    @Override
+    public final W letView(Account account)  throws IllegalAccessException{
+        try {
+            this.getResource().addViewer(account.getUuid());
+            account.addKnownResource(this.getUuid());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        return (W) this;
+    }
+    
+    @Override
+    public final W letView(AccountGroup group)  throws IllegalAccessException{
+        try {
+            this.getResource().addViewer(group.getUuid());
+            group.addKnownResource(this.getUuid());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        return (W) this;
+    }
     
 }

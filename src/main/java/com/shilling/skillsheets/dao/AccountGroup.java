@@ -18,6 +18,7 @@
 package com.shilling.skillsheets.dao;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  *
@@ -26,5 +27,7 @@ import java.io.IOException;
 public interface AccountGroup extends Resource<AccountGroup> {
     
     public AccountGroup setTeam (boolean val) throws IOException;
+
+    public AccountGroup addKnownResource(UUID uuid) throws IOException;
     
 }

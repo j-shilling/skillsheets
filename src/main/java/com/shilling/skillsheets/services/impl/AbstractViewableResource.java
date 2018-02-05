@@ -17,46 +17,83 @@
  */
 package com.shilling.skillsheets.services.impl;
 
+import com.shilling.skillsheets.AbstractHasUuid;
 import com.shilling.skillsheets.dao.Account;
+import com.shilling.skillsheets.dao.AccountGroup;
 import com.shilling.skillsheets.dao.Resource;
 import com.shilling.skillsheets.services.ResourceWrapper;
+import java.io.IOException;
 import java.util.Optional;
 
 /**
  *
  * @author jake
  */
-abstract class AbstractViewableResource<T extends Resource> 
-        implements ResourceWrapper<T> {
-
-    @Override
-    public Optional<String> getDisplayName() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+abstract class AbstractViewableResource<T extends Resource, W extends AbstractViewableResource> 
+        extends AbstractHasUuid
+        implements ResourceWrapper<W> {
+    
+    private final T resource;
+    
+    protected AbstractViewableResource (T resource) {
+        super (resource.getUuid());
+        
+        this.resource = resource;
+    }
+    
+    protected final T getResource() {
+        return this.resource;
     }
 
     @Override
-    public T setDisplayName(String displayName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public final Optional<String> getDisplayName() {
+        try {
+            return this.getResource().getDisplayName();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        }
     }
 
     @Override
-    public T giveTo(Account account) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public W setDisplayName(String displayName) throws IllegalAccessException{
+        throw new IllegalAccessException 
+            ("You do not have permission to edit this resource.");
     }
 
     @Override
-    public T letEdit(Account account) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public W giveTo(Account account)  throws IllegalAccessException{
+        throw new IllegalAccessException 
+            ("You do not have permission to edit the owner of this resource.");
     }
 
     @Override
-    public T letView(Account account) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public W letEdit(Account account)  throws IllegalAccessException{
+        throw new IllegalAccessException 
+            ("You do not have permission to edit this resource.");
+    }
+    
+    @Override
+    public W letEdit(AccountGroup group)  throws IllegalAccessException{
+        throw new IllegalAccessException 
+            ("You do not have permission to edit this resource.");
     }
 
     @Override
-    public void delete() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public W letView(Account account)  throws IllegalAccessException{
+        throw new IllegalAccessException 
+            ("You do not have permission to edit this resource.");
+    }
+    
+    @Override
+    public W letView(AccountGroup group)  throws IllegalAccessException{
+        throw new IllegalAccessException 
+            ("You do not have permission to edit this resource.");
+    }
+
+    @Override
+    public void delete()  throws IllegalAccessException{
+        throw new IllegalAccessException 
+            ("You do not have permission to delete this resource.");
     }
     
 }

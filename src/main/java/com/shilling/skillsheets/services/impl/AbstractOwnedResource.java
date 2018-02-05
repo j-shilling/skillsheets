@@ -18,29 +18,43 @@
 package com.shilling.skillsheets.services.impl;
 
 import com.shilling.skillsheets.dao.Account;
+import com.shilling.skillsheets.dao.Dao;
 import com.shilling.skillsheets.dao.Resource;
-import java.util.Optional;
+import java.io.IOException;
 
 /**
  *
  * @author jake
  */
-public class AbstractOwnedResource<T extends Resource> 
-        extends AbstractEditableResource<T> {
+abstract class AbstractOwnedResource<T extends Resource, W extends AbstractOwnedResource> 
+        extends AbstractEditableResource<T, W> {
+    
+    private final Dao<T> dao;
+
+    public AbstractOwnedResource(Dao<T> dao, T resource) {
+        super(resource);
+        this.dao = dao;
+    }
 
     @Override
-    public Optional<String> getDisplayName() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public final W giveTo(Account account)  throws IllegalAccessException {
+        try {
+            this.getResource().setOwner(account.getUuid());
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        }
+        
+        return (W) this;
     }
     
     @Override
-    public T setDisplayName(String displayName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    @Override
-    public void delete() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public final void delete() throws IllegalAccessException {
+        try {
+            this.dao.remove(this.getUuid());
+            this.getResource().delete();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        }
     }
     
 }

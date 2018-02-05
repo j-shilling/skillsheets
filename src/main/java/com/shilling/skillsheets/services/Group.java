@@ -18,11 +18,11 @@
 package com.shilling.skillsheets.services;
 
 import com.shilling.skillsheets.HasUuid;
-import com.shilling.skillsheets.dao.AccountGroup;
 
 /**
  *
  * @author jake
  */
-public interface Group extends HasUuid, ResourceWrapper<AccountGroup> {
+public interface Group extends HasUuid, ResourceWrapper<Group> {
+
 }

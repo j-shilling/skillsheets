@@ -34,5 +34,6 @@ public interface Account extends Resource {
     public boolean isTeacher () throws IOException;
 
     public void addOwnedTeam(UUID uuid) throws IOException;
+    public Account addKnownResource (UUID uuid) throws IOException;
     
 }

@@ -20,6 +20,7 @@ package com.shilling.skillsheets.dao;
 import com.shilling.skillsheets.HasUuid;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 import javax.annotation.Nullable;
 
 /**
@@ -30,5 +31,9 @@ public interface Resource<T extends Resource> extends HasUuid {
     
     public Optional<String> getDisplayName() throws IOException;
     public T setDisplayName (@Nullable String displayName) throws IOException;
+    public T addEditor (UUID uuid) throws IOException;
+    public T addViewer (UUID uuid) throws IOException;
+    public T setOwner (UUID uuid) throws IOException;
+    public void delete () throws IOException;
     
 }

@@ -18,7 +18,7 @@
 package com.shilling.skillsheets.services;
 
 import com.shilling.skillsheets.dao.Account;
-import com.shilling.skillsheets.dao.Resource;
+import com.shilling.skillsheets.dao.AccountGroup;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -26,13 +26,17 @@ import javax.annotation.Nullable;
  *
  * @author jake
  */
-public interface ResourceWrapper<T extends Resource> {
+public interface ResourceWrapper<T extends ResourceWrapper> {
     
     public Optional<String> getDisplayName ();
-    public T setDisplayName (@Nullable String displayName);
-    public T giveTo (Account account);
-    public T letEdit (Account account);
-    public T letView (Account account);
-    public void delete ();
+    public T setDisplayName (@Nullable String displayName) throws IllegalAccessException;
+    public T giveTo (Account account) throws IllegalAccessException;
+    public T letEdit (Account account) throws IllegalAccessException;
+    public T letEdit (AccountGroup group) throws IllegalAccessException;
+    public T letView (Account account) throws IllegalAccessException;
+    public T letView (AccountGroup group) throws IllegalAccessException;
+    public void delete () throws IllegalAccessException;
+    
+    public String serialize();
     
 }
