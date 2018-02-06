@@ -17,7 +17,6 @@
  */
 package com.shilling.skillsheets.services.impl;
 
-import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.shilling.skillsheets.AbstractHasUuid;
 import com.shilling.skillsheets.dao.Account;
 import com.shilling.skillsheets.dao.Resource;

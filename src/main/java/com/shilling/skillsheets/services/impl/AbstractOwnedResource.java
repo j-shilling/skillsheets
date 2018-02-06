@@ -39,6 +39,9 @@ abstract class AbstractOwnedResource<T extends Resource, W extends AbstractOwned
     @Override
     public final W giveTo(Account account)  throws IllegalAccessException {
         try {
+            if (!account.isTeacher())
+                throw new IllegalAccessException 
+                    ("Cannot give a student ownership of a resource");
             this.getResource().setOwner(account.getUuid());
         } catch (IOException e) {
             throw new RuntimeException (e);

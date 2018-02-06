@@ -47,6 +47,9 @@ abstract class AbstractEditableResource<T extends Resource, W extends AbstractEd
     @Override
     public final W letEdit(Account account)  throws IllegalAccessException{
         try {
+            if (!account.isTeacher())
+                throw new IllegalAccessException 
+                    ("Cannot give a student editing permissions");
             this.getResource().addEditor(account.getUuid());
             account.addKnownResource(this.getUuid());
         } catch (IOException e) {
@@ -59,6 +62,9 @@ abstract class AbstractEditableResource<T extends Resource, W extends AbstractEd
     @Override
     public final W letEdit(AccountGroup group)  throws IllegalAccessException{
         try {
+            if (!group.isTeam())
+                throw new IllegalAccessException 
+                    ("Cannot give a student group editing permissions");
             this.getResource().addEditor(group.getUuid());
             group.addKnownResource(this.getUuid());
         } catch (IOException e) {

@@ -75,7 +75,7 @@ abstract class AbstractResource<T extends Resource>
 
     @Override
     public boolean isOwner(UUID uuid) throws IOException {
-        return this.owner.equals(this.owner);
+        return uuid.equals(this.owner);
     }
     
 }
