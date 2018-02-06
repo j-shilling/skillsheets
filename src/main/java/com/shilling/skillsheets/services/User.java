@@ -23,13 +23,46 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 /**
+ * Performs operations upon service layer objects with a particular identity.
+ * Implementations wrap an {@link Account} object and are used to create and
+ * manipulate resources viewable to the contained account.
  * 
  * @author Jake Shilling
  */
 public interface User extends HasUuid {
     
+    /**
+     * Creates a new {@link Team} to manipulate a collection of teacher
+     * accounts.
+     * 
+     * @return                          Result. Never null.
+     * @throws IllegalAccessException   Thrown if the operation is performed by
+     *                                  a student account.
+     */
     public Team newTeam() throws IllegalAccessException;
+    
+    /**
+     * Get a {@link Team} objects to manipulate a previously created collection
+     * of teacher accounts.
+     * 
+     * @param uuid                      Identifies the resource
+     * @return                          The {@link Team} object. Never null.
+     * @throws NoSuchElementException   Thrown if the UUID does not correspond
+     *                                  to a resource viewable to this user.
+     * @throws IllegalAccessException   Thrown if the operation is performed by
+     *                                  a student account.
+     */
     public Team team (UUID uuid) throws NoSuchElementException, IllegalAccessException;
+    
+    /**
+     * Get a {@link Team} object for each existing {@link AccountGroup} visible
+     * to this user.
+     * 
+     * @return                          A {@link Collection} of results. Never null.
+     *                                  Maybe empty.
+     * @throws IllegalAccessException   Thrown if the operation is performed by
+     *                                  a student account.
+     */
     public Collection<Team> teams () throws IllegalAccessException;
 
 }

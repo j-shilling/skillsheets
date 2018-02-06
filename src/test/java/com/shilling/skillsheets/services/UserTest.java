@@ -10,12 +10,10 @@ import com.shilling.skillsheets.dao.AccountDao;
 import com.shilling.skillsheets.dao.AccountGroup;
 import com.shilling.skillsheets.dao.Dao;
 import com.shilling.skillsheets.services.impl.UserFactory;
-import java.io.IOException;
-import java.util.Optional;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
@@ -50,5 +48,67 @@ public class UserTest {
         assertTrue (group.isOwner(user.getUuid()));
         assertTrue (group.isTeam());
         assertTrue (account.getKnownResources().contains(team.getUuid()));
+        
+        groups.remove(team.getUuid());
+    }
+    
+    @Test(expected = IllegalAccessException.class)
+    public void newTeamStudentTest() throws Exception {
+        Account account = accounts.create().setTeacher(false);
+        User user = this.factory.student(account);
+        user.newTeam();
+    }
+    
+    @Test
+    public void teamTest () throws Exception {
+        Account account = accounts.create().setTeacher(true);
+        User user = this.factory.teacher(account);
+        
+        Team team = user.newTeam();
+        
+        assertEquals (team, user.team(team.getUuid()));
+        
+        groups.remove (team.getUuid());
+    }
+    
+    @Test(expected = NoSuchElementException.class)
+    public void teamNotFoundTest () throws Exception {
+        Account account = accounts.create().setTeacher(true);
+        User user = this.factory.teacher(account);
+        
+        user.team(UUID.randomUUID());
+    }
+    
+    @Test(expected = IllegalAccessException.class)
+    public void teamStudentTest () throws Exception {
+        Account account = accounts.create().setTeacher(false);
+        User user = this.factory.student(account);
+        
+        user.team(UUID.randomUUID());
+    }
+    
+    @Test
+    public void teamsTest () throws Exception {
+        Account account = accounts.create().setTeacher(true);
+        User user = this.factory.teacher(account);
+        
+        Collection<Team> teams = new HashSet<>();
+        
+        teams.add(user.newTeam());
+        teams.add(user.newTeam());
+        teams.add(user.newTeam());
+        
+        assertEquals (teams, user.teams());
+        
+        for (Team team : teams)
+            groups.remove(team.getUuid());
+    }
+    
+    @Test(expected = IllegalAccessException.class)
+    public void teamsStudentTest () throws Exception {
+        Account account = accounts.create().setTeacher(false);
+        User user = this.factory.student(account);
+        
+        user.teams();
     }
 }
