@@ -25,7 +25,7 @@ import java.util.UUID;
  *
  * @author jake
  */
-public interface AccountGroup extends Resource<AccountGroup> {
+public interface AccountGroup extends Resource<AccountGroup>, GroupMember<AccountGroup> {
     
     public AccountGroup setTeam (boolean val) throws IOException;
     public boolean isTeam () throws IOException;

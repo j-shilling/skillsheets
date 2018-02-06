@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Pivotal Software, Inc.
+ * Copyright (C) 2018 Jake Shilling
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,8 +18,11 @@
 package com.shilling.skillsheets.services;
 
 /**
- *
+ * A version of {@link Group} which is used for {@link AccountGroup}s of
+ * teacher accounts.
+ * 
  * @author jake
+ * @param <T> Return type used for method chaining.
  */
 public interface Team<T extends Team> extends Group<T> {
 }

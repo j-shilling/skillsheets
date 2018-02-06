@@ -20,6 +20,7 @@ public class MemoryAccountGroup
         extends AbstractResource<AccountGroup> 
         implements AccountGroup {
     
+    private Set<UUID> parents = new HashSet<>();
     private Set<UUID> members = new HashSet<>();
     private Set<UUID> known = new HashSet<>();
     private boolean team = false;
@@ -71,6 +72,23 @@ public class MemoryAccountGroup
     public AccountGroup delKnownResource(UUID uuid) throws IOException {
         this.known.remove(uuid);
         return this;
+    }
+
+    @Override
+    public AccountGroup addGroup(UUID uuid) throws IOException {
+        this.parents.add(uuid);
+        return this;
+    }
+
+    @Override
+    public AccountGroup delGroup(UUID uuid) throws IOException {
+        this.parents.remove(uuid);
+        return this;
+    }
+
+    @Override
+    public Collection<UUID> getGroups() throws IOException {
+        return this.parents;
     }
     
 }

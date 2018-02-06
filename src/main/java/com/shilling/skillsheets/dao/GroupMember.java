@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Jake Shilling
+ * Copyright (C) 2018 Pivotal Software, Inc.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,28 +17,28 @@
  */
 package com.shilling.skillsheets.dao;
 
+import com.shilling.skillsheets.HasUuid;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
  *
  * @author jake
  */
-public interface Account extends Resource<Account>, GroupMember<Account> {
+public interface GroupMember<T extends GroupMember> extends HasUuid {
     
-    public Account setId (String id) throws IOException;
-    public Optional<String> getId () throws IOException;
-    public Account setEmail (String email) throws IOException;
-    public Optional<String> getEmail() throws IOException;
-    
-    public boolean isTeacher () throws IOException;
-    public Account setTeacher (boolean val) throws IOException;
+    public T addGroup (UUID uuid) throws IOException;
+    public T delGroup(UUID uuid) throws IOException;
+    public Collection<UUID> getGroups () throws IOException;
+    default public boolean isInGroup (UUID uuid) throws IOException {
+        return this.getGroups().contains(uuid);
+    }
 
-    public Account addKnownResource (UUID uuid) throws IOException;
-    public Account delKnownResource (UUID uuid) throws IOException;
-    
-    public Collection<UUID> getKnownResources () throws IOException;
-    
+    default public boolean isTeacherOrTeam() throws IOException {
+        if (this instanceof Account)
+            return ((Account)this).isTeacher();
+        else
+            return ((AccountGroup)this).isTeam();
+    }
 }

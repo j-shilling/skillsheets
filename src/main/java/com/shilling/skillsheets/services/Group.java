@@ -18,24 +18,58 @@
 package com.shilling.skillsheets.services;
 
 import com.shilling.skillsheets.HasUuid;
-import com.shilling.skillsheets.dao.Account;
 import com.shilling.skillsheets.dao.AccountGroup;
+import com.shilling.skillsheets.dao.GroupMember;
 import java.util.UUID;
 
 /**
+ * Common interface for service layer objects manipulating an
+ * {@link AccountGroup}.
  *
- * @author jake
+ * @author Jake Shilling
+ * @param <T> Return type used for method chaining.
  */
 public interface Group<T extends Group> extends HasUuid, ResourceWrapper<T> {
 
-    public T add (Account account) throws IllegalAccessException ;
-    public T add (AccountGroup group) throws IllegalAccessException ;
-    public T remove (Account account) throws IllegalAccessException ;
-    public T remove (AccountGroup group) throws IllegalAccessException ;
-    
-    public boolean contains (UUID uuid);
-    default public boolean contains (HasUuid hasUuid) {
-        return this.contains (hasUuid.getUuid());
+    /**
+     * Adds an account to this group. If the account is already in the group,
+     * this method should have no effect. If the underlying group is a team, only
+     * teacher accounts may be added.
+     * 
+     * @param account                   New member
+     * @return                          <tt>this</tt> for chaining
+     * @throws IllegalAccessException   If the requesting user does not have
+     *                                  editing permissions.
+     */
+    public T add(GroupMember account) throws IllegalAccessException;
+
+    /**
+     * Remove a user account from this group. If the account is not in the group,
+     * this method has no effect.
+     * 
+     * @param account                   Removed member
+     * @return                          <tt>this</tt> for chaining
+     * @throws IllegalAccessException   If the requesting user does not have
+     *                                  editing permissions.
+     */
+    public T remove(GroupMember account) throws IllegalAccessException;
+
+    /**
+     * Check if the UUID is in this group.
+     *  
+     * @param uuid
+     * @return  
+     */
+    public boolean contains(UUID uuid);
+
+    /**
+     * Convenience method which calls {@link #contains(java.util.UUID)}
+     * 
+     * @param hasUuid
+     * @return 
+     */
+    default public boolean contains(HasUuid hasUuid) {
+        return this.contains(hasUuid.getUuid());
     }
-    
+
 }
