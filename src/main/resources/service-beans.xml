@@ -5,7 +5,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
 ">
 
-    <bean id="GoogleIdTokenVerifier" class="com.shilling.skillsheets.service.impl.GoogleIdTokenVerifierFactory"/>
+    <bean id="GoogleIdTokenVerifier" class="com.shilling.skillsheets.services.impl.GoogleIdTokenVerifierFactory"/>
     <bean id="UserService" class="com.shilling.skillsheets.services.impl.UserServiceImpl"/>
+    <bean id="UserFactory" class="com.shilling.skillsheets.services.impl.UserFactory"/>
+    <bean id="TeamFactory" class="com.shilling.skillsheets.services.impl.TeamFactory"/>
+    <bean id="AccountGroupSerializer" class="com.shilling.skillsheets.services.impl.AccountGroupSerializer"/>
     
 </beans>

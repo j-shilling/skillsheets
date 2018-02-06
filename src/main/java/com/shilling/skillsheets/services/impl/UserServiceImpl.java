@@ -69,12 +69,12 @@ public class UserServiceImpl implements UserService {
             if (result.isPresent()) {
 
                 account = result.get()
-                        .setName((String) payload.get("name"))
+                        .setDisplayName((String) payload.get("name"))
                         .setId(payload.getSubject())
                         .setEmail(payload.getEmail());
             } else {
                 account = this.dao.newWithId(payload.getSubject())
-                        .setName((String) payload.get("name"))
+                        .setDisplayName((String) payload.get("name"))
                         .setEmail(payload.getEmail());
             }
         

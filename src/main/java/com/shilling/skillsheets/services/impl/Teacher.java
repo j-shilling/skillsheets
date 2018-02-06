@@ -58,10 +58,12 @@ public class Teacher extends Student {
     @Override
     public Team newTeam() throws IllegalAccessException {
         try {
-            AccountGroup group = this.groups.create().setTeam(true);
-            this.getAccount().addOwnedTeam (group.getUuid());
+            AccountGroup group = this.groups.create()
+                    .setTeam(true)
+                    .setOwner(this.getUuid());
+            this.getAccount().addKnownResource (group.getUuid());
             
-            return null;
+            return teams.owned(group);
         } catch (IOException e) {
             throw new RuntimeException (e);
         }

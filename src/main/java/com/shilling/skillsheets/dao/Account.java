@@ -19,22 +19,23 @@ package com.shilling.skillsheets.dao;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 /**
  *
  * @author jake
  */
-public interface Account extends Resource {
+public interface Account extends Resource<Account> {
     
-    public Account setName (@Nullable String name) throws IOException;
     public Account setId (String id) throws IOException;
+    public Optional<String> getId () throws IOException;
     public Account setEmail (String email) throws IOException;
+    public Optional<String> getEmail() throws IOException;
     
     public boolean isTeacher () throws IOException;
+    public Account setTeacher (boolean val) throws IOException;
 
-    public void addOwnedTeam(UUID uuid) throws IOException;
     public Account addKnownResource (UUID uuid) throws IOException;
     public Account delKnownResource (UUID uuid) throws IOException;
     

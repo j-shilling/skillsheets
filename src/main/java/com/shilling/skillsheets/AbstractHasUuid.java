@@ -17,6 +17,7 @@
  */
 package com.shilling.skillsheets;
 
+import com.google.api.client.util.Preconditions;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -29,6 +30,7 @@ public class AbstractHasUuid implements HasUuid {
     private final UUID uuid;
     
     protected AbstractHasUuid (UUID uuid) {
+        Preconditions.checkNotNull (uuid);
         this.uuid = uuid;
     }
 

@@ -38,11 +38,6 @@ public class Student extends AbstractHasUuid implements User {
 
     public Student(Account account) {
         super (account.getUuid());
-        try {
-            Preconditions.checkArgument (!account.isTeacher());
-        } catch (IOException e) {
-            throw new RuntimeException (e);
-        }
         
         this.account = account;
     }
