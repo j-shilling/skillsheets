@@ -17,11 +17,9 @@
  */
 package com.shilling.skillsheets.services.impl;
 
-import com.shilling.skillsheets.AbstractHasUuid;
 import com.shilling.skillsheets.dao.Account;
 import com.shilling.skillsheets.dao.AccountGroup;
 import com.shilling.skillsheets.dao.Resource;
-import com.shilling.skillsheets.services.ResourceWrapper;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -29,63 +27,57 @@ import java.util.Optional;
  *
  * @author jake
  */
-abstract class AbstractViewableResource<T extends Resource, W extends AbstractViewableResource> 
-        extends AbstractHasUuid
-        implements ResourceWrapper<W> {
+class WrappedViewableResource<T extends Resource>
+        extends WrappedResource<T> {
     
-    private final T resource;
-    
-    protected AbstractViewableResource (T resource) {
-        super (resource.getUuid());
-        
-        this.resource = resource;
-    }
-    
-    protected final T getResource() {
-        return this.resource;
+    protected WrappedViewableResource (T resource) {
+        super (resource);
     }
 
     @Override
     public final Optional<String> getDisplayName() {
+        this.readLock().lock();
         try {
             return this.getResource().getDisplayName();
         } catch (IOException e) {
             throw new RuntimeException (e);
+        } finally {
+            this.readLock().unlock();;
         }
     }
 
     @Override
-    public W setDisplayName(String displayName) throws IllegalAccessException{
+    public WrappedResource<T> setDisplayName(String displayName) throws IllegalAccessException{
         throw new IllegalAccessException 
             ("You do not have permission to edit this resource.");
     }
 
     @Override
-    public W giveTo(Account account)  throws IllegalAccessException{
+    public WrappedResource<T> giveTo(Account account)  throws IllegalAccessException{
         throw new IllegalAccessException 
             ("You do not have permission to edit the owner of this resource.");
     }
 
     @Override
-    public W letEdit(Account account)  throws IllegalAccessException{
+    public WrappedResource<T> letEdit(Account account)  throws IllegalAccessException{
         throw new IllegalAccessException 
             ("You do not have permission to edit this resource.");
     }
     
     @Override
-    public W letEdit(AccountGroup group)  throws IllegalAccessException{
+    public WrappedResource<T> letEdit(AccountGroup group)  throws IllegalAccessException{
         throw new IllegalAccessException 
             ("You do not have permission to edit this resource.");
     }
 
     @Override
-    public W letView(Account account)  throws IllegalAccessException{
+    public WrappedResource<T> letView(Account account)  throws IllegalAccessException{
         throw new IllegalAccessException 
             ("You do not have permission to edit this resource.");
     }
     
     @Override
-    public W letView(AccountGroup group)  throws IllegalAccessException{
+    public WrappedResource<T> letView(AccountGroup group)  throws IllegalAccessException{
         throw new IllegalAccessException 
             ("You do not have permission to edit this resource.");
     }

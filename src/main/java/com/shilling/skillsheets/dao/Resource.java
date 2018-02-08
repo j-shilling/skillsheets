@@ -36,6 +36,8 @@ public interface Resource<T extends Resource> extends HasUuid {
     public T setOwner (UUID uuid) throws IOException;
     public void delete () throws IOException;
     
+    public boolean isDeleted();
+    
     public boolean isEditor (UUID uuid) throws IOException;
     public boolean isViewer (UUID uuid) throws IOException;
     public boolean isOwner  (UUID uuid) throws IOException;

@@ -20,7 +20,9 @@ public class ViewableTeam
     public ViewableTeam(
             Serializer<AccountGroup> serializer, 
             AccountGroup group) {
-        super(serializer, group);
+        
+        super(serializer, new WrappedViewableResource (group));
+    
     }
     
 }

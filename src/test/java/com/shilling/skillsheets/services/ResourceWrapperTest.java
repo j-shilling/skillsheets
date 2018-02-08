@@ -50,7 +50,7 @@ public class ResourceWrapperTest {
         User user = this.factory.teacher(this.accounts.create().setTeacher(true));
         Account account = this.accounts.create().setTeacher(true);
         
-        ResourceWrapper<?> wrap = user.newTeam();
+        Service<?> wrap = user.newTeam();
         Resource res = groups.read(wrap.getUuid()).get();
         
         assertTrue (res.isOwner(user.getUuid()));
@@ -66,7 +66,7 @@ public class ResourceWrapperTest {
         User user = this.factory.teacher(this.accounts.create().setTeacher(true));
         Account account = this.accounts.create().setTeacher(false);
         
-        ResourceWrapper<?> wrap = user.newTeam();
+        Service<?> wrap = user.newTeam();
         wrap.giveTo(account);
     }
     
@@ -75,7 +75,7 @@ public class ResourceWrapperTest {
         User user = this.factory.teacher(this.accounts.create().setTeacher(true));
         Account account = this.accounts.create().setTeacher(true);
         
-        ResourceWrapper<?> wrap = user.newTeam();
+        Service<?> wrap = user.newTeam();
         Resource res = groups.read(wrap.getUuid()).get();
         
         assertFalse (res.isEditor(account.getUuid()));
@@ -90,7 +90,7 @@ public class ResourceWrapperTest {
         User user = this.factory.teacher(this.accounts.create().setTeacher(true));
         Account account = this.accounts.create().setTeacher(false);
         
-        ResourceWrapper<?> wrap = user.newTeam();
+        Service<?> wrap = user.newTeam();
         wrap.letEdit(account);
     }
     
@@ -99,7 +99,7 @@ public class ResourceWrapperTest {
         User user = this.factory.teacher(this.accounts.create().setTeacher(true));
         AccountGroup group = this.groups.create().setTeam(true);
         
-        ResourceWrapper<?> wrap = user.newTeam();
+        Service<?> wrap = user.newTeam();
         Resource res = groups.read(wrap.getUuid()).get();
         
         assertFalse (res.isEditor(group.getUuid()));
@@ -114,7 +114,7 @@ public class ResourceWrapperTest {
         User user = this.factory.teacher(this.accounts.create().setTeacher(true));
         AccountGroup group = this.groups.create().setTeam(false);
         
-        ResourceWrapper<?> wrap = user.newTeam();
+        Service<?> wrap = user.newTeam();
         wrap.letEdit(group);
     }
     
@@ -123,7 +123,7 @@ public class ResourceWrapperTest {
         User user = this.factory.teacher(this.accounts.create().setTeacher(true));
         Account account = this.accounts.create().setTeacher(true);
         
-        ResourceWrapper<?> wrap = user.newTeam();
+        Service<?> wrap = user.newTeam();
         Resource res = groups.read(wrap.getUuid()).get();
         
         assertFalse (res.isViewer(account.getUuid()));
@@ -138,7 +138,7 @@ public class ResourceWrapperTest {
         User user = this.factory.teacher(this.accounts.create().setTeacher(true));
         AccountGroup group = this.groups.create().setTeam(true);
         
-        ResourceWrapper<?> wrap = user.newTeam();
+        Service<?> wrap = user.newTeam();
         Resource res = groups.read(wrap.getUuid()).get();
         
         assertFalse (res.isViewer(group.getUuid()));

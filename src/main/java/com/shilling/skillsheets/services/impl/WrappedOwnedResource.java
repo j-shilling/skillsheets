@@ -26,18 +26,19 @@ import java.io.IOException;
  *
  * @author jake
  */
-abstract class AbstractOwnedResource<T extends Resource, W extends AbstractOwnedResource> 
-        extends AbstractEditableResource<T, W> {
+class WrappedOwnedResource<T extends Resource> 
+        extends WrappedEditableResource<T> {
     
     private final Dao<T> dao;
 
-    public AbstractOwnedResource(Dao<T> dao, T resource) {
+    public WrappedOwnedResource(Dao<T> dao, T resource) {
         super(resource);
         this.dao = dao;
     }
 
     @Override
-    public final W giveTo(Account account)  throws IllegalAccessException {
+    public final WrappedResource<T> giveTo(Account account)  throws IllegalAccessException {
+        this.writeLock().lock();
         try {
             if (!account.isTeacher())
                 throw new IllegalAccessException 
@@ -45,18 +46,23 @@ abstract class AbstractOwnedResource<T extends Resource, W extends AbstractOwned
             this.getResource().setOwner(account.getUuid());
         } catch (IOException e) {
             throw new RuntimeException (e);
+        } finally {
+            this.writeLock().unlock();
         }
         
-        return (W) this;
+        return this;
     }
     
     @Override
     public final void delete() throws IllegalAccessException {
+        this.writeLock().lock();
         try {
             this.dao.remove(this.getUuid());
             this.getResource().delete();
         } catch (IOException e) {
             throw new RuntimeException (e);
+        } finally {
+            this.writeLock().lock();
         }
     }
     

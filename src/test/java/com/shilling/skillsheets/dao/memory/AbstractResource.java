@@ -21,6 +21,7 @@ abstract class AbstractResource<T extends Resource>
         extends AbstractHasUuid
         implements Resource<T> {
     
+    private boolean isDeleted = false;
     private String displayName = null;
     private Set<UUID> editors = new HashSet<>();
     private Set<UUID> viewers = new HashSet<>();
@@ -61,6 +62,12 @@ abstract class AbstractResource<T extends Resource>
 
     @Override
     public void delete() throws IOException {
+        this.isDeleted = true;
+    }
+    
+    @Override
+    public boolean isDeleted() {
+        return this.isDeleted;
     }
 
     @Override

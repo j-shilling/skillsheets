@@ -26,26 +26,16 @@ import java.io.IOException;
  *
  * @author jake
  */
-abstract class AbstractEditableResource<T extends Resource, W extends AbstractEditableResource>
-       extends AbstractViewableResource<T, W> {
+class WrappedEditableResource<T extends Resource>
+       extends WrappedViewableResource<T> {
     
-    public AbstractEditableResource(T resource) {
+    public WrappedEditableResource(T resource) {
         super(resource);
     }
     
     @Override
-    public final W setDisplayName(String displayName) throws IllegalAccessException{
-        try {
-            this.getResource().setDisplayName(displayName);
-        } catch (IOException e) {
-            throw new RuntimeException (e);
-        }
-        
-        return (W) this;
-    }
-    
-    @Override
-    public final W letEdit(Account account)  throws IllegalAccessException{
+    public final WrappedResource<T> letEdit(Account account)  throws IllegalAccessException{
+        this.writeLock().lock();
         try {
             if (!account.isTeacher())
                 throw new IllegalAccessException 
@@ -54,13 +44,16 @@ abstract class AbstractEditableResource<T extends Resource, W extends AbstractEd
             account.addKnownResource(this.getUuid());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            this.writeLock().unlock();
         }
         
-        return (W) this;
+        return this;
     }
     
     @Override
-    public final W letEdit(AccountGroup group)  throws IllegalAccessException{
+    public final WrappedResource<T> letEdit(AccountGroup group)  throws IllegalAccessException{
+        this.writeLock().lock();
         try {
             if (!group.isTeam())
                 throw new IllegalAccessException 
@@ -69,33 +62,41 @@ abstract class AbstractEditableResource<T extends Resource, W extends AbstractEd
             group.addKnownResource(this.getUuid());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            this.writeLock().unlock();
         }
         
-        return (W) this;
+        return this;
     }
 
     @Override
-    public final W letView(Account account)  throws IllegalAccessException{
+    public final WrappedResource<T> letView(Account account)  throws IllegalAccessException{
+        this.writeLock().lock();
         try {
             this.getResource().addViewer(account.getUuid());
             account.addKnownResource(this.getUuid());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            this.writeLock().unlock();
         }
         
-        return (W) this;
+        return this;
     }
     
     @Override
-    public final W letView(AccountGroup group)  throws IllegalAccessException{
+    public final WrappedResource<T> letView(AccountGroup group)  throws IllegalAccessException{
+        this.writeLock().lock();
         try {
             this.getResource().addViewer(group.getUuid());
             group.addKnownResource(this.getUuid());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            this.writeLock().unlock();
         }
         
-        return (W) this;
+        return this;
     }
     
 }

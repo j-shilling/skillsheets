@@ -11,44 +11,38 @@ import com.shilling.skillsheets.dao.AccountGroup;
 import com.shilling.skillsheets.services.Group;
 import com.shilling.skillsheets.services.Serializer;
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  *
  * @author Jake Shilling <shilling.jake@gmail.com>
  */
 abstract class AbstractEditableGroup<T extends AbstractEditableGroup>
-        extends AbstractEditableResource<AccountGroup, T> 
+        extends AbstractViewableGroup<T>
         implements Group<T> {
-    
-    private final Serializer<AccountGroup> serializer;
 
     protected AbstractEditableGroup (
             Serializer<AccountGroup> serializer,
-            AccountGroup group) {
-        super (group);
+            WrappedResource<AccountGroup> group) {
         
-        Preconditions.checkNotNull (serializer);
-        
-        this.serializer = serializer;
+        super (serializer, group);
     }
-
-    @Override
-    public final String serialize() {
-        
-        return this.serializer.writeValueAsString(this.getResource());
-        
-    }
+    
+    abstract protected void checkArgument (Account account) throws IllegalAccessException;
+    abstract protected void checkArgument (AccountGroup group) throws IllegalAccessException;
 
     @Override
     public T add(Account account) throws IllegalAccessException {
         Preconditions.checkNotNull (account);
+        this.checkArgument (account);
         
+        this.writeLock().lock();
         try {
             this.getResource().addMember(account.getUuid());
             account.addGroup (this.getUuid());
         } catch (IOException e) {
             throw new RuntimeException (e);
+        } finally {
+            this.writeLock().unlock();
         }
         
         return (T) this;
@@ -57,12 +51,16 @@ abstract class AbstractEditableGroup<T extends AbstractEditableGroup>
     @Override
     public T add(AccountGroup group) throws IllegalAccessException {
         Preconditions.checkNotNull (group);
+        this.checkArgument(group);
         
+        this.writeLock().lock();
         try {
             this.getResource().addChild(group.getUuid());
             group.addParent (this.getUuid());
         } catch (IOException e) {
             throw new RuntimeException (e);
+        } finally {
+            this.writeLock().lock();
         }
         
         return (T) this;
@@ -72,11 +70,14 @@ abstract class AbstractEditableGroup<T extends AbstractEditableGroup>
     public T remove(Account account) throws IllegalAccessException {
         Preconditions.checkNotNull (account);
         
+        this.writeLock().lock();
         try {
             this.getResource().delMember(account.getUuid());
             account.delGroup (this.getUuid());
         } catch (IOException e) {
             throw new RuntimeException (e);
+        } finally {
+            this.writeLock().unlock();
         }
         
         return (T) this;
@@ -86,23 +87,17 @@ abstract class AbstractEditableGroup<T extends AbstractEditableGroup>
     public T remove(AccountGroup group) throws IllegalAccessException {
         Preconditions.checkNotNull (group);
         
+        this.writeLock().lock();
         try {
             this.getResource().delChild(group.getUuid());
             group.delParent (this.getUuid());
         } catch (IOException e) {
             throw new RuntimeException (e);
+        } finally {
+            this.writeLock().unlock();
         }
         
         return (T) this;
-    }
-
-    @Override
-    public final boolean contains(UUID uuid) {
-        try {
-            return this.getResource().contains(uuid);
-        } catch (IOException e) {
-            throw new RuntimeException (e);
-        }
     }
     
 }

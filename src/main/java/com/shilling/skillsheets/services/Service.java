@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
  * @author Jake Shilling
  * @param <T>               Return type for method chaining.
  */
-public interface ResourceWrapper<T extends ResourceWrapper> extends HasUuid {
+public interface Service<T extends Service> extends HasUuid {
     
     /**
      * Get the resources display name.

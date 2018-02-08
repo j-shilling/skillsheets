@@ -20,7 +20,6 @@ package com.shilling.skillsheets.services;
 import com.shilling.skillsheets.HasUuid;
 import com.shilling.skillsheets.dao.Account;
 import com.shilling.skillsheets.dao.AccountGroup;
-import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -30,7 +29,7 @@ import java.util.UUID;
  * @author Jake Shilling
  * @param <T> Return type used for method chaining.
  */
-public interface Group<T extends Group> extends HasUuid, ResourceWrapper<T> {
+public interface Group<T extends Group> extends HasUuid, Service<T> {
 
     /**
      * Adds an account to this group. If the account is already in the group,

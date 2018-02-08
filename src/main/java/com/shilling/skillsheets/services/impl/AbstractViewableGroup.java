@@ -30,14 +30,14 @@ import java.util.UUID;
  * @author jake
  */
 abstract class AbstractViewableGroup <T extends AbstractViewableGroup>
-        extends AbstractViewableResource<AccountGroup, T> 
+        extends AbstractService<AccountGroup, T> 
         implements Group<T> {
     
     private final Serializer<AccountGroup> serializer;
     
     protected AbstractViewableGroup (
             Serializer<AccountGroup> serializer,
-            AccountGroup group) {
+            WrappedResource<AccountGroup> group) {
         super (group);
         
         Preconditions.checkNotNull (serializer);
@@ -48,41 +48,51 @@ abstract class AbstractViewableGroup <T extends AbstractViewableGroup>
     @Override
     public final String serialize() {
         
-        return this.serializer.writeValueAsString(this.getResource());
+        this.readLock().lock();
+        try {
+            return this.serializer.writeValueAsString(this.getResource());
+        } finally {
+            this.readLock().unlock();
+        }
         
     }
 
     @Override
-    public final T add(Account account) throws IllegalAccessException {
+    public T add(Account account) throws IllegalAccessException {
         throw new IllegalAccessException
                 ("You do not have permission to edit this group.");
     }
     
     @Override
-    public final T add(AccountGroup group) throws IllegalAccessException {
+    public T add(AccountGroup group) throws IllegalAccessException {
         throw new IllegalAccessException
                 ("You do not have permission to edit this group.");
     }
 
     @Override
-    public final T remove(Account account) throws IllegalAccessException  {
+    public T remove(Account account) throws IllegalAccessException  {
         throw new IllegalAccessException
                 ("You do not have permission to edit this group.");
     }
     
     @Override
-    public final T remove(AccountGroup group) throws IllegalAccessException  {
+    public T remove(AccountGroup group) throws IllegalAccessException  {
         throw new IllegalAccessException
                 ("You do not have permission to edit this group.");
     }
 
     @Override
     public final boolean contains(UUID uuid) {
+        
+        this.readLock().lock();
         try {
             return this.getResource().contains(uuid);
         } catch (IOException e) {
             throw new RuntimeException (e);
+        } finally {
+            this.readLock().unlock();
         }
+        
     }
     
 }
