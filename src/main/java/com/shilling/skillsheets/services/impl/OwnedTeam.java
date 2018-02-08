@@ -6,9 +6,9 @@
 package com.shilling.skillsheets.services.impl;
 
 import com.google.api.client.util.Preconditions;
+import com.shilling.skillsheets.dao.Account;
 import com.shilling.skillsheets.dao.AccountGroup;
 import com.shilling.skillsheets.dao.Dao;
-import com.shilling.skillsheets.dao.GroupMember;
 import com.shilling.skillsheets.services.Serializer;
 import com.shilling.skillsheets.services.Team;
 import java.io.IOException;
@@ -29,16 +29,32 @@ public class OwnedTeam
     }
     
     @Override
-    public OwnedTeam add(GroupMember account) throws IllegalAccessException {
+    public OwnedTeam add(Account account) throws IllegalAccessException {
         Preconditions.checkNotNull (account);
+        
         try {
-            if (!account.isTeacherOrTeam())
-                throw new IllegalAccessException ("Students and Rosters cannot be added to Teams");
+            if (!account.isTeacher())
+                throw new IllegalAccessException ("A student account cannot be added to a team of teachers.");
         } catch (IOException e) {
             throw new RuntimeException (e);
         }
         
         return super.add(account);
+    }
+    
+    @Override
+    public OwnedTeam add(AccountGroup group) throws IllegalAccessException {
+        Preconditions.checkNotNull (group);
+        
+        try {
+            if (!group.isTeam())
+                throw new IllegalAccessException 
+                    ("A roster of student accounts cannot be added to a team of teachers.");
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        }
+        
+        return super.add(group);
     }
     
 }

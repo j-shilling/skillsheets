@@ -41,7 +41,7 @@ public class UserFactory {
             throw new RuntimeException (e);
         }
         
-        return new Student (account);
+        return new Student (this.groups, account);
     }
     
     public Student teacher (Account account) {

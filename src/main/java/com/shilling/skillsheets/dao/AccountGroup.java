@@ -25,7 +25,7 @@ import java.util.UUID;
  *
  * @author jake
  */
-public interface AccountGroup extends Resource<AccountGroup>, GroupMember<AccountGroup> {
+public interface AccountGroup extends Resource<AccountGroup> {
     
     public AccountGroup setTeam (boolean val) throws IOException;
     public boolean isTeam () throws IOException;
@@ -33,8 +33,17 @@ public interface AccountGroup extends Resource<AccountGroup>, GroupMember<Accoun
     public AccountGroup addKnownResource(UUID uuid) throws IOException;
     public boolean contains (UUID uuid) throws IOException;
     public Collection<UUID> getAll () throws IOException;
+    
     public AccountGroup addMember (UUID uuid) throws IOException;
     public AccountGroup delMember (UUID uuid) throws IOException;
+    
+    public AccountGroup addChild (UUID uuid) throws IOException;
+    public AccountGroup delChild (UUID uuid) throws IOException;
+    
+    public AccountGroup addParent (UUID uuid) throws IOException;
+    public AccountGroup delParent (UUID uuid) throws IOException;
+    public Collection<UUID> getParents () throws IOException;
+    
     public AccountGroup delKnownResource (UUID uuid) throws IOException;
 
     

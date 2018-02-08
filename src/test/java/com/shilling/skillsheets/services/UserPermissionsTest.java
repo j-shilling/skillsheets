@@ -190,7 +190,7 @@ public class UserPermissionsTest {
         User user = this.factory.teacher(this.accounts.create().setTeacher(true));
         group.add(this.accounts.read(user.getUuid()).get());
         parent.add (this.groups.read(group.getUuid()).get());
-        team.letEdit(this.groups.read(parent.getUuid()).get());
+        team.letView(this.groups.read(parent.getUuid()).get());
         
         assertFalse (this.owns (user, res));
         assertFalse (this.edits (user, res));

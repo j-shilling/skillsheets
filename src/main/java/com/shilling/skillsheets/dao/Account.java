@@ -26,7 +26,11 @@ import java.util.UUID;
  *
  * @author jake
  */
-public interface Account extends Resource<Account>, GroupMember<Account> {
+public interface Account extends Resource<Account> {
+    
+    public Account addGroup (UUID uuid) throws IOException;
+    public Account delGroup (UUID uuid) throws IOException;
+    public Collection<UUID> getGroups () throws IOException;
     
     public Account setId (String id) throws IOException;
     public Optional<String> getId () throws IOException;

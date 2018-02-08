@@ -20,7 +20,6 @@ package com.shilling.skillsheets.services.impl;
 import com.google.api.client.util.Preconditions;
 import com.shilling.skillsheets.dao.Account;
 import com.shilling.skillsheets.dao.AccountGroup;
-import com.shilling.skillsheets.dao.GroupMember;
 import com.shilling.skillsheets.services.Group;
 import com.shilling.skillsheets.services.Serializer;
 import java.io.IOException;
@@ -54,13 +53,25 @@ abstract class AbstractViewableGroup <T extends AbstractViewableGroup>
     }
 
     @Override
-    public final T add(GroupMember account) throws IllegalAccessException {
+    public final T add(Account account) throws IllegalAccessException {
+        throw new IllegalAccessException
+                ("You do not have permission to edit this group.");
+    }
+    
+    @Override
+    public final T add(AccountGroup group) throws IllegalAccessException {
         throw new IllegalAccessException
                 ("You do not have permission to edit this group.");
     }
 
     @Override
-    public final T remove(GroupMember account) throws IllegalAccessException  {
+    public final T remove(Account account) throws IllegalAccessException  {
+        throw new IllegalAccessException
+                ("You do not have permission to edit this group.");
+    }
+    
+    @Override
+    public final T remove(AccountGroup group) throws IllegalAccessException  {
         throw new IllegalAccessException
                 ("You do not have permission to edit this group.");
     }

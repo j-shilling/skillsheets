@@ -20,9 +20,10 @@ public class MemoryAccountGroup
         extends AbstractResource<AccountGroup> 
         implements AccountGroup {
     
-    private Set<UUID> parents = new HashSet<>();
-    private Set<UUID> members = new HashSet<>();
-    private Set<UUID> known = new HashSet<>();
+    private final Set<UUID> parents = new HashSet<>();
+    private final Set<UUID> members = new HashSet<>();
+    private final Set<UUID> children = new HashSet<>();
+    private final Set<UUID> known = new HashSet<>();
     private boolean team = false;
     
     public MemoryAccountGroup (UUID uuid) {
@@ -48,7 +49,7 @@ public class MemoryAccountGroup
 
     @Override
     public boolean contains(UUID uuid) throws IOException {
-        return this.members.contains(uuid);
+        return this.members.contains(uuid) || this.children.contains (uuid);
     }
 
     @Override
@@ -75,19 +76,31 @@ public class MemoryAccountGroup
     }
 
     @Override
-    public AccountGroup addGroup(UUID uuid) throws IOException {
+    public AccountGroup addChild(UUID uuid) throws IOException {
+        this.children.add (uuid);
+        return this;
+    }
+
+    @Override
+    public AccountGroup delChild(UUID uuid) throws IOException {
+        this.children.remove (uuid);
+        return this;
+    }
+
+    @Override
+    public AccountGroup addParent(UUID uuid) throws IOException {
         this.parents.add(uuid);
         return this;
     }
 
     @Override
-    public AccountGroup delGroup(UUID uuid) throws IOException {
-        this.parents.remove(uuid);
+    public AccountGroup delParent(UUID uuid) throws IOException {
+        this.parents.remove (uuid);
         return this;
     }
 
     @Override
-    public Collection<UUID> getGroups() throws IOException {
+    public Collection<UUID> getParents() throws IOException {
         return this.parents;
     }
     

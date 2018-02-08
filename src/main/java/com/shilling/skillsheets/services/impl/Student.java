@@ -19,12 +19,17 @@ package com.shilling.skillsheets.services.impl;
 
 import com.shilling.skillsheets.AbstractHasUuid;
 import com.shilling.skillsheets.dao.Account;
+import com.shilling.skillsheets.dao.AccountGroup;
+import com.shilling.skillsheets.dao.Dao;
 import com.shilling.skillsheets.dao.Resource;
 import com.shilling.skillsheets.services.Team;
 import com.shilling.skillsheets.services.User;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Queue;
 import java.util.UUID;
 
 /**
@@ -34,11 +39,13 @@ import java.util.UUID;
 public class Student extends AbstractHasUuid implements User {
     
     private final Account account;
+    private final Dao<AccountGroup> groups;
 
-    public Student(Account account) {
+    public Student(Dao<AccountGroup> groups, Account account) {
         super (account.getUuid());
         
         this.account = account;
+        this.groups = groups;
     }
     
     protected final Account getAccount() {
@@ -54,17 +61,30 @@ public class Student extends AbstractHasUuid implements User {
     }
     
     protected final boolean edits (Resource<?> resource) {
+        /* If we own, we edit */
         if (this.owns (resource))
             return true;
         
         try {
+            /* Maybe we are and editor */
             if (resource.isEditor(this.getUuid()))
                 return true;
             
-            Collection<UUID> groups = this.account.getGroups();
-            for (UUID group : groups) {
-                if (resource.isEditor (group))
+            /* Maybe we are an editing group */
+            Queue<UUID> uuids = new LinkedList<>();
+            uuids.addAll(this.account.getGroups());
+            while (!uuids.isEmpty()) {
+                UUID uuid = uuids.remove();
+                
+                /* Is this group an editing group */
+                if (resource.isEditor(uuid))
                     return true;
+                
+                /* This group might be a subgroup of an editing group */
+                Optional<AccountGroup> group = this.groups.read(uuid);
+                if (group.isPresent()) {
+                    uuids.addAll(group.get().getParents());
+                }
             }
             
             return false;
@@ -74,17 +94,30 @@ public class Student extends AbstractHasUuid implements User {
     }
     
     protected final boolean views (Resource<?> resource) {
+        /* If we edit, we view */
         if (this.edits (resource))
             return true;
         
         try {
+            /* Maybe we are a viewer */
             if (resource.isViewer(this.getUuid()))
                 return true;
             
-            Collection<UUID> groups = this.account.getGroups();
-            for (UUID group : groups) {
-                if (resource.isViewer (group))
+            /* Maybe we are in a viewing group */
+            Queue<UUID> uuids = new LinkedList<>();
+            uuids.addAll(this.account.getGroups());
+            while (!uuids.isEmpty()) {
+                UUID uuid = uuids.remove();
+                
+                /* Is this group a viewing group */
+                if (resource.isViewer(uuid))
                     return true;
+                
+                /* This group might be a subgroup of a viewing group */
+                Optional<AccountGroup> group = this.groups.read(uuid);
+                if (group.isPresent()) {
+                    uuids.addAll(group.get().getParents());
+                }
             }
             
             return false;

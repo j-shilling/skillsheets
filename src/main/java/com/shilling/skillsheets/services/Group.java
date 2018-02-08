@@ -18,8 +18,9 @@
 package com.shilling.skillsheets.services;
 
 import com.shilling.skillsheets.HasUuid;
+import com.shilling.skillsheets.dao.Account;
 import com.shilling.skillsheets.dao.AccountGroup;
-import com.shilling.skillsheets.dao.GroupMember;
+import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -41,7 +42,19 @@ public interface Group<T extends Group> extends HasUuid, ResourceWrapper<T> {
      * @throws IllegalAccessException   If the requesting user does not have
      *                                  editing permissions.
      */
-    public T add(GroupMember account) throws IllegalAccessException;
+    public T add(Account account) throws IllegalAccessException;
+    
+    /**
+     * Adds a subgroup to this group. If the subgroup is already in the group,
+     * this method should have no effect. If the underlying group is a team, only
+     * teacher accounts may be added.
+     * 
+     * @param group                     New member
+     * @return                          <tt>this</tt> for chaining
+     * @throws IllegalAccessException   If the requesting user does not have
+     *                                  editing permissions.
+     */
+    public T add(AccountGroup group) throws IllegalAccessException;
 
     /**
      * Remove a user account from this group. If the account is not in the group,
@@ -52,7 +65,18 @@ public interface Group<T extends Group> extends HasUuid, ResourceWrapper<T> {
      * @throws IllegalAccessException   If the requesting user does not have
      *                                  editing permissions.
      */
-    public T remove(GroupMember account) throws IllegalAccessException;
+    public T remove(Account account) throws IllegalAccessException;
+    
+    /**
+     * Remove a subgroup account from this group. If the subgroup is not in the group,
+     * this method has no effect.
+     * 
+     * @param group                     Removed group
+     * @return                          <tt>this</tt> for chaining
+     * @throws IllegalAccessException   If the requesting user does not have
+     *                                  editing permissions.
+     */
+    public T remove(AccountGroup group) throws IllegalAccessException;
 
     /**
      * Check if the UUID is in this group.

@@ -43,7 +43,7 @@ public class Teacher extends Student {
             TeamFactory teams,
             Account account) {
         
-        super (account);
+        super (groups, account);
         
         Preconditions.checkNotNull(groups);
         Preconditions.checkNotNull(teams);

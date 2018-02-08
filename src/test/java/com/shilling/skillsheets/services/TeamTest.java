@@ -74,12 +74,12 @@ public class TeamTest {
         AccountGroup group = this.groups.create().setTeam(true);
         Team team = user.newTeam();
         
-        assertFalse (group.getGroups().contains(team.getUuid()));
+        assertFalse (group.getParents().contains(team.getUuid()));
         assertFalse (team.contains(group));
         
         team.add(group);
         
-        assertTrue (group.getGroups().contains(team.getUuid()));
+        assertTrue (group.getParents().contains(team.getUuid()));
         assertTrue (team.contains(group));
     }
     
@@ -117,12 +117,12 @@ public class TeamTest {
         
         team.add(group);
         
-        assertTrue (group.getGroups().contains(team.getUuid()));
+        assertTrue (group.getParents().contains(team.getUuid()));
         assertTrue (team.contains(group));
         
         team.remove(group);
         
-        assertFalse (group.getGroups().contains(team.getUuid()));
+        assertFalse (group.getParents().contains(team.getUuid()));
         assertFalse (team.contains(group));
     }
     
