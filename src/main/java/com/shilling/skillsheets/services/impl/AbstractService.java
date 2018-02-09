@@ -5,12 +5,16 @@
  */
 package com.shilling.skillsheets.services.impl;
 
+import com.google.api.client.util.Preconditions;
 import com.shilling.skillsheets.AbstractHasUuid;
-import com.shilling.skillsheets.dao.Account;
-import com.shilling.skillsheets.dao.AccountGroup;
 import com.shilling.skillsheets.dao.Resource;
+import com.shilling.skillsheets.services.Group;
 import com.shilling.skillsheets.services.Service;
+import com.shilling.skillsheets.services.User;
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -21,69 +25,182 @@ abstract class AbstractService<T extends Resource, R extends AbstractService>
         extends AbstractHasUuid
         implements Service<R> {
     
-    private final WrappedResource<T> wrap;
+    private final T resource;
+    private final User user;
     
-    protected AbstractService (WrappedResource<T> wrap) {
-        super (wrap.getUuid());
-        this.wrap = wrap;
+    protected AbstractService (User user, T resource) {
+        super (resource.getUuid());
+        
+        Preconditions.checkNotNull(user);
+        
+        this.resource = resource;
+        this.user = user;
     }
     
     protected Lock readLock() {
-        return this.wrap.readLock();
+        return this.resource.readLock();
     }
     
     protected Lock writeLock() {
-        return this.wrap.writeLock();
+        return this.resource.writeLock();
     }
     
     protected T getResource() {
-        return this.wrap.getResource();
+        Preconditions.checkState(!this.resource.isDeleted(),
+                "Cannot access a deleted resource.");
+        return this.resource;
+    }
+    
+    protected final User getUser() {
+        return this.user;
+    }
+    
+    protected final boolean isOwned() {
+        this.readLock().lock();
+        try {
+            return this.resource.isOwner(this.user.getUuid());
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.readLock().unlock();
+        }
+    }
+    
+    protected final boolean isWritable () {
+        if (this.isOwned())
+            return true;
+        
+        this.readLock().lock();
+        try {
+            Queue<Group> groups = new LinkedList<>();
+            groups.addAll(this.user.getGroups());
+            
+            while (!groups.isEmpty()) {
+                Group group = groups.remove();
+                if (this.resource.isEditor(group.getUuid()))
+                    return true;
+                
+                groups.addAll(group.getParents());
+            }
+            
+            return false;
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.readLock().unlock();
+        }
     }
 
     @Override
     public Optional<String> getDisplayName() {
-        return this.wrap.getDisplayName();
+        this.readLock().lock();
+        try {
+            return this.getResource().getDisplayName();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.readLock().unlock();
+        }
     }
 
     @Override
     public R setDisplayName(String displayName) throws IllegalAccessException {
-        this.wrap.setDisplayName(displayName);
+        if (!this.isWritable())
+            throw new IllegalAccessException 
+                (this.user + " does not have permission to edit this resource");
+        
+        this.writeLock().lock();
+        try {
+            this.getResource().setDisplayName(displayName);
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.writeLock().unlock();
+        }
+        
         return (R) this;
     }
 
     @Override
-    public R giveTo(Account account) throws IllegalAccessException {
-        this.wrap.giveTo(account);
+    public R giveTo(User user) throws IllegalAccessException {
+        if (!this.isWritable())
+            throw new IllegalAccessException 
+                (this.user + " does not have permission to edit this resource");
+        
+        this.writeLock().lock();
+        try {
+            this.getResource().setOwner(user.getUuid());
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.writeLock().unlock();
+        }
+        
         return (R) this;
     }
 
     @Override
-    public R letEdit(Account account) throws IllegalAccessException {
-        this.wrap.letEdit(account);
+    public R letEdit(User user) throws IllegalAccessException {
+        if (!this.isWritable())
+            throw new IllegalAccessException 
+                (this.user + " does not have permission to edit this resource");
+        
+        this.writeLock().lock();
+        try {
+            this.getResource().addEditor(user.getUuid());
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.writeLock().unlock();
+        }
+        
         return (R) this;
     }
 
     @Override
-    public R letEdit(AccountGroup group) throws IllegalAccessException {
-        this.wrap.letEdit(group);
+    public R letEdit(Group group) throws IllegalAccessException {
+        if (!this.isWritable())
+            throw new IllegalAccessException 
+                (this.user + " does not have permission to edit this resource");
+        
+        this.writeLock().lock();
+        try {
+            this.getResource().addEditor(group.getUuid());
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.writeLock().unlock();
+        }
+        
         return (R) this;
     }
 
     @Override
-    public R letView(Account account) throws IllegalAccessException {
-        this.wrap.letView(account);
+    public R letView(User user) throws IllegalAccessException {
+        user.addKnownResource(this.getUuid());
         return (R) this;
     }
 
     @Override
-    public R letView(AccountGroup group) throws IllegalAccessException {
-        this.wrap.letView(group);
+    public R letView(Group group) throws IllegalAccessException {
+        group.addKnownResource(this.getUuid());
         return (R) this;
     }
 
     @Override
     public void delete() throws IllegalAccessException {
-        this.wrap.delete();
+        if (!this.isWritable())
+            throw new IllegalAccessException 
+                (this.user + " does not have permission to delete this resource");
+        
+        this.writeLock().lock();
+        try {
+            this.getResource().delete();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.writeLock().unlock();
+        }
     }
     
 }

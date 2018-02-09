@@ -31,6 +31,14 @@ import java.util.UUID;
  */
 public interface User extends HasUuid {
     
+    public boolean isTeacher();
+    
+    public User addKnownResource (UUID uuid);
+    
+    public Collection<Group> getGroups();
+    public User addGroup (Group group);
+    public User delGroup (Group group);
+    
     /**
      * Creates a new {@link Team} to manipulate a collection of teacher
      * accounts.

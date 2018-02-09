@@ -21,6 +21,7 @@ import com.shilling.skillsheets.HasUuid;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
 import javax.annotation.Nullable;
 
 /**
@@ -28,6 +29,9 @@ import javax.annotation.Nullable;
  * @author jake
  */
 public interface Resource<T extends Resource> extends HasUuid {
+    
+    public Lock readLock();
+    public Lock writeLock();
     
     public Optional<String> getDisplayName() throws IOException;
     public T setDisplayName (@Nullable String displayName) throws IOException;

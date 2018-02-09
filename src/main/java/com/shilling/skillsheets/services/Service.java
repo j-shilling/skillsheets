@@ -18,8 +18,6 @@
 package com.shilling.skillsheets.services;
 
 import com.shilling.skillsheets.HasUuid;
-import com.shilling.skillsheets.dao.Account;
-import com.shilling.skillsheets.dao.AccountGroup;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -60,7 +58,7 @@ public interface Service<T extends Service> extends HasUuid {
      *                                  other than the owner, or if account is not
      *                                  a teacher account.
      */
-    public T giveTo (Account account) throws IllegalAccessException;
+    public T giveTo (User user) throws IllegalAccessException;
     
     /**
      * Grant editing permissions to another user account. This operation must
@@ -72,7 +70,7 @@ public interface Service<T extends Service> extends HasUuid {
      *                                  editing permissions, or if account is not
      *                                  a teacher account.
      */
-    public T letEdit (Account account) throws IllegalAccessException;
+    public T letEdit (User user) throws IllegalAccessException;
     
     /**
      * Grant editing permissions to another user group. This operation must
@@ -84,7 +82,7 @@ public interface Service<T extends Service> extends HasUuid {
      *                                  editing permissions, or if group is not
      *                                  a team.
      */
-    public T letEdit (AccountGroup group) throws IllegalAccessException;
+    public T letEdit (Group group) throws IllegalAccessException;
     
     /**
      * Grant viewing permissions to another user account. This operation must
@@ -95,7 +93,7 @@ public interface Service<T extends Service> extends HasUuid {
      * @throws IllegalAccessException   If this operation is performed without
      *                                  editing permissions.
      */
-    public T letView (Account account) throws IllegalAccessException;
+    public T letView (User user) throws IllegalAccessException;
     
     /**
      * Grant viewing permissions to another user group. This operation must
@@ -106,7 +104,7 @@ public interface Service<T extends Service> extends HasUuid {
      * @throws IllegalAccessException   If this operation is performed without
      *                                  editing permissions.
      */
-    public T letView (AccountGroup group) throws IllegalAccessException;
+    public T letView (Group group) throws IllegalAccessException;
     
     /**
      * Delete this resource from persistent storage. This operation can only

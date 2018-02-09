@@ -18,8 +18,7 @@
 package com.shilling.skillsheets.services;
 
 import com.shilling.skillsheets.HasUuid;
-import com.shilling.skillsheets.dao.Account;
-import com.shilling.skillsheets.dao.AccountGroup;
+import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -30,18 +29,26 @@ import java.util.UUID;
  * @param <T> Return type used for method chaining.
  */
 public interface Group<T extends Group> extends HasUuid, Service<T> {
+    
+    public boolean isTeam();
+    
+    public T addKnownResource(UUID uuid) throws IllegalAccessException;
+    
+    public Collection<Group> getParents();
+    public T addParent(Group group);
+    public T delParent(Group group);
 
     /**
      * Adds an account to this group. If the account is already in the group,
      * this method should have no effect. If the underlying group is a team, only
      * teacher accounts may be added.
      * 
-     * @param account                   New member
+     * @param user                      New member
      * @return                          <tt>this</tt> for chaining
      * @throws IllegalAccessException   If the requesting user does not have
      *                                  editing permissions.
      */
-    public T add(Account account) throws IllegalAccessException;
+    public T add(User user) throws IllegalAccessException;
     
     /**
      * Adds a subgroup to this group. If the subgroup is already in the group,
@@ -53,18 +60,18 @@ public interface Group<T extends Group> extends HasUuid, Service<T> {
      * @throws IllegalAccessException   If the requesting user does not have
      *                                  editing permissions.
      */
-    public T add(AccountGroup group) throws IllegalAccessException;
+    public T add(Group group) throws IllegalAccessException;
 
     /**
      * Remove a user account from this group. If the account is not in the group,
      * this method has no effect.
      * 
-     * @param account                   Removed member
+     * @param user                      Removed member
      * @return                          <tt>this</tt> for chaining
      * @throws IllegalAccessException   If the requesting user does not have
      *                                  editing permissions.
      */
-    public T remove(Account account) throws IllegalAccessException;
+    public T remove(User user) throws IllegalAccessException;
     
     /**
      * Remove a subgroup account from this group. If the subgroup is not in the group,
@@ -75,24 +82,14 @@ public interface Group<T extends Group> extends HasUuid, Service<T> {
      * @throws IllegalAccessException   If the requesting user does not have
      *                                  editing permissions.
      */
-    public T remove(AccountGroup group) throws IllegalAccessException;
+    public T remove(Group group) throws IllegalAccessException;
 
     /**
-     * Check if the UUID is in this group.
+     * Check if the user is in this group.
      *  
-     * @param uuid
+     * @param user
      * @return  
      */
-    public boolean contains(UUID uuid);
-
-    /**
-     * Convenience method which calls {@link #contains(java.util.UUID)}
-     * 
-     * @param hasUuid
-     * @return 
-     */
-    default public boolean contains(HasUuid hasUuid) {
-        return this.contains(hasUuid.getUuid());
-    }
-
+    public boolean contains(User user);
+    
 }

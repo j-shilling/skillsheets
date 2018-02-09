@@ -21,7 +21,7 @@ import com.shilling.skillsheets.dao.AccountDao;
 import com.shilling.skillsheets.dao.AccountGroup;
 import com.shilling.skillsheets.dao.Dao;
 import com.shilling.skillsheets.dao.Resource;
-import com.shilling.skillsheets.services.impl.Student;
+import com.shilling.skillsheets.services.impl.UserImpl;
 import com.shilling.skillsheets.services.impl.UserFactory;
 import java.lang.reflect.Method;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class UserPermissionsTest {
     
     private boolean owns (User user, Resource<?>res) {
         try {
-            Class<Student> klass = Student.class;
+            Class<UserImpl> klass = UserImpl.class;
             Method method = klass.getDeclaredMethod("owns", Resource.class);
             method.setAccessible(true);
             
@@ -61,7 +61,7 @@ public class UserPermissionsTest {
     
     private boolean edits (User user, Resource<?>res) {
         try {
-            Class<Student> klass = Student.class;
+            Class<UserImpl> klass = UserImpl.class;
             Method method = klass.getDeclaredMethod("edits", Resource.class);
             method.setAccessible(true);
             
@@ -74,7 +74,7 @@ public class UserPermissionsTest {
     
     private boolean views (User user, Resource<?>res) {
         try {
-            Class<Student> klass = Student.class;
+            Class<UserImpl> klass = UserImpl.class;
             Method method = klass.getDeclaredMethod("views", Resource.class);
             method.setAccessible(true);
             

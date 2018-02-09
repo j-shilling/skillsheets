@@ -32,7 +32,7 @@ public interface AccountGroup extends Resource<AccountGroup> {
 
     public AccountGroup addKnownResource(UUID uuid) throws IOException;
     public boolean contains (UUID uuid) throws IOException;
-    public Collection<UUID> getAll () throws IOException;
+    public Collection<UUID> getMembers () throws IOException;
     
     public AccountGroup addMember (UUID uuid) throws IOException;
     public AccountGroup delMember (UUID uuid) throws IOException;
@@ -43,6 +43,7 @@ public interface AccountGroup extends Resource<AccountGroup> {
     public AccountGroup addParent (UUID uuid) throws IOException;
     public AccountGroup delParent (UUID uuid) throws IOException;
     public Collection<UUID> getParents () throws IOException;
+    public Collection<UUID> getChildren() throws IOException;
     
     public AccountGroup delKnownResource (UUID uuid) throws IOException;
 

@@ -77,17 +77,8 @@ public class UserServiceImpl implements UserService {
                         .setDisplayName((String) payload.get("name"))
                         .setEmail(payload.getEmail());
             }
-        
 
-            User user;
-            
-            if (account.isTeacher()) {
-               user = this.users.teacher(account);
-            } else {
-                user = this.users.student(account);
-            }
-
-            return Optional.of(user);
+            return Optional.of(this.users.user(account));
             
         } catch (IOException e) {
             throw new RuntimeException (e);
