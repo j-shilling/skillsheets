@@ -39,7 +39,7 @@ public class UserTest {
     @Test
     public void newTeamTest() throws Exception {
         Account account = accounts.create().setTeacher(true);
-        User user = this.factory.teacher(account);
+        User user = this.factory.user(account.getUuid()).get();
         Team team = user.newTeam();
         
         assertTrue (groups.read (team.getUuid()).isPresent());
@@ -55,14 +55,14 @@ public class UserTest {
     @Test(expected = IllegalAccessException.class)
     public void newTeamStudentTest() throws Exception {
         Account account = accounts.create().setTeacher(false);
-        User user = this.factory.student(account);
+        User user = this.factory.user(account.getUuid()).get();
         user.newTeam();
     }
     
     @Test
     public void teamTest () throws Exception {
         Account account = accounts.create().setTeacher(true);
-        User user = this.factory.teacher(account);
+        User user = this.factory.user(account.getUuid()).get();
         
         Team team = user.newTeam();
         
@@ -74,7 +74,7 @@ public class UserTest {
     @Test(expected = NoSuchElementException.class)
     public void teamNotFoundTest () throws Exception {
         Account account = accounts.create().setTeacher(true);
-        User user = this.factory.teacher(account);
+        User user = this.factory.user(account.getUuid()).get();
         
         user.team(UUID.randomUUID());
     }
@@ -82,7 +82,7 @@ public class UserTest {
     @Test(expected = IllegalAccessException.class)
     public void teamStudentTest () throws Exception {
         Account account = accounts.create().setTeacher(false);
-        User user = this.factory.student(account);
+        User user = this.factory.user(account.getUuid()).get();
         
         user.team(UUID.randomUUID());
     }
@@ -90,7 +90,7 @@ public class UserTest {
     @Test
     public void teamsTest () throws Exception {
         Account account = accounts.create().setTeacher(true);
-        User user = this.factory.teacher(account);
+        User user = this.factory.user(account.getUuid()).get();
         
         Collection<Team> teams = new HashSet<>();
         
@@ -107,7 +107,7 @@ public class UserTest {
     @Test(expected = IllegalAccessException.class)
     public void teamsStudentTest () throws Exception {
         Account account = accounts.create().setTeacher(false);
-        User user = this.factory.student(account);
+        User user = this.factory.user(account.getUuid()).get();
         
         user.teams();
     }

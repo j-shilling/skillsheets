@@ -55,7 +55,8 @@ abstract class AbstractService<T extends Resource, R extends AbstractService>
         return this.user;
     }
     
-    protected final boolean isOwned() {
+    @Override
+    public final boolean isOwned() {
         this.readLock().lock();
         try {
             return this.resource.isOwner(this.user.getUuid());
@@ -66,7 +67,8 @@ abstract class AbstractService<T extends Resource, R extends AbstractService>
         }
     }
     
-    protected final boolean isWritable () {
+    @Override
+    public final boolean isWritable () {
         if (this.isOwned())
             return true;
         

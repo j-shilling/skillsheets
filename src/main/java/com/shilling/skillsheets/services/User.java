@@ -21,6 +21,7 @@ import com.shilling.skillsheets.HasUuid;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * Performs operations upon service layer objects with a particular identity.
@@ -32,12 +33,17 @@ import java.util.UUID;
 public interface User extends HasUuid {
     
     public boolean isTeacher();
+    public User setTeacher (boolean val);
     
     public User addKnownResource (UUID uuid);
     
     public Collection<Group> getGroups();
     public User addGroup (Group group);
     public User delGroup (Group group);
+    
+    public User setId (String id);
+    public User setEmail (String email);
+    public User setDisplayName (@Nullable String name);
     
     /**
      * Creates a new {@link Team} to manipulate a collection of teacher
@@ -60,7 +66,7 @@ public interface User extends HasUuid {
      * @throws IllegalAccessException   Thrown if the operation is performed by
      *                                  a student account.
      */
-    public Team team (UUID uuid) throws NoSuchElementException, IllegalAccessException;
+    public Group team (UUID uuid) throws NoSuchElementException, IllegalAccessException;
     
     /**
      * Get a {@link Team} object for each existing {@link AccountGroup} visible

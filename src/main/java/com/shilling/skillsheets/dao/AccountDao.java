@@ -19,6 +19,7 @@ package com.shilling.skillsheets.dao;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  *
@@ -28,7 +29,7 @@ public interface AccountDao extends Dao<Account> {
     
     public Account newWithId (String id) throws IOException;
     public Account newWithEmail (String email) throws IOException;
-    public Optional<Account> getById (String id) throws IOException;
-    public Optional<Account> getByEmail (String email) throws IOException;
+    public Optional<UUID> getById (String id) throws IOException;
+    public Optional<UUID> getByEmail (String email) throws IOException;
     
 }

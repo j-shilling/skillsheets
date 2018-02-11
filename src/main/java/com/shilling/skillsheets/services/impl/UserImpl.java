@@ -64,6 +64,20 @@ public class UserImpl
     }
     
     @Override
+    public User setTeacher (boolean val) {
+        this.account.writeLock().lock();
+        try {
+            this.account.setTeacher(val);
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.account.writeLock().unlock();
+        }
+        
+        return this;
+    }
+    
+    @Override
     public User addKnownResource(UUID uuid) {
         this.account.writeLock().lock();
         try {
@@ -129,6 +143,54 @@ public class UserImpl
         
         return this;
     }
+    
+    @Override
+    public User setId(String id) {
+        
+        this.account.writeLock().lock();
+        try {
+            this.account.setId(id);
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.account.writeLock().unlock();
+        }
+        
+        return this;
+        
+    }
+
+    @Override
+    public User setEmail(String email) {
+        
+        this.account.writeLock().lock();
+        try {
+            this.account.setEmail(email);
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.account.writeLock().unlock();
+        }
+        
+        return this;
+        
+    }
+
+    @Override
+    public User setDisplayName(String name) {
+        
+        this.account.writeLock().lock();
+        try {
+            this.account.setDisplayName(name);
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.account.writeLock().unlock();
+        }
+        
+        return this;
+        
+    }
 
     @Override
     public Team newTeam() throws IllegalAccessException {
@@ -136,13 +198,32 @@ public class UserImpl
     }
 
     @Override
-    public Team team(UUID uuid) throws NoSuchElementException, IllegalAccessException {
-       throw new IllegalAccessException ("Student accounts cannot view teams");
+    public Group team(UUID uuid) throws NoSuchElementException, IllegalAccessException {
+        Collection<UUID> known;
+        this.account.readLock().lock();
+        try {
+            known = this.account.getKnownResources();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.account.readLock().unlock();
+        }
+        
+        if (!known.contains(uuid))
+            throw new NoSuchElementException ("There is no such group in your inventory");
+        
+        Optional<Group> group = this.groups.group(this, uuid);
+        if (group.isPresent())
+            return group.get();
+        else
+            throw new NoSuchElementException ("There is no such group");
     }
 
     @Override
     public Collection<Team> teams() throws IllegalAccessException {
         throw new IllegalAccessException ("Student accounts cannot view teams");
     }
+
+    
     
 }

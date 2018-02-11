@@ -8,6 +8,8 @@ package com.shilling.skillsheets.dao.memory;
 import com.shilling.skillsheets.dao.Account;
 import com.shilling.skillsheets.dao.AccountDao;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,42 +20,42 @@ import java.util.UUID;
 public class MemoryAccountDao 
         extends MemoryDao<Account> 
         implements AccountDao {
+    
+    private final Map<String, UUID> keys = new HashMap<>();
+    
+    public Map<String, UUID> getKeys() {
+        return this.keys;
+    }
 
     @Override
     public Account create() throws IOException {
-        Account account = new MemoryAccount(UUID.randomUUID());
+        Account account = new MemoryAccount(this, UUID.randomUUID());
         this.vals().put(account.getUuid(), account);
         return account;
     }
 
     @Override
     public Account newWithId(String id) throws IOException {
-        return this.create().setId(id);
+        Account account = this.create().setId(id);
+        this.getKeys().put(id, account.getUuid());
+        return account;
     }
 
     @Override
     public Account newWithEmail(String email) throws IOException {
-        return this.create().setEmail(email);
+        Account account = this.create().setId(email);
+        this.getKeys().put(email, account.getUuid());
+        return account;
     }
 
     @Override
-    public Optional<Account> getById(String id) throws IOException {
-        for (Account account : this.vals().values()) {
-            if (account.getId().equals(Optional.ofNullable(id)))
-                return Optional.of(account);
-        }
-        
-        return Optional.empty();
+    public Optional<UUID> getById(String id) throws IOException {
+        return Optional.ofNullable(this.getKeys().get(id));
     }
 
     @Override
-    public Optional<Account> getByEmail(String email) throws IOException {
-         for (Account account : this.vals().values()) {
-            if (account.getEmail().equals(Optional.ofNullable(email)))
-                return Optional.of(account);
-        }
-        
-        return Optional.empty();
+    public Optional<UUID> getByEmail(String email) throws IOException {
+        return Optional.ofNullable(this.getKeys().get(email));
     }
     
 }

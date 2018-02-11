@@ -12,6 +12,9 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  *
@@ -28,19 +31,26 @@ public class MemoryAccount
     private Set<UUID> known = new HashSet<>();
     private Set<UUID> groups = new HashSet<>();
     
-    public MemoryAccount (UUID uuid) {
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
+    
+    private MemoryAccountDao dao;
+    
+    public MemoryAccount (MemoryAccountDao dao, UUID uuid) {
         super (uuid);
+        this.dao = dao;
     }
 
     @Override
     public Account setId(String id) throws IOException {
         this.id = id;
+        this.dao.getKeys().put(id, this.getUuid());
         return this;
     }
 
     @Override
     public Account setEmail(String email) throws IOException {
         this.email = email;
+        this.dao.getKeys().put(email, this.getUuid());
         return this;
     }
 
@@ -97,6 +107,16 @@ public class MemoryAccount
     @Override
     public Optional<String> getEmail() throws IOException {
         return Optional.ofNullable (this.email);
+    }
+
+    @Override
+    public Lock readLock() {
+        return this.lock.readLock();
+    }
+
+    @Override
+    public Lock writeLock() {
+        return this.lock.writeLock();
     }
     
 }

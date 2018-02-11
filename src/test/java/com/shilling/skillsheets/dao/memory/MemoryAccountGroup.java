@@ -11,6 +11,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  *
@@ -25,6 +28,8 @@ public class MemoryAccountGroup
     private final Set<UUID> children = new HashSet<>();
     private final Set<UUID> known = new HashSet<>();
     private boolean team = false;
+    
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
     
     public MemoryAccountGroup (UUID uuid) {
         super (uuid);
@@ -50,11 +55,6 @@ public class MemoryAccountGroup
     @Override
     public boolean contains(UUID uuid) throws IOException {
         return this.members.contains(uuid) || this.children.contains (uuid);
-    }
-
-    @Override
-    public Collection<UUID> getAll() throws IOException {
-        return this.members;
     }
 
     @Override
@@ -102,6 +102,26 @@ public class MemoryAccountGroup
     @Override
     public Collection<UUID> getParents() throws IOException {
         return this.parents;
+    }
+
+    @Override
+    public Lock readLock() {
+        return this.lock.readLock();
+    }
+
+    @Override
+    public Lock writeLock() {
+        return this.lock.writeLock();
+    }
+
+    @Override
+    public Collection<UUID> getMembers() throws IOException {
+        return this.members;
+    }
+
+    @Override
+    public Collection<UUID> getChildren() throws IOException {
+        return this.children;
     }
     
 }

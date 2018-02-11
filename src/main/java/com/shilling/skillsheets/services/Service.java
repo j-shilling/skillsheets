@@ -122,4 +122,7 @@ public interface Service<T extends Service> extends HasUuid {
      */
     public String serialize();
     
+    public boolean isOwned();
+    public boolean isWritable();
+    
 }
