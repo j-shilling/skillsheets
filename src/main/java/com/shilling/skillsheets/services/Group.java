@@ -30,6 +30,12 @@ import java.util.UUID;
  */
 public interface Group<T extends Group> extends HasUuid, Service<T> {
     
+    /**
+     * Checks whether the underlying {@link AccountGroup} is a group
+     * of teacher accounts.
+     * 
+     * @return
+     */
     public boolean isTeam();
     
     public T addKnownResource(UUID uuid) throws IllegalAccessException;

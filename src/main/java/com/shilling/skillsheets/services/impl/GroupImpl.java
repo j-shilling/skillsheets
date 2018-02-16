@@ -91,6 +91,10 @@ class GroupImpl <T extends GroupImpl>
             throw new IllegalAccessException
                     ("You do not have permission to edit this group.");
         
+        if (this.isTeam() && !user.isTeacher())
+            throw new IllegalAccessException
+                    ("This user does not have permission to be in this group.");
+        
         this.writeLock().lock();
         try {
             this.getResource().addMember(user.getUuid());
@@ -109,6 +113,9 @@ class GroupImpl <T extends GroupImpl>
         if (!this.isWritable())
             throw new IllegalAccessException
                     ("You do not have permission to edit this group.");
+        if (this.isTeam() && !group.isTeam())
+            throw new IllegalAccessException
+                    ("This group does not have permission to be in this group.");
         
         this.writeLock().lock();
         try {
@@ -128,7 +135,7 @@ class GroupImpl <T extends GroupImpl>
         if (!this.isWritable())
             throw new IllegalAccessException
                     ("You do not have permission to edit this group.");
-        
+
         this.writeLock().lock();
         try {
             this.getResource().delMember(user.getUuid());
@@ -202,11 +209,12 @@ class GroupImpl <T extends GroupImpl>
             this.readLock().unlock();
         }
         
-        for (UUID uuid : uuids) {
-            Optional<Group> group = this.factory.group (this.getUser(), uuid);
-            if (group.isPresent())
-                ret.add(group.get());
-        }
+        uuids.stream()
+                .map((uuid) -> this.factory.group (this.getUser(), uuid))
+                .filter((group) -> (group.isPresent()))
+                .forEachOrdered((group) -> {
+            ret.add(group.get());
+        });
         
         return ret.build();
     }
@@ -217,21 +225,15 @@ class GroupImpl <T extends GroupImpl>
         this.readLock().lock();
         try {
             Collection<UUID> members = this.getResource().getMembers();
-            for (UUID uuid : members) {
-                if (user.getUuid().equals(uuid))
-                    return true;
+            if (members.stream().anyMatch((uuid) -> (user.getUuid().equals(uuid)))) {
+                return true;
             }
             
             Collection<UUID> children = this.getResource().getChildren();
-            for (UUID uuid : children) {
-                Optional<Group> group = this.factory.group(this.getUser(), uuid);
-                if (group.isPresent()) {
-                    if (group.get().contains(user))
-                        return false;
-                }
-            }
-            
-            return false;
+            return children.stream()
+                    .map((uuid) -> this.factory.group(this.getUser(), uuid))
+                    .filter((group) -> (group.isPresent()))
+                    .anyMatch((group) -> (group.get().contains(user)));
         } catch (IOException e) {
             throw new RuntimeException (e);
         } finally {

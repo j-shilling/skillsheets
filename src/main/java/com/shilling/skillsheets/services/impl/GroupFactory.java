@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Jake Shilling <shilling.jake@gmail.com>
  */
-public class GroupFactory {
+class GroupFactory {
     
     private final Dao<AccountGroup> dao;
     private final LoadingCache<UUID, AccountGroup> cache;
