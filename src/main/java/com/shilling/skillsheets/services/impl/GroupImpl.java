@@ -17,35 +17,36 @@
  */
 package com.shilling.skillsheets.services.impl;
 
-import com.google.api.client.util.Preconditions;
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.ImmutableSet;
 import com.shilling.skillsheets.dao.AccountGroup;
 import com.shilling.skillsheets.services.Group;
 import com.shilling.skillsheets.services.User;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author jake
  */
+@JsonSerialize (using = ResourceSerializer.class)
 class GroupImpl <T extends GroupImpl>
         extends AbstractService<AccountGroup, T> 
         implements Group<T> {
     
-    private final GroupFactory factory;
-    
     protected GroupImpl (
-            GroupFactory factory,
+            UserFactory users,
+            GroupFactory groups,
             User user,
             AccountGroup group) {
-        super (user, group);
-        
-        Preconditions.checkNotNull (factory);
-        
-        this.factory = factory;
+        super (users, groups, user, group);
     }
     
     @Override
@@ -63,8 +64,37 @@ class GroupImpl <T extends GroupImpl>
     @Override
     public final String serialize() {
         
-        throw new UnsupportedOperationException ("this method has not been written");
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         
+        try (JsonGenerator generator = new JsonFactory ().createGenerator(out, JsonEncoding.UTF8)) {
+            
+            generator.writeStartObject();
+            
+            Optional<User> owner = this.getOwner();
+            if (this.isWritable()) {
+                if (owner.isPresent()) {
+                    generator.writeObjectField("owner", owner.get());
+                } else {
+                    generator.writeNullField("owner");
+                }
+                
+                generator.writeObjectField("editing_accounts", this.getEditingAccounts());
+                generator.writeObjectField("editing_groups", this.getEditingGroups());
+                generator.writeObjectField("viewing_accounts", this.getViewingAccounts());
+                generator.writeObjectField("viewing_groups", this.getViewingGroups());
+            }
+            
+            generator.writeObjectField ("members", this.getMembers());
+            generator.writeObjectField ("children", this.getChildren());
+            generator.writeBooleanField ("team", this.isTeam());
+            
+            generator.writeEndObject();
+            
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        }
+        
+        return new String(out.toByteArray());
     }
     
     @Override
@@ -210,7 +240,7 @@ class GroupImpl <T extends GroupImpl>
         }
         
         uuids.stream()
-                .map((uuid) -> this.factory.group (this.getUser(), uuid))
+                .map((uuid) -> this.groups().group (this.getUser(), uuid))
                 .filter((group) -> (group.isPresent()))
                 .forEachOrdered((group) -> {
             ret.add(group.get());
@@ -231,7 +261,7 @@ class GroupImpl <T extends GroupImpl>
             
             Collection<UUID> children = this.getResource().getChildren();
             return children.stream()
-                    .map((uuid) -> this.factory.group(this.getUser(), uuid))
+                    .map((uuid) -> this.groups().group(this.getUser(), uuid))
                     .filter((group) -> (group.isPresent()))
                     .anyMatch((group) -> (group.get().contains(user)));
         } catch (IOException e) {
@@ -240,6 +270,46 @@ class GroupImpl <T extends GroupImpl>
             this.readLock().unlock();
         }
         
+    }
+    
+    @Override
+    public Collection<User> getMembers() {
+        this.readLock().lock();
+        try {
+            Collection<UUID> uuids = this.getResource().getMembers();
+            Collection<User> members = uuids.stream()
+                    .map((uuid) -> this.users().user(uuid))
+                    .filter ((o) -> o.isPresent())
+                    .map((o) -> o.get())
+                    .collect(Collectors.toSet());
+            return new ImmutableSet.Builder<User>()
+                    .addAll (members)
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.readLock().unlock();
+        }
+    }
+    
+    @Override
+    public Collection<Group> getChildren() {
+        this.readLock().lock();
+        try {
+            Collection<UUID> uuids = this.getResource().getChildren();
+            Collection<Group> children = uuids.stream()
+                    .map((uuid) -> this.groups().group(this.getUser(), uuid))
+                    .filter ((o) -> o.isPresent())
+                    .map((o) -> o.get())
+                    .collect(Collectors.toSet());
+            return new ImmutableSet.Builder<Group>()
+                    .addAll (children)
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.readLock().unlock();
+        }
     }
     
 }

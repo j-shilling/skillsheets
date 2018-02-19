@@ -98,4 +98,7 @@ public interface Group<T extends Group> extends HasUuid, Service<T> {
      */
     public boolean contains(User user);
     
+    public Collection<User> getMembers();
+    public Collection<Group> getChildren();
+    
 }

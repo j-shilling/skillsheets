@@ -20,6 +20,7 @@ package com.shilling.skillsheets.services;
 import com.shilling.skillsheets.HasUuid;
 import java.util.Collection;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
@@ -42,8 +43,11 @@ public interface User extends HasUuid {
     public User delGroup (Group group);
     
     public User setId (String id);
+    public Optional<String> getId();
     public User setEmail (String email);
+    public Optional<String> getEmail();
     public User setDisplayName (@Nullable String name);
+    public Optional<String> getDisplayName();
     
     /**
      * Creates a new {@link Team} to manipulate a collection of teacher

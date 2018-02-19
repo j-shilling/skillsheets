@@ -18,6 +18,7 @@
 package com.shilling.skillsheets.services;
 
 import com.shilling.skillsheets.HasUuid;
+import java.util.Collection;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
@@ -124,5 +125,11 @@ public interface Service<T extends Service> extends HasUuid {
     
     public boolean isOwned();
     public boolean isWritable();
+    
+    public Optional<User> getOwner();
+    public Collection<User> getEditingAccounts();
+    public Collection<Group> getEditingGroups();
+    public Collection<User> getViewingAccounts();
+    public Collection<Group> getViewingGroups();
     
 }

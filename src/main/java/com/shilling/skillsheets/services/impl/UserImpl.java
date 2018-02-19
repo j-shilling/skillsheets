@@ -17,6 +17,7 @@
  */
 package com.shilling.skillsheets.services.impl;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.ImmutableSet;
 import com.shilling.skillsheets.AbstractHasUuid;
 import com.shilling.skillsheets.dao.Account;
@@ -33,6 +34,7 @@ import java.util.UUID;
  *
  * @author jake
  */
+@JsonSerialize(using = UserSerializer.class)
 public class UserImpl 
         extends AbstractHasUuid 
         implements User {
@@ -159,6 +161,20 @@ public class UserImpl
         return this;
         
     }
+    
+    @Override
+    public Optional<String> getId() {
+        
+        this.account.readLock().lock();
+        try {
+            return this.account.getId();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.account.readLock().unlock();
+        }
+        
+    }
 
     @Override
     public User setEmail(String email) {
@@ -175,6 +191,20 @@ public class UserImpl
         return this;
         
     }
+    
+    @Override
+    public Optional<String> getEmail() {
+        
+        this.account.readLock().lock();
+        try {
+            return this.account.getEmail();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.account.readLock().unlock();
+        }
+        
+    }
 
     @Override
     public User setDisplayName(String name) {
@@ -189,6 +219,20 @@ public class UserImpl
         }
         
         return this;
+        
+    }
+    
+    @Override
+    public Optional<String> getDisplayName() {
+        
+        this.account.readLock().lock();
+        try {
+            return this.account.getDisplayName();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.account.readLock().unlock();
+        }
         
     }
 

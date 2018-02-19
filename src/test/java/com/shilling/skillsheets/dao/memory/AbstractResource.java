@@ -8,6 +8,7 @@ package com.shilling.skillsheets.dao.memory;
 import com.shilling.skillsheets.AbstractHasUuid;
 import com.shilling.skillsheets.dao.Resource;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -83,6 +84,21 @@ abstract class AbstractResource<T extends Resource>
     @Override
     public boolean isOwner(UUID uuid) throws IOException {
         return uuid.equals(this.owner);
+    }
+    
+    @Override
+    public Collection<UUID> getEditors() throws IOException {
+        return this.editors;
+    }
+
+    @Override
+    public Collection<UUID> getViewers() throws IOException {
+        return this.viewers;
+    }
+
+    @Override
+    public Optional<UUID> getOwner() throws IOException {
+        return Optional.ofNullable(this.owner);
     }
     
 }

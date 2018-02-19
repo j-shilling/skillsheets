@@ -26,15 +26,19 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 class GroupFactory {
     
+    private final UserFactory users;
     private final Dao<AccountGroup> dao;
     private final LoadingCache<UUID, AccountGroup> cache;
     
     @Autowired
     private GroupFactory (
+            UserFactory users,
             Dao<AccountGroup> dao) {
         
+        Preconditions.checkNotNull (users);
         Preconditions.checkNotNull (dao);
         
+        this.users = users;
         this.dao = dao;
         this.cache = CacheBuilder.newBuilder()
                 .weakValues()
@@ -67,7 +71,7 @@ class GroupFactory {
         this.cache.put(group.getUuid(), group);
         user.addKnownResource(group.getUuid());
         
-        return new GroupImpl (this, user, group);
+        return new GroupImpl (this.users, this, user, group);
     }
     
     public Group newTeam (User user) {
@@ -85,7 +89,7 @@ class GroupFactory {
         try {
             AccountGroup group = this.cache.get(uuid);
             
-            return Optional.of(new GroupImpl (this, user, group));
+            return Optional.of(new GroupImpl (this.users, this, user, group));
         } catch (ExecutionException e) {
             if (e.getCause().getClass().equals(NoSuchElementException.class))
                 return Optional.empty();

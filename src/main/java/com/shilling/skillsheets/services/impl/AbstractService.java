@@ -6,16 +6,20 @@
 package com.shilling.skillsheets.services.impl;
 
 import com.google.api.client.util.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.shilling.skillsheets.AbstractHasUuid;
 import com.shilling.skillsheets.dao.Resource;
 import com.shilling.skillsheets.services.Group;
 import com.shilling.skillsheets.services.Service;
 import com.shilling.skillsheets.services.User;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -27,14 +31,23 @@ abstract class AbstractService<T extends Resource, R extends AbstractService>
     
     private final T resource;
     private final User user;
+    private final UserFactory users;
+    private final GroupFactory groups;
     
-    protected AbstractService (User user, T resource) {
+    protected AbstractService (
+            UserFactory users, 
+            GroupFactory groups, 
+            User user, 
+            T resource) {
         super (resource.getUuid());
         
+        Preconditions.checkNotNull (users);
         Preconditions.checkNotNull(user);
         
         this.resource = resource;
         this.user = user;
+        this.users = users;
+        this.groups = groups;
     }
     
     protected Lock readLock() {
@@ -53,6 +66,14 @@ abstract class AbstractService<T extends Resource, R extends AbstractService>
     
     protected final User getUser() {
         return this.user;
+    }
+    
+    protected final UserFactory users() {
+        return this.users;
+    }
+    
+    protected final GroupFactory groups() {
+        return this.groups;
     }
     
     @Override
@@ -205,4 +226,100 @@ abstract class AbstractService<T extends Resource, R extends AbstractService>
         }
     }
     
+    @Override
+    public Optional<User> getOwner() {
+        this.readLock().lock();
+        try {
+            Optional<UUID> owner = this.getResource().getOwner();
+            if (owner.isPresent()) {
+                return this.users.user(owner.get());
+            } else {
+                return Optional.empty();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.readLock().unlock();
+        }
+    }
+    
+    @Override
+    public Collection<User> getEditingAccounts() {
+        this.readLock().lock();
+        try {
+            Collection<UUID> uuids = this.getResource().getEditors();
+            Collection<User> editors = uuids.stream()
+                    .map((uuid) -> this.users.user(uuid))
+                    .filter((u) -> u.isPresent())
+                    .map((o) -> o.get())
+                    .collect(Collectors.toSet());
+            return new ImmutableSet.Builder<User>()
+                    .addAll(editors)
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.readLock().unlock();
+        }
+    }
+    
+    @Override
+    public Collection<Group> getEditingGroups() {
+        this.readLock().lock();
+        try {
+            Collection<UUID> uuids = this.getResource().getEditors();
+            Collection<Group> editors = uuids.stream()
+                    .map((uuid) -> this.groups.group(this.user, uuid))
+                    .filter((u) -> u.isPresent())
+                    .map((o) -> o.get())
+                    .collect(Collectors.toSet());
+            return new ImmutableSet.Builder<Group>()
+                    .addAll(editors)
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.readLock().unlock();
+        }
+    }
+    
+    @Override
+    public Collection<User> getViewingAccounts() {
+        this.readLock().lock();
+        try {
+            Collection<UUID> uuids = this.getResource().getViewers();
+            Collection<User> editors = uuids.stream()
+                    .map((uuid) -> this.users.user(uuid))
+                    .filter((u) -> u.isPresent())
+                    .map((o) -> o.get())
+                    .collect(Collectors.toSet());
+            return new ImmutableSet.Builder<User>()
+                    .addAll(editors)
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.readLock().unlock();
+        }
+    }
+    
+    @Override
+    public Collection<Group> getViewingGroups() {
+        this.readLock().lock();
+        try {
+            Collection<UUID> uuids = this.getResource().getViewers();
+            Collection<Group> editors = uuids.stream()
+                    .map((uuid) -> this.groups.group(this.user, uuid))
+                    .filter((u) -> u.isPresent())
+                    .map((o) -> o.get())
+                    .collect(Collectors.toSet());
+            return new ImmutableSet.Builder<Group>()
+                    .addAll(editors)
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException (e);
+        } finally {
+            this.readLock().unlock();
+        }
+    }
 }

@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.shilling.skillsheets.services;
+package com.shilling.skillsheets.services.impl;
 
-import com.shilling.skillsheets.services.impl.GroupFactory;
-import com.shilling.skillsheets.services.impl.UserFactory;
+import com.shilling.skillsheets.services.SeriveLayerTest;
+import com.shilling.skillsheets.services.User;
+import com.shilling.skillsheets.services.Group;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.Test;
@@ -34,7 +35,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes={SeriveLayerTest.class})
-public class GroupTest {
+public class TeamTest {
     
     @Autowired
     private UserFactory users;

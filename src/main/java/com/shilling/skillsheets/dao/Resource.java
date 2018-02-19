@@ -19,6 +19,7 @@ package com.shilling.skillsheets.dao;
 
 import com.shilling.skillsheets.HasUuid;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
@@ -36,8 +37,11 @@ public interface Resource<T extends Resource> extends HasUuid {
     public Optional<String> getDisplayName() throws IOException;
     public T setDisplayName (@Nullable String displayName) throws IOException;
     public T addEditor (UUID uuid) throws IOException;
+    public Collection<UUID> getEditors () throws IOException;
     public T addViewer (UUID uuid) throws IOException;
+    public Collection<UUID> getViewers () throws IOException;
     public T setOwner (UUID uuid) throws IOException;
+    public Optional<UUID> getOwner () throws IOException;
     public void delete () throws IOException;
     
     public boolean isDeleted();
